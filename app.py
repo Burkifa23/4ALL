@@ -6,12 +6,17 @@ from ui.results import show_result
 from sandbox.stub import run_submission
 
 from evaluator.stub import get_hint, evaluate_complexity
+from ui.question_loader import load_questions
+from ui.question_loader import load_questions
+
+from ui.history import initialize_history, add_attempt, get_history
+from ui.sidebar import render_sidebar, show_history
 
 st.set_page_config(page_title="Adaptive Assessor", layout="wide")
 
 
 st.title("Adaptive AI Coding Assessment Platform")
-
+initialize_history()
 
 # Initialize memory
 
@@ -21,27 +26,18 @@ if "result" not in st.session_state:
 
 # Fake question for now
 
-question = {
-    "title": "Two Sum",
-    "difficulty": "Easy",
-    "description": """
-    Given an array of integers,
-    return indices of two numbers
-    that add up to a target.
-    """,
-    "starter_code": """
-def two_sum(nums, target):
-    # Write your solution here
-    pass
-""",
-}
+questions = load_questions()
+
+if "current_question" not in st.session_state:
+    st.session_state.current_question = 0
 
 
+question = questions[st.session_state.current_question]
 # Sidebar
 
 render_sidebar()
 
-
+show_history()
 # Editor
 
 code, submitted = render_editor(question)
@@ -53,6 +49,12 @@ if submitted:
     sandbox_result = run_submission(code, "two_sum")
 
     st.session_state["sandbox_result"] = sandbox_result
+    add_attempt(
+        question_id=question["id"],
+        result=sandbox_result.status,
+        tests_passed=sandbox_result.tests_passed,
+        tests_total=sandbox_result.tests_total,
+    )
 
     if sandbox_result.status == "failed":
         hint = get_hint(code, question, sandbox_result.failed_case_summary, "ollama")
@@ -66,3 +68,12 @@ if submitted:
 # Results
 
 show_result()
+
+
+if st.button("Next Question", key="next_question_btn"):
+    st.session_state.current_question += 1
+
+    if st.session_state.current_question >= len(questions):
+        st.session_state.current_question = 0
+
+    st.rerun()

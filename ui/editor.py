@@ -13,6 +13,6 @@ def render_editor(question):
         "Write your Python solution:", height=300, value=question["starter_code"]
     )
 
-    submit = st.button("Submit Code")
+    submit = st.button("Submit Code", key="submit_code_btn")
 
     return code, submit
