@@ -52,14 +52,19 @@ def has_parseable_code(code: str) -> bool:
 
 def is_single_function_entry(row) -> bool:
     """Reject class-based / design-problem rows (e.g. LRUCache) — keep-pile
-    is single free-function entry points only."""
+    is single free-function entry points only.
+
+    Note: nearly every LeetCodeDataset row wraps its solution in a
+    `class Solution:` block, so we can't reject on "contains a class" alone.
+    Instead we reject only rows where the class defines more than one
+    method — that's the real signal for multi-method design problems.
+    """
     starter = row.get("starter_code") or ""
     entry = row.get("entry_point") or ""
     if not entry:
         return False
-    if re.search(r"^\s*class\s+\w+", starter, flags=re.MULTILINE):
-        return False
-    return True
+    method_defs = re.findall(r"^\s{4}def\s+\w+", starter, flags=re.MULTILINE)
+    return len(method_defs) <= 1
 
 
 def has_usable_tests(row) -> bool:
@@ -109,32 +114,65 @@ def stratified_sample(
     return sampled
 
 
-def parse_test_cases(row) -> list:
-    """Normalize input_output into [{"input":..., "expected":...}, ...].
+def _parse_kwargs(input_str: str) -> dict:
+    """Turn 'nums = [3,3], target = 6' into {'nums': [3, 3], 'target': 6}
+    by parsing it as if it were a keyword-argument call, then reading the
+    AST directly (no eval() of untrusted content)."""
+    tree = ast.parse(f"f({input_str})", mode="eval")
+    return {kw.arg: ast.literal_eval(kw.value) for kw in tree.body.keywords}
 
-    ASSUMPTION (verify against real data, see docs/dataset_notes.md open
-    question #1): input_output is a JSON string or dict with parallel
-    "inputs" and "outputs" lists. Adjust this function once you see a real row.
+
+def parse_test_cases(row) -> list:
+    """Normalize input_output into [{"input": {...}, "expected": ...}, ...].
+
+    Real rows come through as a numpy-print of a list of dicts, e.g.
+    "[{'input': 'nums = [3,3], target = 6', 'output': '[0, 1]'}\n {...}]"
+    — missing commas between entries, and both `input` and `output` are
+    themselves strings that need a second parse pass.
     """
     raw = row.get("input_output")
-    if raw is None:
-        return []
-    try:
-        parsed = json.loads(raw) if isinstance(raw, str) else raw
-    except (json.JSONDecodeError, TypeError):
+    if not raw:
         return []
 
-    if not isinstance(parsed, dict):
+    # numpy's print puts a newline+space between dict entries instead of a
+    # comma — patch that so the whole thing is valid Python list syntax.
+    fixed = re.sub(r"}\s*\n\s*{", "}, {", raw)
+
+    try:
+        parsed = ast.literal_eval(fixed)
+    except (ValueError, SyntaxError):
         return []
-    inputs = parsed.get("inputs", [])
-    outputs = parsed.get("outputs", [])
-    return [{"input": i, "expected": o} for i, o in zip(inputs, outputs)]
+
+    if not isinstance(parsed, list):
+        return []
+
+    cases = []
+    for item in parsed:
+        try:
+            args = _parse_kwargs(item.get("input", ""))
+            expected = ast.literal_eval(item.get("output", ""))
+        except (ValueError, SyntaxError):
+            continue
+        cases.append({"input": args, "expected": expected})
+    return cases
+
+def parse_tags(tags_raw) -> list:
+    """Normalize the dataset's `tags` field into a clean list of strings.
+
+    Real rows come through as a numpy-print string like
+    "['Array' 'Hash Table']" — note the missing comma, which means this is
+    NOT valid Python list syntax and ast.literal_eval() would silently
+    mangle it. Pull quoted substrings out with regex instead.
+    """
+    if not tags_raw:
+        return []
+    if isinstance(tags_raw, list):
+        return tags_raw
+    return re.findall(r"'([^']*)'", tags_raw)
 
 
 def to_question_record(row, idx: int) -> dict:
-    tags = row.get("tags") or []
-    if not isinstance(tags, list):
-        tags = [tags] if tags else []
+    tags = parse_tags(row.get("tags"))
     return {
         "question_id": f"q_{idx:04d}",
         "title": (row.get("task_id") or "").replace("-", " ").title(),
