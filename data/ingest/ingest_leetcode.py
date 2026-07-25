@@ -120,8 +120,7 @@ def stratified_sample(
 
     topics = set()
     for tags in sampled["tags"]:
-        if isinstance(tags, list):
-            topics.update(tags)
+            topics.update(parse_tags(tags))
     if len(topics) < MIN_TOPICS:
         print(
             f"WARNING: sampled set only covers {len(topics)} topics "
