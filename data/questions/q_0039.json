@@ -1,0 +1,1861 @@
+{
+  "question_id": "q_0039",
+  "title": "Open The Lock",
+  "difficulty": 2,
+  "topic": "Breadth-First Search",
+  "topics": [
+    "Breadth-First Search",
+    "Array",
+    "Hash Table",
+    "String"
+  ],
+  "description_md": "You have a lock in front of you with 4 circular wheels. Each wheel has 10 slots: '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'. The wheels can rotate freely and wrap around: for example we can turn '9' to be '0', or '0' to be '9'. Each move consists of turning one wheel one slot.\nThe lock initially starts at '0000', a string representing the state of the 4 wheels.\nYou are given a list of deadends dead ends, meaning if the lock displays any of these codes, the wheels of the lock will stop turning and you will be unable to open it.\nGiven a target representing the value of the wheels that will unlock the lock, return the minimum total number of turns required to open the lock, or -1 if it is impossible.\n\u00a0\nExample 1:\n\nInput: deadends = [\"0201\",\"0101\",\"0102\",\"1212\",\"2002\"], target = \"0202\"\nOutput: 6\nExplanation: \nA sequence of valid moves would be \"0000\" -> \"1000\" -> \"1100\" -> \"1200\" -> \"1201\" -> \"1202\" -> \"0202\".\nNote that a sequence like \"0000\" -> \"0001\" -> \"0002\" -> \"0102\" -> \"0202\" would be invalid,\nbecause the wheels of the lock become stuck after the display becomes the dead end \"0102\".\n\nExample 2:\n\nInput: deadends = [\"8888\"], target = \"0009\"\nOutput: 1\nExplanation: We can turn the last wheel in reverse to move from \"0000\" -> \"0009\".\n\nExample 3:\n\nInput: deadends = [\"8887\",\"8889\",\"8878\",\"8898\",\"8788\",\"8988\",\"7888\",\"9888\"], target = \"8888\"\nOutput: -1\nExplanation: We cannot reach the target without getting stuck.\n\n\u00a0\nConstraints:\n\n1 <= deadends.length <= 500\ndeadends[i].length == 4\ntarget.length == 4\ntarget will not be in the list deadends.\ntarget and deadends[i] consist of digits only.\n\n",
+  "starter_code": "class Solution:\n    def openLock(self, deadends: List[str], target: str) -> int:\n        ",
+  "entry_point": "Solution().openLock",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def openLock(self, deadends: List[str], target: str) -> int:\n        def next(s):\n            res = []\n            s = list(s)\n            for i in range(4):\n                c = s[i]\n                s[i] = '9' if c == '0' else str(int(c) - 1)\n                res.append(''.join(s))\n                s[i] = '0' if c == '9' else str(int(c) + 1)\n                res.append(''.join(s))\n                s[i] = c\n            return res\n\n        if target == '0000':\n            return 0\n        s = set(deadends)\n        if '0000' in s:\n            return -1\n        q = deque([('0000')])\n        s.add('0000')\n        ans = 0\n        while q:\n            ans += 1\n            for _ in range(len(q)):\n                p = q.popleft()\n                for t in next(p):\n                    if t == target:\n                        return ans\n                    if t not in s:\n                        q.append(t)\n                        s.add(t)\n        return -1\n",
+  "test_cases": [
+    {
+      "input": {
+        "deadends": [],
+        "target": "1111"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "1111",
+          "2222",
+          "3333"
+        ],
+        "target": "4444"
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0002",
+          "0003",
+          "0004"
+        ],
+        "target": "0005"
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0011",
+          "0101",
+          "1001",
+          "1101",
+          "0111",
+          "0110",
+          "1010",
+          "1110",
+          "1100"
+        ],
+        "target": "1111"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "1110",
+          "1101",
+          "1011",
+          "0111"
+        ],
+        "target": "1111"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "9998",
+          "9997",
+          "9996",
+          "9995"
+        ],
+        "target": "9999"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000"
+        ],
+        "target": "1111"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "1111",
+          "2222",
+          "3333",
+          "4444"
+        ],
+        "target": "5555"
+      },
+      "expected": 20
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "8888"
+        ],
+        "target": "0009"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0002",
+          "0020",
+          "0200",
+          "2000"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0010",
+          "0100",
+          "1000"
+        ],
+        "target": "1111"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "0201",
+          "0101",
+          "0102",
+          "1212",
+          "2002"
+        ],
+        "target": "0202"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "1110",
+          "1101",
+          "1011",
+          "0111"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "1111"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "1111"
+        ],
+        "target": "1112"
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0010",
+          "0100",
+          "1000"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "8887",
+          "8889",
+          "8878",
+          "8898",
+          "8788",
+          "8988",
+          "7888",
+          "9888"
+        ],
+        "target": "8888"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000"
+        ],
+        "target": "8888"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "9999"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890",
+          "8901",
+          "9012",
+          "0123"
+        ],
+        "target": "5555"
+      },
+      "expected": 20
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "4321",
+          "2345",
+          "5432",
+          "3456",
+          "6543",
+          "4567",
+          "7654",
+          "5678"
+        ],
+        "target": "8765"
+      },
+      "expected": 14
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "4321",
+          "2143",
+          "3412",
+          "0987",
+          "7890",
+          "8709",
+          "9087"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777",
+          "8888",
+          "9999",
+          "0000"
+        ],
+        "target": "1234"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0011",
+          "0110",
+          "1100",
+          "1001",
+          "1112",
+          "1211",
+          "2111"
+        ],
+        "target": "2222"
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "deadends": [
+          "1000",
+          "0100",
+          "0010",
+          "0001",
+          "0011",
+          "0110",
+          "1010",
+          "1100",
+          "1110"
+        ],
+        "target": "1111"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "0009",
+          "0018",
+          "0108",
+          "0117",
+          "0126",
+          "0135",
+          "0144",
+          "0153",
+          "0162",
+          "0171"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890",
+          "8901",
+          "9012",
+          "0123"
+        ],
+        "target": "9999"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777",
+          "8888",
+          "9999"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0101",
+          "1010",
+          "1100",
+          "1111"
+        ],
+        "target": "0011"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000",
+          "1111",
+          "2222",
+          "3333",
+          "4444"
+        ],
+        "target": "5555"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0010",
+          "1000",
+          "0100",
+          "0011",
+          "1100",
+          "0110",
+          "1010"
+        ],
+        "target": "1111"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "1112",
+          "2223",
+          "3334",
+          "4445",
+          "5556",
+          "6667",
+          "7778",
+          "8889"
+        ],
+        "target": "9999"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "0123",
+          "9876",
+          "5432",
+          "1357",
+          "2468",
+          "0909",
+          "1111",
+          "2222",
+          "3333"
+        ],
+        "target": "4444"
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "deadends": [
+          "9998",
+          "9989",
+          "9899",
+          "8999",
+          "0000",
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555"
+        ],
+        "target": "6789"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0002",
+          "0003",
+          "0004",
+          "0005",
+          "0006",
+          "0007",
+          "0008",
+          "0009"
+        ],
+        "target": "1111"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "0123",
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890",
+          "8901",
+          "9012"
+        ],
+        "target": "0123"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000",
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777",
+          "8888",
+          "9999"
+        ],
+        "target": "9999"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0002",
+          "0003",
+          "0004",
+          "0005",
+          "0006",
+          "0007",
+          "0008",
+          "0009",
+          "0100"
+        ],
+        "target": "0011"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "deadends": [
+          "9999",
+          "8888",
+          "7777",
+          "6666",
+          "5555",
+          "4444",
+          "3333",
+          "2222",
+          "1111"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890",
+          "8901",
+          "9012",
+          "0123"
+        ],
+        "target": "1000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "deadends": [
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777",
+          "8888",
+          "9999",
+          "1234",
+          "4321",
+          "2345",
+          "5432",
+          "3456",
+          "6543",
+          "4567",
+          "7654",
+          "5678",
+          "8765",
+          "6789",
+          "9876",
+          "7890",
+          "0987",
+          "8790",
+          "9087",
+          "0879"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000",
+          "9999",
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777",
+          "8888"
+        ],
+        "target": "1234"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0011",
+          "0101",
+          "1001",
+          "1100",
+          "1110",
+          "1101"
+        ],
+        "target": "1111"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0002",
+          "0003",
+          "0004",
+          "0005",
+          "0006",
+          "0007",
+          "0008",
+          "0009",
+          "0100"
+        ],
+        "target": "9999"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "1000",
+          "0100",
+          "0010",
+          "0001",
+          "2000",
+          "0200",
+          "0020",
+          "0002"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000",
+          "0009",
+          "0090",
+          "0900",
+          "9000",
+          "1111",
+          "2222",
+          "3333",
+          "4444"
+        ],
+        "target": "5555"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0010",
+          "0100",
+          "0001",
+          "0110",
+          "1001",
+          "1100",
+          "1111",
+          "0000"
+        ],
+        "target": "0101"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0002",
+          "0010",
+          "0020",
+          "0100",
+          "0200",
+          "1000",
+          "2000",
+          "0003",
+          "0030",
+          "0300",
+          "3000"
+        ],
+        "target": "0004"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890",
+          "8901",
+          "9012"
+        ],
+        "target": "0123"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0010",
+          "0100",
+          "1000",
+          "0111",
+          "1110",
+          "1101",
+          "1011",
+          "2220",
+          "2202",
+          "2022",
+          "0222"
+        ],
+        "target": "0202"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "4321",
+          "2143",
+          "3412"
+        ],
+        "target": "5678"
+      },
+      "expected": 14
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890",
+          "8901",
+          "9012",
+          "0123",
+          "0234",
+          "1345",
+          "2456",
+          "3567",
+          "4678",
+          "5789",
+          "6890",
+          "7901",
+          "8012",
+          "9123"
+        ],
+        "target": "4567"
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0010",
+          "0100",
+          "1000",
+          "1234",
+          "4321",
+          "5678",
+          "8765",
+          "9999"
+        ],
+        "target": "8888"
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0002",
+          "0003",
+          "0004",
+          "0005",
+          "0006",
+          "0007",
+          "0008",
+          "0009"
+        ],
+        "target": "9999"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "9999",
+          "8888",
+          "7777",
+          "6666",
+          "5555"
+        ],
+        "target": "4444"
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "deadends": [
+          "0002",
+          "0020",
+          "0200",
+          "2000",
+          "0013",
+          "0130",
+          "1300",
+          "3000",
+          "0112",
+          "1120",
+          "1201",
+          "2011",
+          "1011",
+          "0110",
+          "0101",
+          "1010",
+          "0011"
+        ],
+        "target": "1111"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "1111",
+          "1110",
+          "1101",
+          "1011",
+          "0111",
+          "2222",
+          "2221",
+          "2212",
+          "2122",
+          "1222",
+          "3333",
+          "3332",
+          "3323",
+          "3233",
+          "2333",
+          "4444",
+          "4443",
+          "4434",
+          "4344",
+          "3444"
+        ],
+        "target": "5555"
+      },
+      "expected": 20
+    },
+    {
+      "input": {
+        "deadends": [
+          "9998",
+          "9989",
+          "9899",
+          "8999",
+          "0001",
+          "0010",
+          "0100",
+          "1000"
+        ],
+        "target": "9999"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "1110",
+          "1101",
+          "1011",
+          "0111",
+          "2220",
+          "2202",
+          "2022",
+          "0222",
+          "3330",
+          "3303",
+          "3033",
+          "0333"
+        ],
+        "target": "4444"
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "deadends": [
+          "0009",
+          "0018",
+          "0108",
+          "0117",
+          "0126",
+          "0135",
+          "0144",
+          "0153",
+          "0162",
+          "0171",
+          "0800",
+          "0900",
+          "1800",
+          "1900",
+          "2800",
+          "2900",
+          "3800",
+          "3900",
+          "4800",
+          "4900",
+          "5800",
+          "5900",
+          "6800",
+          "6900",
+          "7800",
+          "7900",
+          "8800",
+          "8900",
+          "9800",
+          "9900"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0010",
+          "0100",
+          "1000",
+          "1110",
+          "1101",
+          "1011",
+          "0111"
+        ],
+        "target": "1111"
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000",
+          "1234",
+          "5678",
+          "9999"
+        ],
+        "target": "4321"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0010",
+          "0020",
+          "0030",
+          "0040",
+          "0050"
+        ],
+        "target": "0060"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "1110",
+          "1101",
+          "1011",
+          "0111",
+          "0011",
+          "0101",
+          "0110"
+        ],
+        "target": "1111"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0010",
+          "0100",
+          "1000",
+          "1110",
+          "1101",
+          "1011",
+          "0111",
+          "0002",
+          "0020"
+        ],
+        "target": "3333"
+      },
+      "expected": 14
+    },
+    {
+      "input": {
+        "deadends": [
+          "0011",
+          "1100",
+          "2211",
+          "3322",
+          "4433",
+          "5544",
+          "6655",
+          "7766",
+          "8877"
+        ],
+        "target": "9988"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000",
+          "0010",
+          "0100",
+          "0110",
+          "1000",
+          "1010",
+          "1100",
+          "1110",
+          "0001",
+          "0011",
+          "0101",
+          "0111",
+          "1001",
+          "1011",
+          "1101"
+        ],
+        "target": "1111"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0010",
+          "0100",
+          "0111",
+          "1000",
+          "1001",
+          "1010",
+          "1100",
+          "1111",
+          "0001",
+          "0011",
+          "0110",
+          "1101",
+          "0101",
+          "1011"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0011",
+          "0111",
+          "1111",
+          "0002",
+          "0020",
+          "0200",
+          "2000",
+          "0003",
+          "0030",
+          "0300",
+          "3000"
+        ],
+        "target": "0101"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "deadends": [
+          "1112",
+          "1121",
+          "1211",
+          "2111",
+          "2221",
+          "2212",
+          "2122",
+          "1222"
+        ],
+        "target": "2222"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "deadends": [
+          "8888",
+          "8887",
+          "8878",
+          "8788",
+          "7888",
+          "9999",
+          "9998",
+          "9989",
+          "9899",
+          "8999"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890",
+          "8901",
+          "9012"
+        ],
+        "target": "0123"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "0010",
+          "0100",
+          "1000",
+          "0001",
+          "0002",
+          "0020",
+          "0200",
+          "2000"
+        ],
+        "target": "0003"
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000",
+          "0011",
+          "0101",
+          "0110",
+          "1001",
+          "1010",
+          "1100",
+          "1111",
+          "2222"
+        ],
+        "target": "3333"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0009",
+          "0010",
+          "0090",
+          "0100",
+          "0900",
+          "1000",
+          "9000",
+          "0002",
+          "0020",
+          "0200",
+          "2000",
+          "0008",
+          "0080",
+          "0800",
+          "8000"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0009",
+          "0018",
+          "0027",
+          "0036",
+          "0045",
+          "0054",
+          "0063",
+          "0072",
+          "0081"
+        ],
+        "target": "0090"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "deadends": [
+          "8888",
+          "9999",
+          "0000",
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777"
+        ],
+        "target": "0001"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0101",
+          "1010",
+          "1111",
+          "0011",
+          "1100",
+          "1001",
+          "0110",
+          "0001",
+          "0010",
+          "0100"
+        ],
+        "target": "9999"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000",
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777",
+          "8888",
+          "9999"
+        ],
+        "target": "1234"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000",
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777",
+          "8888"
+        ],
+        "target": "9999"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "1112",
+          "2223",
+          "3334",
+          "4445",
+          "5556",
+          "6667",
+          "7778",
+          "8889"
+        ],
+        "target": "4321"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0002",
+          "0003",
+          "0004",
+          "0005",
+          "0006",
+          "0007",
+          "0008",
+          "0009"
+        ],
+        "target": "1000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "deadends": [
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777",
+          "8888"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000",
+          "0010",
+          "0020",
+          "0030",
+          "0040",
+          "0050",
+          "0060",
+          "0070",
+          "0080",
+          "0090"
+        ],
+        "target": "0009"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "0123",
+          "4567",
+          "8901",
+          "2345",
+          "6789",
+          "0987",
+          "5432",
+          "1098",
+          "3210"
+        ],
+        "target": "1111"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "1110",
+          "1101",
+          "1011",
+          "0111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777"
+        ],
+        "target": "1234"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "deadends": [
+          "0123",
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890"
+        ],
+        "target": "9876"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "deadends": [
+          "9998",
+          "9989",
+          "9899",
+          "8999",
+          "0000",
+          "0001",
+          "0010",
+          "0100",
+          "1000"
+        ],
+        "target": "1111"
+      },
+      "expected": -1
+    },
+    {
+      "input": {
+        "deadends": [
+          "9998",
+          "9989",
+          "9899",
+          "8999",
+          "0001",
+          "0010",
+          "0100",
+          "1000"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890",
+          "8901",
+          "9012",
+          "0123"
+        ],
+        "target": "5678"
+      },
+      "expected": 14
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "4321",
+          "2345",
+          "5432",
+          "3456",
+          "6543",
+          "4567",
+          "7654",
+          "5678",
+          "8765"
+        ],
+        "target": "9876"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890",
+          "8901",
+          "9012",
+          "0123"
+        ],
+        "target": "5432"
+      },
+      "expected": 14
+    },
+    {
+      "input": {
+        "deadends": [
+          "0101",
+          "1010",
+          "1100",
+          "1110",
+          "1101",
+          "0111",
+          "1001",
+          "0011"
+        ],
+        "target": "1111"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "deadends": [
+          "0123",
+          "1230",
+          "2301",
+          "3012",
+          "1023",
+          "0231",
+          "2310",
+          "3102",
+          "2013",
+          "0132",
+          "1320",
+          "3201",
+          "0213",
+          "2130",
+          "3021",
+          "1203"
+        ],
+        "target": "9999"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "1110",
+          "1101",
+          "1011",
+          "0111",
+          "1112",
+          "1121",
+          "1211",
+          "2111",
+          "1113",
+          "1131",
+          "1311",
+          "3111"
+        ],
+        "target": "1114"
+      },
+      "expected": 7
+    },
+    {
+      "input": {
+        "deadends": [
+          "0123",
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890",
+          "8901",
+          "9012",
+          "0013",
+          "0103",
+          "0130",
+          "1030",
+          "1300",
+          "3000"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0012",
+          "0102",
+          "0201",
+          "0210",
+          "1002",
+          "1020",
+          "1200",
+          "2001",
+          "2010",
+          "2100"
+        ],
+        "target": "2222"
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "deadends": [
+          "1000",
+          "2000",
+          "3000",
+          "4000",
+          "5000",
+          "6000",
+          "7000",
+          "8000",
+          "9000"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777",
+          "8888",
+          "9999"
+        ],
+        "target": "8888"
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "deadends": [
+          "0101",
+          "1212",
+          "2323",
+          "3434",
+          "4545",
+          "5656",
+          "6767",
+          "7878",
+          "8989",
+          "9090"
+        ],
+        "target": "9090"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "deadends": [
+          "0000",
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777",
+          "8888",
+          "9999"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0009",
+          "0090",
+          "0900",
+          "9000",
+          "1111"
+        ],
+        "target": "2222"
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0010",
+          "0100",
+          "1000",
+          "0011",
+          "0110",
+          "1100",
+          "1010",
+          "0101",
+          "1001",
+          "0111",
+          "1110",
+          "1101",
+          "1011",
+          "1111"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "0001",
+          "0011",
+          "0111",
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555",
+          "6666",
+          "7777",
+          "8888",
+          "9999"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "deadends": [
+          "1110",
+          "2220",
+          "3330",
+          "4440",
+          "5550",
+          "6660",
+          "7770",
+          "8880",
+          "9990"
+        ],
+        "target": "0001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "deadends": [
+          "1111",
+          "2222",
+          "3333",
+          "4444",
+          "5555"
+        ],
+        "target": "6666"
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "deadends": [
+          "1001",
+          "2002",
+          "3003",
+          "4004",
+          "5005",
+          "6006",
+          "7007",
+          "8008",
+          "9009"
+        ],
+        "target": "9999"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "deadends": [
+          "1234",
+          "2345",
+          "3456",
+          "4567",
+          "5678",
+          "6789",
+          "7890",
+          "8901",
+          "9012"
+        ],
+        "target": "0000"
+      },
+      "expected": 0
+    }
+  ],
+  "test_case_count": 110,
+  "optimal_complexity": null,
+  "source_task_id": "open-the-lock",
+  "source_question_id": 752
+}

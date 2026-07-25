@@ -1,0 +1,861 @@
+{
+  "question_id": "q_0026",
+  "title": "Check If A String Can Break Another String",
+  "difficulty": 2,
+  "topic": "Greedy",
+  "topics": [
+    "Greedy",
+    "String",
+    "Sorting"
+  ],
+  "description_md": "Given two strings: s1 and s2 with the same\u00a0size, check if some\u00a0permutation of string s1 can break\u00a0some\u00a0permutation of string s2 or vice-versa. In other words s2 can break s1\u00a0or vice-versa.\nA string x\u00a0can break\u00a0string y\u00a0(both of size n) if x[i] >= y[i]\u00a0(in alphabetical order)\u00a0for all i\u00a0between 0 and n-1.\n\u00a0\nExample 1:\n\nInput: s1 = \"abc\", s2 = \"xya\"\nOutput: true\nExplanation: \"ayx\" is a permutation of s2=\"xya\" which can break to string \"abc\" which is a permutation of s1=\"abc\".\n\nExample 2:\n\nInput: s1 = \"abe\", s2 = \"acd\"\nOutput: false \nExplanation: All permutations for s1=\"abe\" are: \"abe\", \"aeb\", \"bae\", \"bea\", \"eab\" and \"eba\" and all permutation for s2=\"acd\" are: \"acd\", \"adc\", \"cad\", \"cda\", \"dac\" and \"dca\". However, there is not any permutation from s1 which can break some permutation from s2 and vice-versa.\n\nExample 3:\n\nInput: s1 = \"leetcodee\", s2 = \"interview\"\nOutput: true\n\n\u00a0\nConstraints:\n\ns1.length == n\ns2.length == n\n1 <= n <= 10^5\nAll strings consist of lowercase English letters.\n\n",
+  "starter_code": "class Solution:\n    def checkIfCanBreak(self, s1: str, s2: str) -> bool:\n        ",
+  "entry_point": "Solution().checkIfCanBreak",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def checkIfCanBreak(self, s1: str, s2: str) -> bool:\n        cs1 = sorted(s1)\n        cs2 = sorted(s2)\n        return all(a >= b for a, b in zip(cs1, cs2)) or all(\n            a <= b for a, b in zip(cs1, cs2)\n        )\n",
+  "test_cases": [
+    {
+      "input": {
+        "s1": "same",
+        "s2": "same"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abc",
+        "s2": "bca"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "hello",
+        "s2": "bello"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aazz",
+        "s2": "zzaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abac",
+        "s2": "baca"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "xyz",
+        "s2": "wvu"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abc",
+        "s2": "xya"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabbcc",
+        "s2": "abcabc"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "pqrs",
+        "s2": "rstu"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "zyx",
+        "s2": "wvu"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcd",
+        "s2": "adcb"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aaa",
+        "s2": "bbb"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcd",
+        "s2": "dcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abe",
+        "s2": "acd"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s1": "leetcodee",
+        "s2": "interview"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "python",
+        "s2": "typhon"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdxyz",
+        "s2": "zyxwvut"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "zzzz",
+        "s2": "zzzz"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "xyz",
+        "s2": "zyx"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "s2": "zzyyxxwwvvuuttrrssqqpponnmlkkjjiihhggeeffddaabbcc"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghijklmnopqrstuvwxyz",
+        "s2": "zyxwvutsrqponmlkjihgfedcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "algorithm",
+        "s2": "logarithm"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "longerstringwithvariouscharacters",
+        "s2": "variouscharacterswithlongerstring"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "zzzzzz",
+        "s2": "aaaaaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "unbreakable",
+        "s2": "rebreakable"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdabcdabcd",
+        "s2": "ddddcccbbbbaaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabbcc",
+        "s2": "ccbbaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "mississippi",
+        "s2": "pippiimissi"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "almostsame",
+        "s2": "almostsane"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "s2": "zzzzyyxwwvvuutssrrqqponnmmllkkjjiihhggeeffdccbaaab"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s1": "racecar",
+        "s2": "carrace"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "thisisaverylongstringthatneedstobecomparesothattwostingsareofthesamelength",
+        "s2": "somuchlongeranddifferentsomenecessarypaddingletterssotheyareofthesame"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s1": "abacabadabacaba",
+        "s2": "zyzxzyzyzxzyzyz"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abracadabra",
+        "s2": "cadabrabara"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "zyxwvutsrqponmlkjihgfedcba",
+        "s2": "abcdefghijklmnopqrstuvwxyz"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghijk",
+        "s2": "fghijklmno"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abracadabra",
+        "s2": "alakazamazam"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s1": "randomstringhere",
+        "s2": "somestringrandom"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "uniquechars",
+        "s2": "distinctset"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s1": "aazzzzzzzzzzzzzzzz",
+        "s2": "zzzzzzzzzzzzzzaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "zzzzzzzz",
+        "s2": "zzzzzzzz"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabbbccc",
+        "s2": "bbbcccaaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "zzzzzzzzzz",
+        "s2": "zzzzzzzzzz"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "complex",
+        "s2": "lexicom"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "s2": "zzyyxxwwvvuuttssrrqqppoonnmlkkjjiihhggffeeddccbbaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdxyzabcdxyz",
+        "s2": "xyzabcdxyzabcd"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefgh",
+        "s2": "hgfedcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "pppppppppp",
+        "s2": "qqqqqqqqqq"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghij",
+        "s2": "fedcbaghij"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aaaaabbbbcccccddeeefffffgggghhhiiijjjkkklllmmmnnnooopppqqqrrrssstttuuuvvvwwwxxxxxyyyyyzzzzz",
+        "s2": "zzzzzyyyyyxxxwwwvvvuuutttsssrqqppoonnmlkkkjjjiiihgggfffffeeedddccccbbbaaaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "programming",
+        "s2": "gnimmargorp"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "permutation",
+        "s2": "reupmttinao"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "mississippi",
+        "s2": "pppnnnnmsssssiiii"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabbccddeeffgghhii",
+        "s2": "iihhggeeffddccbbaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghijk",
+        "s2": "jihgfedcbaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "xyzzzz",
+        "s2": "zzzzxy"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "medium",
+        "s2": "median"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "mnopqr",
+        "s2": "qrstuv"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "xyzyzyzyzyzyzyzyz",
+        "s2": "zyxzyxzyxzyxzyxzy"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghijklnopqrstuvwxyz",
+        "s2": "zyxwvutsrqponmlkjihgfedcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aaaabbbbccccdddd",
+        "s2": "ddddccccbbbbaaaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "thisisalongstring",
+        "s2": "stringlongthisisalo"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "s2": "abcdefghijklmnopqrstuvwxyzzzyxwvutsrqponmlkjihgfedcbaaabb"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "algorithm",
+        "s2": "thmalogri"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "xyzz",
+        "s2": "yyzz"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "s2": "zzzzyyxwwvvuttsrrqqponnmlkkjjiihhggffeeeeddccbbaa"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s1": "aabbcc",
+        "s2": "bbccaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aaaaabbbbbcccccc",
+        "s2": "bbbbbaaaaacccccb"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghijklmnop",
+        "s2": "ponmlkjihgfedcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "mississippi",
+        "s2": "ppssiiimmm"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s1": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "s2": "zzyyxxwwvvuuttssrrqqppoonnmmllkkjjiihhggffeeddccbbaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abacabadabacaba",
+        "s2": "zxyzyxzyxzyxzyxzyx"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdef",
+        "s2": "ghijkl"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabbbcccddddeeeeffffgggghhhhiiiiiijjjjjjkkkkkkllllllmmmmmmmnnnnnnnooooooooppppppppqqqqqqqqrrrrrrrrssssssssstttttttttuuuuuuuuuvvvvvvvvvwwwwwwwwwxxxxxxxxxyyyyyyyyyzzzzzzzzz",
+        "s2": "zzzzzzzzzyyyyyyyyyxxxxxxxxxwwwwwwwwwvvvvvvvvvuuuuuuuuutttttttttssssssssrrrrrrrrqqqqqqqqppppppppooooooonnnnnnnmmmmmmmllllllkkkkkkjjjjjjiiiiiiggggffffeeeeeeeeeddddddccccbbbaaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aaaabbbbcccc",
+        "s2": "ccccbbbbaaaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabcc",
+        "s2": "bbdda"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "congratulations",
+        "s2": "stucgnioalort"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdabcdabcd",
+        "s2": "dcbaabcddcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "permutation",
+        "s2": "nutationspr"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghijklmnopqrstuvwxyzz",
+        "s2": "zzzzzyzyxwvutsrqponmlkjihgfedcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aaaaaaab",
+        "s2": "baaaaaaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "equalstring",
+        "s2": "equalstring"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghijk",
+        "s2": "zyxwvutsrqz"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aaaaaa",
+        "s2": "bbbbbb"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdabcd",
+        "s2": "dcbaabcd"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghij",
+        "s2": "jihgfedcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdabcdabcdabcdabcd",
+        "s2": "dcbaabdcbaabdcbaabdcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "optimization",
+        "s2": "nttimzpiaoos"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "optimization",
+        "s2": "izationoptim"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghij",
+        "s2": "abcdefghij"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "leetcodeleetcode",
+        "s2": "interviewinterview"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "qwertypoiuytrewq",
+        "s2": "mnbvcxzlkjhgfd"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s1": "abacabadabacaba",
+        "s2": "zyxzyxzyxzyxzyx"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "mississippi",
+        "s2": "pississippi"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aaaaaaaaaabbbbbbbbbbcccccccccc",
+        "s2": "ccccccccccbbbbbbbbbbaaaaaaaaaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "longerstringexample",
+        "s2": "examplelongerstring"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abacabacabacabac",
+        "s2": "zyxzyxzyxzyxzyxzyx"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcabcabc",
+        "s2": "xyzxyzxyz"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "pqrstuvw",
+        "s2": "qrstuvwp"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdef",
+        "s2": "fedcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "pqrsrpqrsrpqrsr",
+        "s2": "zyxwzyxwzyxwzyx"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcde",
+        "s2": "edcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghijklnmopqrstuvwxyz",
+        "s2": "zyxwvutsrqponmlkjihgfedcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefghijabcdefghijabcdefghij",
+        "s2": "zyxwvutsrqzyxwvutsrqzyxwvutsrq"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "interview",
+        "s2": "terviewin"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "mnopqr",
+        "s2": "rstuvw"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abacabadabacaba",
+        "s2": "zzzzzzzzzzzzzzz"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "break",
+        "s2": "maker"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "qrstuv",
+        "s2": "vwxyza"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s1": "permutation",
+        "s2": "interwoven"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdxyz",
+        "s2": "zyxcbaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "zzzzz",
+        "s2": "aaaaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "aabbbccc",
+        "s2": "cccbbbaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "abcdefg",
+        "s2": "ghijklm"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "leetcode",
+        "s2": "docodele"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "xyzz",
+        "s2": "wxyz"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+        "s2": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "zzzzzzzzzzzzzzzzzz",
+        "s2": "aaaaaaaaaaaaaaaaaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "banana",
+        "s2": "anabna"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s1": "mississippi",
+        "s2": "ppissimiss"
+      },
+      "expected": true
+    }
+  ],
+  "test_case_count": 120,
+  "optimal_complexity": null,
+  "source_task_id": "check-if-a-string-can-break-another-string",
+  "source_question_id": 1433
+}

@@ -1,0 +1,216 @@
+{
+  "question_id": "q_0019",
+  "title": "Find If Path Exists In Graph",
+  "difficulty": 1,
+  "topic": "Depth-First Search",
+  "topics": [
+    "Depth-First Search",
+    "Breadth-First Search",
+    "Union Find",
+    "Graph"
+  ],
+  "description_md": "There is a bi-directional graph with n vertices, where each vertex is labeled from 0 to n - 1 (inclusive). The edges in the graph are represented as a 2D integer array edges, where each edges[i] = [ui, vi] denotes a bi-directional edge between vertex ui and vertex vi. Every vertex pair is connected by at most one edge, and no vertex has an edge to itself.\nYou want to determine if there is a valid path that exists from vertex source to vertex destination.\nGiven edges and the integers n, source, and destination, return true if there is a valid path from source to destination, or false otherwise.\n\u00a0\nExample 1:\n\n\nInput: n = 3, edges = [[0,1],[1,2],[2,0]], source = 0, destination = 2\nOutput: true\nExplanation: There are two paths from vertex 0 to vertex 2:\n- 0 \u2192 1 \u2192 2\n- 0 \u2192 2\n\nExample 2:\n\n\nInput: n = 6, edges = [[0,1],[0,2],[3,5],[5,4],[4,3]], source = 0, destination = 5\nOutput: false\nExplanation: There is no path from vertex 0 to vertex 5.\n\n\u00a0\nConstraints:\n\n1 <= n <= 2 * 105\n0 <= edges.length <= 2 * 105\nedges[i].length == 2\n0 <= ui, vi <= n - 1\nui != vi\n0 <= source, destination <= n - 1\nThere are no duplicate edges.\nThere are no self edges.\n\n",
+  "starter_code": "class Solution:\n    def validPath(self, n: int, edges: List[List[int]], source: int, destination: int) -> bool:\n        ",
+  "entry_point": "Solution().validPath",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def validPath(\n        self, n: int, edges: List[List[int]], source: int, destination: int\n    ) -> bool:\n        def dfs(i: int) -> bool:\n            if i == destination:\n                return True\n            if i in vis:\n                return False\n            return any(dfs(j) for j in g[i])\n\n        g = [[] for _ in range(n)]\n        for u, v in edges:\n            g[u].append(v)\n            g[v].append(u)\n        vis = set()\n        return dfs(source)\n",
+  "test_cases": [
+    {
+      "input": {
+        "n": 1,
+        "edges": [],
+        "source": 0,
+        "destination": 0
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "n": 100,
+        "edges": [],
+        "source": 0,
+        "destination": 99
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "n": 25,
+        "edges": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            14,
+            15
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            18,
+            19
+          ],
+          [
+            19,
+            20
+          ],
+          [
+            20,
+            21
+          ],
+          [
+            21,
+            22
+          ],
+          [
+            22,
+            23
+          ],
+          [
+            23,
+            24
+          ],
+          [
+            24,
+            0
+          ]
+        ],
+        "source": 15,
+        "destination": 10
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "n": 15,
+        "edges": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            14
+          ]
+        ],
+        "source": 14,
+        "destination": 0
+      },
+      "expected": true
+    }
+  ],
+  "test_case_count": 4,
+  "optimal_complexity": null,
+  "source_task_id": "find-if-path-exists-in-graph",
+  "source_question_id": 1971
+}

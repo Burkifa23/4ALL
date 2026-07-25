@@ -1,0 +1,741 @@
+{
+  "question_id": "q_0041",
+  "title": "Lexicographically Smallest Beautiful String",
+  "difficulty": 3,
+  "topic": "Greedy",
+  "topics": [
+    "Greedy",
+    "String"
+  ],
+  "description_md": "A string is beautiful if:\n\nIt consists of the first k letters of the English lowercase alphabet.\nIt does not contain any substring of length 2 or more which is a palindrome.\n\nYou are given a beautiful string s of length n and a positive integer k.\nReturn the lexicographically smallest string of length n, which is larger than s and is beautiful. If there is no such string, return an empty string.\nA string a is lexicographically larger than a string b (of the same length) if in the first position where a and b differ, a has a character strictly larger than the corresponding character in b.\n\nFor example, \"abcd\" is lexicographically larger than \"abcc\" because the first position they differ is at the fourth character, and d is greater than c.\n\n\u00a0\nExample 1:\n\nInput: s = \"abcz\", k = 26\nOutput: \"abda\"\nExplanation: The string \"abda\" is beautiful and lexicographically larger than the string \"abcz\".\nIt can be proven that there is no string that is lexicographically larger than the string \"abcz\", beautiful, and lexicographically smaller than the string \"abda\".\n\nExample 2:\n\nInput: s = \"dc\", k = 4\nOutput: \"\"\nExplanation: It can be proven that there is no string that is lexicographically larger than the string \"dc\" and is beautiful.\n\n\u00a0\nConstraints:\n\n1 <= n == s.length <= 105\n4 <= k <= 26\ns is a beautiful string.\n\n",
+  "starter_code": "class Solution:\n    def smallestBeautifulString(self, s: str, k: int) -> str:\n        ",
+  "entry_point": "Solution().smallestBeautifulString",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def smallestBeautifulString(self, s: str, k: int) -> str:\n        n = len(s)\n        cs = list(s)\n        for i in range(n - 1, -1, -1):\n            p = ord(cs[i]) - ord('a') + 1\n            for j in range(p, k):\n                c = chr(ord('a') + j)\n                if (i > 0 and cs[i - 1] == c) or (i > 1 and cs[i - 2] == c):\n                    continue\n                cs[i] = c\n                for l in range(i + 1, n):\n                    for m in range(k):\n                        c = chr(ord('a') + m)\n                        if (l > 0 and cs[l - 1] == c) or (l > 1 and cs[l - 2] == c):\n                            continue\n                        cs[l] = c\n                        break\n                return ''.join(cs)\n        return ''\n",
+  "test_cases": [
+    {
+      "input": {
+        "s": "abcd",
+        "k": 5
+      },
+      "expected": "abce"
+    },
+    {
+      "input": {
+        "s": "aabbcc",
+        "k": 6
+      },
+      "expected": "aabbcd"
+    },
+    {
+      "input": {
+        "s": "zyx",
+        "k": 26
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "abcz",
+        "k": 26
+      },
+      "expected": "abda"
+    },
+    {
+      "input": {
+        "s": "aaa",
+        "k": 4
+      },
+      "expected": "aab"
+    },
+    {
+      "input": {
+        "s": "dc",
+        "k": 4
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "aab",
+        "k": 3
+      },
+      "expected": "aac"
+    },
+    {
+      "input": {
+        "s": "abcd",
+        "k": 4
+      },
+      "expected": "abda"
+    },
+    {
+      "input": {
+        "s": "xyz",
+        "k": 26
+      },
+      "expected": "xza"
+    },
+    {
+      "input": {
+        "s": "zyx",
+        "k": 3
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "aabb",
+        "k": 4
+      },
+      "expected": "aabc"
+    },
+    {
+      "input": {
+        "s": "azzzz",
+        "k": 26
+      },
+      "expected": "bacba"
+    },
+    {
+      "input": {
+        "s": "abcabcabcabc",
+        "k": 3
+      },
+      "expected": "acbacbacbacb"
+    },
+    {
+      "input": {
+        "s": "abcabca",
+        "k": 26
+      },
+      "expected": "abcabcd"
+    },
+    {
+      "input": {
+        "s": "aabababa",
+        "k": 6
+      },
+      "expected": "aabababc"
+    },
+    {
+      "input": {
+        "s": "zzzzz",
+        "k": 26
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "abcabcabcabc",
+        "k": 26
+      },
+      "expected": "abcabcabcabd"
+    },
+    {
+      "input": {
+        "s": "zyxzyxzyxzyx",
+        "k": 26
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "wxyz",
+        "k": 26
+      },
+      "expected": "wxza"
+    },
+    {
+      "input": {
+        "s": "zzzzzzzzzz",
+        "k": 26
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "mnopqrstuvw",
+        "k": 21
+      },
+      "expected": "mnopqrsuabc"
+    },
+    {
+      "input": {
+        "s": "zyxwvutsr",
+        "k": 19
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "abcdefg",
+        "k": 7
+      },
+      "expected": "abcdega"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnop",
+        "k": 26
+      },
+      "expected": "abcdefghijklmnoq"
+    },
+    {
+      "input": {
+        "s": "mnopqr",
+        "k": 18
+      },
+      "expected": "mnopra"
+    },
+    {
+      "input": {
+        "s": "lkjihgf",
+        "k": 12
+      },
+      "expected": "lkjihgi"
+    },
+    {
+      "input": {
+        "s": "abcabc",
+        "k": 3
+      },
+      "expected": "acbacb"
+    },
+    {
+      "input": {
+        "s": "abcdefghij",
+        "k": 10
+      },
+      "expected": "abcdefghja"
+    },
+    {
+      "input": {
+        "s": "aabccba",
+        "k": 15
+      },
+      "expected": "aabccbd"
+    },
+    {
+      "input": {
+        "s": "mnbvcxzlkjhgfdsapoiuytrewq",
+        "k": 26
+      },
+      "expected": "mnbvcxzlkjhgfdsapoiuytrewr"
+    },
+    {
+      "input": {
+        "s": "ababababababab",
+        "k": 3
+      },
+      "expected": "ababababababac"
+    },
+    {
+      "input": {
+        "s": "abcabcabcabcabc",
+        "k": 3
+      },
+      "expected": "acbacbacbacbacb"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxyza",
+        "k": 26
+      },
+      "expected": "abcdefghijklmnopqrstuvwxyzb"
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "k": 20
+      },
+      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrstabcabcabcabcab"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuv",
+        "k": 21
+      },
+      "expected": "abcdefghijklmnopqrsuab"
+    },
+    {
+      "input": {
+        "s": "zzzzzz",
+        "k": 4
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "k": 26
+      },
+      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyzab"
+    },
+    {
+      "input": {
+        "s": "abcdabcd",
+        "k": 4
+      },
+      "expected": "abcdabda"
+    },
+    {
+      "input": {
+        "s": "zzzzzzzzzzzzzzzzzzzzzzzz",
+        "k": 26
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "abcaabcd",
+        "k": 26
+      },
+      "expected": "abcaabce"
+    },
+    {
+      "input": {
+        "s": "mnopqrlmno",
+        "k": 14
+      },
+      "expected": "mnopqrlnab"
+    },
+    {
+      "input": {
+        "s": "abcdcba",
+        "k": 10
+      },
+      "expected": "abcdcbd"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxzz",
+        "k": 26
+      },
+      "expected": "abcdefghijklmnopqrstuvwyab"
+    },
+    {
+      "input": {
+        "s": "abcdefghijk",
+        "k": 12
+      },
+      "expected": "abcdefghijl"
+    },
+    {
+      "input": {
+        "s": "abcdefghijk",
+        "k": 11
+      },
+      "expected": "abcdefghika"
+    },
+    {
+      "input": {
+        "s": "abba",
+        "k": 26
+      },
+      "expected": "abbc"
+    },
+    {
+      "input": {
+        "s": "abababababab",
+        "k": 26
+      },
+      "expected": "abababababac"
+    },
+    {
+      "input": {
+        "s": "aaaabbbbccccdddd",
+        "k": 26
+      },
+      "expected": "aaaabbbbccccddde"
+    },
+    {
+      "input": {
+        "s": "abcabcabc",
+        "k": 3
+      },
+      "expected": "acbacbacb"
+    },
+    {
+      "input": {
+        "s": "abcdcba",
+        "k": 26
+      },
+      "expected": "abcdcbd"
+    },
+    {
+      "input": {
+        "s": "abcdexyz",
+        "k": 26
+      },
+      "expected": "abcdexza"
+    },
+    {
+      "input": {
+        "s": "pqrs",
+        "k": 18
+      },
+      "expected": "prab"
+    },
+    {
+      "input": {
+        "s": "qwertyuiopasdfghjklzxcvbnm",
+        "k": 26
+      },
+      "expected": "qwertyuiopasdfghjklzxcvbno"
+    },
+    {
+      "input": {
+        "s": "xyzabc",
+        "k": 26
+      },
+      "expected": "xyzabd"
+    },
+    {
+      "input": {
+        "s": "abacabadabacaba",
+        "k": 26
+      },
+      "expected": "abacabadabacabc"
+    },
+    {
+      "input": {
+        "s": "aabbccdd",
+        "k": 6
+      },
+      "expected": "aabbccde"
+    },
+    {
+      "input": {
+        "s": "zzzz",
+        "k": 4
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "aabbaabbaabb",
+        "k": 6
+      },
+      "expected": "aabbaabbaabc"
+    },
+    {
+      "input": {
+        "s": "abcde",
+        "k": 5
+      },
+      "expected": "abcea"
+    },
+    {
+      "input": {
+        "s": "mnopqrstuvw",
+        "k": 22
+      },
+      "expected": "mnopqrstvab"
+    },
+    {
+      "input": {
+        "s": "abcdexyzabcd",
+        "k": 26
+      },
+      "expected": "abcdexyzabce"
+    },
+    {
+      "input": {
+        "s": "abacabacabacaba",
+        "k": 3
+      },
+      "expected": "abacabacabacabc"
+    },
+    {
+      "input": {
+        "s": "abacabadabc",
+        "k": 26
+      },
+      "expected": "abacabadabd"
+    },
+    {
+      "input": {
+        "s": "xyzxyzxyzxyz",
+        "k": 26
+      },
+      "expected": "xzabcabcabca"
+    },
+    {
+      "input": {
+        "s": "abcbabcba",
+        "k": 3
+      },
+      "expected": "abcbacbac"
+    },
+    {
+      "input": {
+        "s": "abcdefghij",
+        "k": 26
+      },
+      "expected": "abcdefghik"
+    },
+    {
+      "input": {
+        "s": "abac",
+        "k": 4
+      },
+      "expected": "abad"
+    },
+    {
+      "input": {
+        "s": "abcabcabc",
+        "k": 26
+      },
+      "expected": "abcabcabd"
+    },
+    {
+      "input": {
+        "s": "abcba",
+        "k": 3
+      },
+      "expected": "acbac"
+    },
+    {
+      "input": {
+        "s": "abcdefghi",
+        "k": 10
+      },
+      "expected": "abcdefghj"
+    },
+    {
+      "input": {
+        "s": "aabbaa",
+        "k": 6
+      },
+      "expected": "aabbac"
+    },
+    {
+      "input": {
+        "s": "abcdefghi",
+        "k": 9
+      },
+      "expected": "abcdefgia"
+    },
+    {
+      "input": {
+        "s": "zyxcba",
+        "k": 6
+      },
+      "expected": "zyxcbd"
+    },
+    {
+      "input": {
+        "s": "mnopqrstuvwxyzz",
+        "k": 26
+      },
+      "expected": "mnopqrstuvwxzab"
+    },
+    {
+      "input": {
+        "s": "zzzzzzzzz",
+        "k": 26
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgg",
+        "k": 6
+      },
+      "expected": "aabbccddefabca"
+    },
+    {
+      "input": {
+        "s": "abacabadabacaba",
+        "k": 15
+      },
+      "expected": "abacabadabacabc"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxy",
+        "k": 26
+      },
+      "expected": "abcdefghijklmnopqrstuvwxz"
+    },
+    {
+      "input": {
+        "s": "abcdabc",
+        "k": 26
+      },
+      "expected": "abcdabd"
+    },
+    {
+      "input": {
+        "s": "fedcba",
+        "k": 6
+      },
+      "expected": "fedcbd"
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgg",
+        "k": 10
+      },
+      "expected": "aabbccddeeffgh"
+    },
+    {
+      "input": {
+        "s": "mnopqrstu",
+        "k": 20
+      },
+      "expected": "mnopqrtab"
+    },
+    {
+      "input": {
+        "s": "abcdefg",
+        "k": 8
+      },
+      "expected": "abcdefh"
+    },
+    {
+      "input": {
+        "s": "abababababab",
+        "k": 2
+      },
+      "expected": "baababababab"
+    },
+    {
+      "input": {
+        "s": "abcddcba",
+        "k": 20
+      },
+      "expected": "abcddcbd"
+    },
+    {
+      "input": {
+        "s": "abacaba",
+        "k": 7
+      },
+      "expected": "abacabc"
+    },
+    {
+      "input": {
+        "s": "abacabadabacaba",
+        "k": 3
+      },
+      "expected": "abacabadabacabc"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnop",
+        "k": 20
+      },
+      "expected": "abcdefghijklmnoq"
+    },
+    {
+      "input": {
+        "s": "aabababacababaca",
+        "k": 26
+      },
+      "expected": "aabababacababacb"
+    },
+    {
+      "input": {
+        "s": "zzyyxxwwvvuuttssrrqqppoonnmmllkkjjiihhaaggeeffddccbb",
+        "k": 26
+      },
+      "expected": "zzyyxxwwvvuuttssrrqqppoonnmmllkkjjiihhaaggeeffddccbd"
+    },
+    {
+      "input": {
+        "s": "abacabad",
+        "k": 4
+      },
+      "expected": "abacabca"
+    },
+    {
+      "input": {
+        "s": "acb",
+        "k": 3
+      },
+      "expected": "bac"
+    },
+    {
+      "input": {
+        "s": "zyxzyxzyx",
+        "k": 26
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "aabbccddeeff",
+        "k": 26
+      },
+      "expected": "aabbccddeefg"
+    },
+    {
+      "input": {
+        "s": "abcbac",
+        "k": 26
+      },
+      "expected": "abcbad"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnop",
+        "k": 16
+      },
+      "expected": "abcdefghijklmnpa"
+    },
+    {
+      "input": {
+        "s": "abcabcabcabc",
+        "k": 6
+      },
+      "expected": "abcabcabcabd"
+    },
+    {
+      "input": {
+        "s": "abacaba",
+        "k": 26
+      },
+      "expected": "abacabc"
+    },
+    {
+      "input": {
+        "s": "abacbacbac",
+        "k": 5
+      },
+      "expected": "abacbacbad"
+    },
+    {
+      "input": {
+        "s": "abcdcba",
+        "k": 5
+      },
+      "expected": "abcdcbd"
+    },
+    {
+      "input": {
+        "s": "abcdefgabcdefg",
+        "k": 26
+      },
+      "expected": "abcdefgabcdefh"
+    },
+    {
+      "input": {
+        "s": "abcdabcdabcd",
+        "k": 4
+      },
+      "expected": "abcdabcdabda"
+    },
+    {
+      "input": {
+        "s": "zyxwvutsrqponmlkjihgfedcba",
+        "k": 26
+      },
+      "expected": "zyxwvutsrqponmlkjihgfedcbd"
+    }
+  ],
+  "test_case_count": 103,
+  "optimal_complexity": null,
+  "source_task_id": "lexicographically-smallest-beautiful-string",
+  "source_question_id": 2663
+}

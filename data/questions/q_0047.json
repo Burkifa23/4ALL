@@ -1,0 +1,764 @@
+{
+  "question_id": "q_0047",
+  "title": "Minimum Possible Integer After At Most K Adjacent Swaps On Digits",
+  "difficulty": 3,
+  "topic": "Greedy",
+  "topics": [
+    "Greedy",
+    "Binary Indexed Tree",
+    "Segment Tree",
+    "String"
+  ],
+  "description_md": "You are given a string num representing the digits of a very large integer and an integer k. You are allowed to swap any two adjacent digits of the integer at most k times.\nReturn the minimum integer you can obtain also as a string.\n\u00a0\nExample 1:\n\n\nInput: num = \"4321\", k = 4\nOutput: \"1342\"\nExplanation: The steps to obtain the minimum integer from 4321 with 4 adjacent swaps are shown.\n\nExample 2:\n\nInput: num = \"100\", k = 1\nOutput: \"010\"\nExplanation: It's ok for the output to have leading zeros, but the input is guaranteed not to have any leading zeros.\n\nExample 3:\n\nInput: num = \"36789\", k = 1000\nOutput: \"36789\"\nExplanation: We can keep the number without any swaps.\n\n\u00a0\nConstraints:\n\n1 <= num.length <= 3 * 104\nnum consists of only digits and does not contain leading zeros.\n1 <= k <= 109\n\n",
+  "starter_code": "class Solution:\n    def minInteger(self, num: str, k: int) -> str:\n        ",
+  "entry_point": "Solution().minInteger",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass BinaryIndexedTree:\n    def __init__(self, n):\n        self.n = n\n        self.c = [0] * (n + 1)\n\n    @staticmethod\n    def lowbit(x):\n        return x & -x\n\n    def update(self, x, delta):\n        while x <= self.n:\n            self.c[x] += delta\n            x += BinaryIndexedTree.lowbit(x)\n\n    def query(self, x):\n        s = 0\n        while x:\n            s += self.c[x]\n            x -= BinaryIndexedTree.lowbit(x)\n        return s\n\n\nclass Solution:\n    def minInteger(self, num: str, k: int) -> str:\n        pos = defaultdict(deque)\n        for i, v in enumerate(num, 1):\n            pos[int(v)].append(i)\n        ans = []\n        n = len(num)\n        tree = BinaryIndexedTree(n)\n        for i in range(1, n + 1):\n            for v in range(10):\n                q = pos[v]\n                if q:\n                    j = q[0]\n                    dist = tree.query(n) - tree.query(j) + j - i\n                    if dist <= k:\n                        k -= dist\n                        q.popleft()\n                        ans.append(str(v))\n                        tree.update(j, 1)\n                        break\n        return ''.join(ans)\n",
+  "test_cases": [
+    {
+      "input": {
+        "num": "36789",
+        "k": 1000
+      },
+      "expected": 36789
+    },
+    {
+      "input": {
+        "num": "100",
+        "k": 1
+      },
+      "expected": "010"
+    },
+    {
+      "input": {
+        "num": "9876543210",
+        "k": 9
+      },
+      "expected": "0987654321"
+    },
+    {
+      "input": {
+        "num": "9876543210",
+        "k": 100
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "222111333",
+        "k": 10
+      },
+      "expected": 111222333
+    },
+    {
+      "input": {
+        "num": "4321",
+        "k": 4
+      },
+      "expected": 1342
+    },
+    {
+      "input": {
+        "num": "3452345",
+        "k": 3
+      },
+      "expected": 2345345
+    },
+    {
+      "input": {
+        "num": "111222333",
+        "k": 5
+      },
+      "expected": 111222333
+    },
+    {
+      "input": {
+        "num": "9876543210",
+        "k": 5
+      },
+      "expected": 4987653210
+    },
+    {
+      "input": {
+        "num": "123456789",
+        "k": 0
+      },
+      "expected": 123456789
+    },
+    {
+      "input": {
+        "num": "102030405060708090",
+        "k": 20
+      },
+      "expected": "000001023456708090"
+    },
+    {
+      "input": {
+        "num": "29431",
+        "k": 2
+      },
+      "expected": 23941
+    },
+    {
+      "input": {
+        "num": "59585756555453525150",
+        "k": 100
+      },
+      "expected": "01234555555556987555"
+    },
+    {
+      "input": {
+        "num": "9999999999",
+        "k": 50
+      },
+      "expected": 9999999999
+    },
+    {
+      "input": {
+        "num": "9487653210",
+        "k": 10
+      },
+      "expected": "0498765321"
+    },
+    {
+      "input": {
+        "num": "1234567890",
+        "k": 9
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "5397268410",
+        "k": 15
+      },
+      "expected": "0235796841"
+    },
+    {
+      "input": {
+        "num": "111222333444555",
+        "k": 25
+      },
+      "expected": 111222333444555
+    },
+    {
+      "input": {
+        "num": "98765432101234567890",
+        "k": 50
+      },
+      "expected": "00112987654323456789"
+    },
+    {
+      "input": {
+        "num": "5432109876",
+        "k": 10
+      },
+      "expected": "0145329876"
+    },
+    {
+      "input": {
+        "num": "1234321",
+        "k": 5
+      },
+      "expected": 1123432
+    },
+    {
+      "input": {
+        "num": "9999999999888888888877777777776666666666",
+        "k": 100
+      },
+      "expected": 6668999999999988888888877777777776666666
+    },
+    {
+      "input": {
+        "num": "0000000000000000000000001",
+        "k": 1
+      },
+      "expected": "0000000000000000000000001"
+    },
+    {
+      "input": {
+        "num": "198765432",
+        "k": 20
+      },
+      "expected": 123479865
+    },
+    {
+      "input": {
+        "num": "54321098765432109876543210",
+        "k": 50
+      },
+      "expected": "00012453987654321987654321"
+    },
+    {
+      "input": {
+        "num": "98765432101234567890",
+        "k": 100
+      },
+      "expected": "00112233445566778899"
+    },
+    {
+      "input": {
+        "num": "5432109876",
+        "k": 30
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "5943281760",
+        "k": 15
+      },
+      "expected": "0159432876"
+    },
+    {
+      "input": {
+        "num": "19876543210",
+        "k": 10
+      },
+      "expected": "01987654321"
+    },
+    {
+      "input": {
+        "num": "77665544332211009988",
+        "k": 100
+      },
+      "expected": "00112233447766559988"
+    },
+    {
+      "input": {
+        "num": "543210987654321098765432109876543210",
+        "k": 200
+      },
+      "expected": "000011112222345498765398765439876543"
+    },
+    {
+      "input": {
+        "num": "5946132780",
+        "k": 15
+      },
+      "expected": "0145963278"
+    },
+    {
+      "input": {
+        "num": "987654321012345678909876543210",
+        "k": 1000
+      },
+      "expected": "000111222333444555666777888999"
+    },
+    {
+      "input": {
+        "num": "342134213421",
+        "k": 15
+      },
+      "expected": 112234343421
+    },
+    {
+      "input": {
+        "num": "9876543210",
+        "k": 30
+      },
+      "expected": "0123987654"
+    },
+    {
+      "input": {
+        "num": "1234567890",
+        "k": 10
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "1234567890",
+        "k": 15
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "999999999999999999999999",
+        "k": 1000000
+      },
+      "expected": 999999999999999999999999
+    },
+    {
+      "input": {
+        "num": "44444444444444444444",
+        "k": 1000
+      },
+      "expected": 44444444444444444444
+    },
+    {
+      "input": {
+        "num": "87654321098765432109",
+        "k": 200
+      },
+      "expected": "00112233445566778899"
+    },
+    {
+      "input": {
+        "num": "999888777666555444333222111000",
+        "k": 1000
+      },
+      "expected": "000111222333444555666777888999"
+    },
+    {
+      "input": {
+        "num": "9876543210987654321098765432109876543210",
+        "k": 200
+      },
+      "expected": "0000111122369875498765439876543298765432"
+    },
+    {
+      "input": {
+        "num": "5555555555",
+        "k": 100
+      },
+      "expected": 5555555555
+    },
+    {
+      "input": {
+        "num": "98765432109876543210",
+        "k": 25
+      },
+      "expected": "01289765439876543210"
+    },
+    {
+      "input": {
+        "num": "9876543210",
+        "k": 45
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "9876543210",
+        "k": 0
+      },
+      "expected": 9876543210
+    },
+    {
+      "input": {
+        "num": "1234567890123456789012345678901234567890",
+        "k": 500
+      },
+      "expected": "0000111122223333444455556666777788889999"
+    },
+    {
+      "input": {
+        "num": "55555555555555555555555555555555",
+        "k": 10000
+      },
+      "expected": 55555555555555555555555555555555
+    },
+    {
+      "input": {
+        "num": "12345678901234567890",
+        "k": 100
+      },
+      "expected": "00112233445566778899"
+    },
+    {
+      "input": {
+        "num": "1010101010101010101010101010101010101010",
+        "k": 50
+      },
+      "expected": "0000000001111101111110101010101010101010"
+    },
+    {
+      "input": {
+        "num": "9438527610",
+        "k": 10
+      },
+      "expected": "0493852761"
+    },
+    {
+      "input": {
+        "num": "987654321098765432109876543210",
+        "k": 1000
+      },
+      "expected": "000111222333444555666777888999"
+    },
+    {
+      "input": {
+        "num": "5432198760",
+        "k": 20
+      },
+      "expected": "0123458976"
+    },
+    {
+      "input": {
+        "num": "9876543210123456789098765432101234567890",
+        "k": 300
+      },
+      "expected": "0000111122223333444479865567899876556789"
+    },
+    {
+      "input": {
+        "num": "2134567890",
+        "k": 5
+      },
+      "expected": 1234506789
+    },
+    {
+      "input": {
+        "num": "3333222211110000",
+        "k": 50
+      },
+      "expected": "0000332332221111"
+    },
+    {
+      "input": {
+        "num": "1234567890987654321",
+        "k": 25
+      },
+      "expected": "0112345678998765432"
+    },
+    {
+      "input": {
+        "num": "0000000001",
+        "k": 5
+      },
+      "expected": "0000000001"
+    },
+    {
+      "input": {
+        "num": "1098765432",
+        "k": 20
+      },
+      "expected": "0123489765"
+    },
+    {
+      "input": {
+        "num": "111112222233333444445555566666777778888899999",
+        "k": 500
+      },
+      "expected": 111112222233333444445555566666777778888899999
+    },
+    {
+      "input": {
+        "num": "12345678909876543210",
+        "k": 50
+      },
+      "expected": "00112345657899876432"
+    },
+    {
+      "input": {
+        "num": "1432214321",
+        "k": 10
+      },
+      "expected": 1122343421
+    },
+    {
+      "input": {
+        "num": "12341234123412341234",
+        "k": 50
+      },
+      "expected": 11111222223434343434
+    },
+    {
+      "input": {
+        "num": "111222333444555666777888999",
+        "k": 300
+      },
+      "expected": 111222333444555666777888999
+    },
+    {
+      "input": {
+        "num": "333222111000999888777666555444333222111000",
+        "k": 500
+      },
+      "expected": "000000111111222222333333444555666779899887"
+    },
+    {
+      "input": {
+        "num": "9999999999999999999999999999999999999999",
+        "k": 100000
+      },
+      "expected": 9999999999999999999999999999999999999999
+    },
+    {
+      "input": {
+        "num": "1111111111111111111111111111111",
+        "k": 30000
+      },
+      "expected": 1111111111111111111111111111111
+    },
+    {
+      "input": {
+        "num": "6482319570",
+        "k": 8
+      },
+      "expected": 1264839570
+    },
+    {
+      "input": {
+        "num": "5999888777666555444333222111000",
+        "k": 100
+      },
+      "expected": "0004599988877766655544333222111"
+    },
+    {
+      "input": {
+        "num": "94321",
+        "k": 3
+      },
+      "expected": 29431
+    },
+    {
+      "input": {
+        "num": "1234321",
+        "k": 3
+      },
+      "expected": 1223431
+    },
+    {
+      "input": {
+        "num": "87654321098765432109",
+        "k": 50
+      },
+      "expected": "00115876432987654329"
+    },
+    {
+      "input": {
+        "num": "8765432109",
+        "k": 100
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "555555555555555555555555",
+        "k": 100000
+      },
+      "expected": 555555555555555555555555
+    },
+    {
+      "input": {
+        "num": "123456789876543212345678987654321",
+        "k": 150
+      },
+      "expected": 111222233334456789876545678987654
+    },
+    {
+      "input": {
+        "num": "54321098765432109876",
+        "k": 100
+      },
+      "expected": "00112233445566778899"
+    },
+    {
+      "input": {
+        "num": "432101234",
+        "k": 10
+      },
+      "expected": "011432234"
+    },
+    {
+      "input": {
+        "num": "1234567890",
+        "k": 30
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "9876543210",
+        "k": 50
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "1987654320",
+        "k": 15
+      },
+      "expected": "0139876542"
+    },
+    {
+      "input": {
+        "num": "5142369870",
+        "k": 15
+      },
+      "expected": "0123456987"
+    },
+    {
+      "input": {
+        "num": "444333222111000",
+        "k": 50
+      },
+      "expected": "000134344322211"
+    },
+    {
+      "input": {
+        "num": "98765432109876543210",
+        "k": 20
+      },
+      "expected": "01698754329876543210"
+    },
+    {
+      "input": {
+        "num": "9457836120",
+        "k": 8
+      },
+      "expected": 1495783620
+    },
+    {
+      "input": {
+        "num": "9876543210",
+        "k": 10000
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "9632147850",
+        "k": 12
+      },
+      "expected": "0296314785"
+    },
+    {
+      "input": {
+        "num": "10987654321",
+        "k": 10
+      },
+      "expected": "01189765432"
+    },
+    {
+      "input": {
+        "num": "1234543210",
+        "k": 25
+      },
+      "expected": "0112233445"
+    },
+    {
+      "input": {
+        "num": "1221331223",
+        "k": 20
+      },
+      "expected": 1112222333
+    },
+    {
+      "input": {
+        "num": "1234567890",
+        "k": 50
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "8642013579",
+        "k": 20
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "11111111111111111111",
+        "k": 10000
+      },
+      "expected": 11111111111111111111
+    },
+    {
+      "input": {
+        "num": "192837465546738291",
+        "k": 50
+      },
+      "expected": 112233458976546789
+    },
+    {
+      "input": {
+        "num": "9438276510",
+        "k": 10
+      },
+      "expected": "0493827651"
+    },
+    {
+      "input": {
+        "num": "123456789012345678901234567890",
+        "k": 100
+      },
+      "expected": "000111222345678394567893456789"
+    },
+    {
+      "input": {
+        "num": "12345678901234567890",
+        "k": 20
+      },
+      "expected": "01123456278934567890"
+    },
+    {
+      "input": {
+        "num": "333222111",
+        "k": 20
+      },
+      "expected": 111323322
+    },
+    {
+      "input": {
+        "num": "9876543210",
+        "k": 25
+      },
+      "expected": "0128976543"
+    },
+    {
+      "input": {
+        "num": "98765432109876543210",
+        "k": 100
+      },
+      "expected": "00112233458976987654"
+    },
+    {
+      "input": {
+        "num": "000111222333444555666777888999",
+        "k": 50
+      },
+      "expected": "000111222333444555666777888999"
+    },
+    {
+      "input": {
+        "num": "1234567890",
+        "k": 25
+      },
+      "expected": "0123456789"
+    },
+    {
+      "input": {
+        "num": "5432109876",
+        "k": 15
+      },
+      "expected": "0123459876"
+    },
+    {
+      "input": {
+        "num": "010203040506070809",
+        "k": 30
+      },
+      "expected": "000000001234560789"
+    },
+    {
+      "input": {
+        "num": "99999999999999999999",
+        "k": 1000
+      },
+      "expected": 99999999999999999999
+    },
+    {
+      "input": {
+        "num": "99887766554433221100",
+        "k": 50
+      },
+      "expected": "00299887766554433211"
+    },
+    {
+      "input": {
+        "num": "12345678900987654321",
+        "k": 50
+      },
+      "expected": "00112234567889976543"
+    }
+  ],
+  "test_case_count": 106,
+  "optimal_complexity": null,
+  "source_task_id": "minimum-possible-integer-after-at-most-k-adjacent-swaps-on-digits",
+  "source_question_id": 1505
+}

@@ -1,0 +1,764 @@
+{
+  "question_id": "q_0007",
+  "title": "Number Of Different Integers In A String",
+  "difficulty": 1,
+  "topic": "Hash Table",
+  "topics": [
+    "Hash Table",
+    "String"
+  ],
+  "description_md": "You are given a string word that consists of digits and lowercase English letters.\nYou will replace every non-digit character with a space. For example, \"a123bc34d8ef34\" will become \" 123\u00a0 34 8\u00a0 34\". Notice that you are left with some integers that are separated by at least one space: \"123\", \"34\", \"8\", and \"34\".\nReturn the number of different integers after performing the replacement operations on word.\nTwo integers are considered different if their decimal representations without any leading zeros are different.\n\u00a0\nExample 1:\n\nInput: word = \"a123bc34d8ef34\"\nOutput: 3\nExplanation: The three different integers are \"123\", \"34\", and \"8\". Notice that \"34\" is only counted once.\n\nExample 2:\n\nInput: word = \"leet1234code234\"\nOutput: 2\n\nExample 3:\n\nInput: word = \"a1b01c001\"\nOutput: 1\nExplanation: The three integers \"1\", \"01\", and \"001\" all represent the same integer because\nthe leading zeros are ignored when comparing their decimal values.\n\n\u00a0\nConstraints:\n\n1 <= word.length <= 1000\nword consists of digits and lowercase English letters.\n\n",
+  "starter_code": "class Solution:\n    def numDifferentIntegers(self, word: str) -> int:\n        ",
+  "entry_point": "Solution().numDifferentIntegers",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def numDifferentIntegers(self, word: str) -> int:\n        s = set()\n        i, n = 0, len(word)\n        while i < n:\n            if word[i].isdigit():\n                while i < n and word[i] == '0':\n                    i += 1\n                j = i\n                while j < n and word[j].isdigit():\n                    j += 1\n                s.add(word[i:j])\n                i = j\n            i += 1\n        return len(s)\n",
+  "test_cases": [
+    {
+      "input": {
+        "word": "a1b2c3d4e5f6g7h8i9j0"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "a123bc34d8ef34"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "a1a2a3a4a5a6a7a8a9a0"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "100leetcode"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a1a1a1"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "0a001b002"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "12345"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "1a2b3c4d5e6f7g8h9i0j"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "00000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "0a001b1c1"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "111222333444555666777888999000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "leet1234code234"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "1234567890"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "000111222333444555666777888999000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "11223344556677889900"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a1b1c1"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "1a2b3c4d5e6f7g8h9i0j1"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "abc"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "word": "22o22o22o"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a1b01c001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a001b002c003"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "a001001b1001c001001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "1a2b3c4d5"
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "word": "0a0b0c0"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "0abc00abc000abc0000abc"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "1a10a100a1000a10000a1"
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "word": "123abc456def789ghi123jkl456mno789pqr"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "abc123xyz456abc123xyz456abc123xyz456"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "0001abc002def03ghi0004"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "word": "same123same123same123same"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "1a1b1c1d1e1f1g1h1i1j1k1l1m1n1o1p1q1r1s1t1u1v1w1x1y1z1"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "mixed123with456numbers789"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "000111000222000333000444000555000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "123abc456def789ghi123jkl456mno789pqr001s002t003u"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "word": "123abc321def234ghi432jkl543mno654pqrs765tuvw876xyz987"
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "word": "1a2a3a4a5a6a7a8a9a0a1a2a3a4a5a6a7a8a9a0a1a2a3a4a5a6a7a8a9a0a1a2a3a4a5a6a7a8a9a0a"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "1a11a111a1111a11111a111111"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "word": "9876543210a123456789b0987654321c"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "aaa123bbb123ccc123ddd123eee123"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a0b00c000d0000e00000f000000g0000000h00000000i00000000j000000000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "z9z8z7z6z5z4z3z2z1z0z9z8z7z6z5z4z3z2z1z0"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "a1b2c3d4e5f6g7h8i9j0a01b02c03d04e05f06g07h08i09j00"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "a10000b1000c100d10e1f0g00h000i0000j00000k"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "word": "1a10a100a1000a10000a100000a1000000a10000000a100000000"
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "word": "1000000000000000000000000000000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "123xyz456xyz789xyz123xyz"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "100000a200000b300000c400000d500000e600000f700000g800000h900000"
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "word": "leading0s123trailing0s456"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "0001000200030004000500060007000800090000000100020003"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "same123same123same123"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "1a001b0001c00001d000001e0000001f00000001g000000001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "0101010101010101010101010101010101010101010101010101010101010101010101010101010101010"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "aaaa111bbbb222cccc333dddd444"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "word": "a1b2c3d4e5f6g7h8i9j0a1b2c3d4e5f6g7h8i9j0"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "a0b00c000d0000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "abc0abc00abc000abc0000abc000000abc0000000abc00000000abc000000000abc0000000000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "leading000trailing"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "many000123manymany000456many000789many"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "a1000b1000c1000d1000e1000f1000g1000h1000i1000j1000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "abc0def00ghi000jkl0000mno00000pqr000000stu"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "0000123456789000000000123456789000000012345678900000001234567890"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "0abc00abc000abc0000abc00000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "0001000000001000000001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "12345abc54321abc12345"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "repeated000repeated000repeated"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "z999y999x999w998v997u996"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "word": "123abc321def456ghi654jkl789mno987pqr012stu210vwx321yz456"
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "word": "a1b01c001d0001e00001f10g100"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "000000000000000001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "9876543210abcdefgh0987654321"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "9876543210zyxwvutsrqponmlkjihgfedcba9876543210"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "xyz001abc002def003ghi004jkl005"
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "word": "000000000012345678900000000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "000abc0000def1234gh5678"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "a1b2c3d4e5f6g7h8i9j0a00b002c003d004e005f006g007h008i009j000"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "a1b01c001d0001e00001f000001g0000001h00000001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "1a01b002c0003d00004e000005f0000006g00000007h000000008i0000000009j0"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "123abc456def789ghi0jklm00nopqr000stu0000vwx00000yz"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "word": "abc123xyz456def789ghi10jkl11mno12pqr13stu14vwx15"
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "word": "000001000002000003000004000005000006000007000008000009"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a1b1c1d1e1f1g1h1i1j1k1l1m1n1o1p1q1r1s1t1u1v1w1x1y1z1"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "abc123xyz456def789ghi001jkl234mno567pqr890stu0vwx123y0z456"
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "word": "abc123xyz456def456ghi789"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "a0b00c000d0000e00000f"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a1b2c3d4e5f6g7h8i9j0a000b0002c0003d0004e0005f0006g0007h0008i0009j0000"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "99999zzz88888xxx7777yyy6666"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "word": "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "abc123xyz456abc123"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "abc123xyz456def123"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "a1b10c100d1000e10000f100000g1000000h10000000i100000000j1000000000"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "1234567890abcdefghijklmnopqrstuvwxyz0987654321"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "0000000000000000000000000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "00000000000000000000000000000000000000000000000001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "010abc0010def00010ghi"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "123abc123def123ghi123jkl123mno123pqrs123tuvw123xyz123"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "abc123def456ghi789jkl0123"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "123456789a987654321b123456789c987654321d123456789e987654321f123456789g"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "00123456789000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "0a00b000c0000d00000e000000f0000000g00000000h000000000i000000000j0"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a0b00c000d0000e00000f000000g0000000h00000000i0"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a1b01c001d100e0001f10"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "99999999999999999999999999999999999999999999999999999999999999999999999999999999999"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "abc001abc01abc1"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a100000000b100000001c100000002d100000003e100000004f100000005"
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "word": "100000000000000000000000000000000000000000000000000000001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "0012300abc045600def0123"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "word": "00123004560078900100000000000000000000000000000000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "9876543210qwertyuiopasdfghjklzxcvbnm"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "a0b0c00d000e0000f00000g000000h0000000i00000000j000000000"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "123abc456def789ghi0jkl123mno456pqr789stu0vwxyz"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "word": "1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "word": "abc123456def654321ghi123456"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "abc1def2ghi3jkl4mno5pqr6stu7vwx8yz90123456789"
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "word": "0a123b456c789d0123"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "word": "a123b456c789d012e345f678g901"
+      },
+      "expected": 7
+    },
+    {
+      "input": {
+        "word": "00100a001b001c"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "abc1abc01abc001abc0001abc00001abc000001abc0000001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "word": "abc001xyz01abc100"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "word": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0"
+      },
+      "expected": 10
+    }
+  ],
+  "test_case_count": 124,
+  "optimal_complexity": null,
+  "source_task_id": "number-of-different-integers-in-a-string",
+  "source_question_id": 1805
+}

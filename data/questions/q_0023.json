@@ -1,0 +1,411 @@
+{
+  "question_id": "q_0023",
+  "title": "Removing Stars From A String",
+  "difficulty": 2,
+  "topic": "Stack",
+  "topics": [
+    "Stack",
+    "String",
+    "Simulation"
+  ],
+  "description_md": "You are given a string s, which contains stars *.\nIn one operation, you can:\n\nChoose a star in s.\nRemove the closest non-star character to its left, as well as remove the star itself.\n\nReturn the string after all stars have been removed.\nNote:\n\nThe input will be generated such that the operation is always possible.\nIt can be shown that the resulting string will always be unique.\n\n\u00a0\nExample 1:\n\nInput: s = \"leet**cod*e\"\nOutput: \"lecoe\"\nExplanation: Performing the removals from left to right:\n- The closest character to the 1st star is 't' in \"leet**cod*e\". s becomes \"lee*cod*e\".\n- The closest character to the 2nd star is 'e' in \"lee*cod*e\". s becomes \"lecod*e\".\n- The closest character to the 3rd star is 'd' in \"lecod*e\". s becomes \"lecoe\".\nThere are no more stars, so we return \"lecoe\".\nExample 2:\n\nInput: s = \"erase*****\"\nOutput: \"\"\nExplanation: The entire string is removed, so we return an empty string.\n\n\u00a0\nConstraints:\n\n1 <= s.length <= 105\ns consists of lowercase English letters and stars *.\nThe operation above can be performed on s.\n\n",
+  "starter_code": "class Solution:\n    def removeStars(self, s: str) -> str:\n        ",
+  "entry_point": "Solution().removeStars",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def removeStars(self, s: str) -> str:\n        ans = []\n        for c in s:\n            if c == '*':\n                ans.pop()\n            else:\n                ans.append(c)\n        return ''.join(ans)\n",
+  "test_cases": [
+    {
+      "input": {
+        "s": "abc*def*ghi*jkl*mno*pqr*stu*vwx*y*z"
+      },
+      "expected": "abdeghjkmnpqstvwz"
+    },
+    {
+      "input": {
+        "s": "leet**cod*e"
+      },
+      "expected": "lecoe"
+    },
+    {
+      "input": {
+        "s": "a*b*c*d*e*"
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxyz"
+      },
+      "expected": "abcdefghijklmnopqrstuvwxyz"
+    },
+    {
+      "input": {
+        "s": "ab*cd*ef*gh*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*"
+      },
+      "expected": "aceg"
+    },
+    {
+      "input": {
+        "s": "a*ab*abc*abcd*abcde*abcdef*abcdefg*abcdefgh*abcdefghi*abcdefghij*abcdefghijk*abcdefghijkl*abcdefghijklm*abcdefghijklmn*abcdefghijklmno*abcdefghijklmnop*abcdefghijklmnopq*abcdefghijklmnopqr*abcdefghijklmnopqrs*abcdefghijklmnopqrst*abcdefghijklmnopqrstu*abcdefghijklmnopqrstuv*abcdefghijklmnopqrstuvw*abcdefghijklmnopqrstuvwx*abcdefghijklmnopqrstuvwxy*abcdefghijklmnopqrstuvwxyza"
+      },
+      "expected": "aababcabcdabcdeabcdefabcdefgabcdefghabcdefghiabcdefghijabcdefghijkabcdefghijklabcdefghijklmabcdefghijklmnabcdefghijklmnoabcdefghijklmnopabcdefghijklmnopqabcdefghijklmnopqrabcdefghijklmnopqrsabcdefghijklmnopqrstabcdefghijklmnopqrstuabcdefghijklmnopqrstuvabcdefghijklmnopqrstuvwabcdefghijklmnopqrstuvwxabcdefghijklmnopqrstuvwxyza"
+    },
+    {
+      "input": {
+        "s": "abcdef"
+      },
+      "expected": "abcdef"
+    },
+    {
+      "input": {
+        "s": "zyxwvutsrqponmlkjihgfedcba"
+      },
+      "expected": "zyxwvutsrqponmlkjihgfedcba"
+    },
+    {
+      "input": {
+        "s": "a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a"
+      },
+      "expected": "a"
+    },
+    {
+      "input": {
+        "s": "ab*cd*ef*gh*ij*kl*mn*op*qr*st*uv*wx*yz"
+      },
+      "expected": "acegikmoqsuwyz"
+    },
+    {
+      "input": {
+        "s": "abcde"
+      },
+      "expected": "abcde"
+    },
+    {
+      "input": {
+        "s": "abc***"
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "ab*cd*ef*g*hi*j*"
+      },
+      "expected": "aceh"
+    },
+    {
+      "input": {
+        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
+      },
+      "expected": "z"
+    },
+    {
+      "input": {
+        "s": "erase*****"
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "abcd**efgh**ijkl**mnop**qrst**uvw**x**y**z"
+      },
+      "expected": "abefijmnqz"
+    },
+    {
+      "input": {
+        "s": "aaabbbcccddd***eee***fffgggggghhhhiiiiijkkkkkllllmmmmnnnnoooo***pppppqqqqrrrrsssss"
+      },
+      "expected": "aaabbbcccfffgggggghhhhiiiiijkkkkkllllmmmmnnnnopppppqqqqrrrrsssss"
+    },
+    {
+      "input": {
+        "s": "abcde**fghij**klmno**pqrst**uvwxy**z"
+      },
+      "expected": "abcfghklmpqruvwz"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuv*xyzwvutsrponmlkjihgfedcba*"
+      },
+      "expected": "abcdefghijklmnopqrstuxyzwvutsrponmlkjihgfedcb"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxyz*zyxwvutsrqponmlkjihgfedcba*"
+      },
+      "expected": "abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcb"
+    },
+    {
+      "input": {
+        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
+      },
+      "expected": "z"
+    },
+    {
+      "input": {
+        "s": "aaaaaa*bbbbbb*cccccc*dddddd*eeeeee*ffffff*gggggg*hhhhhh*iiiiii*jjjjjj*kkkkkk*llllll*mmmmmm*nnnnnn*oooooo*pppppp*qqqqqq*rrrrrr*ssssss*tttttt*uuuuuu*vvvvvv*wwwwww*xxxxxx*yyyyyy*zzzzzz*"
+      },
+      "expected": "aaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrssssstttttuuuuuvvvvvwwwwwxxxxxyyyyyzzzzz"
+    },
+    {
+      "input": {
+        "s": "abcde*fghij*klmno*pqrst*uvwxy*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
+      },
+      "expected": "abcdfghiklmnpqrsuvwxz"
+    },
+    {
+      "input": {
+        "s": "abc*def*ghi*jkl*mno*pqr*stu*vwx*yz*"
+      },
+      "expected": "abdeghjkmnpqstvwy"
+    },
+    {
+      "input": {
+        "s": "aaa*bbb*ccc*ddd*eee*fff*ggg*hhh*iii*jjj*kkk*lll*mmm*nnn*ooo*ppp*qqq*rrr*sss*ttt*uuu*vvv*www*xxx*yyy*zzz*"
+      },
+      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxyz*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
+      },
+      "expected": "abcdefghijklmnopqrstuvwxyz"
+    },
+    {
+      "input": {
+        "s": "abcde*fg*hi*jkl*mno*pqr*stu*vwx*y*z*"
+      },
+      "expected": "abcdfhjkmnpqstvw"
+    },
+    {
+      "input": {
+        "s": "aabbccddeeefffggg***hhiijjkkllmmnn***oo***ppqqrrssttttuuuuuuuuuuvvvvvvvvwxyz"
+      },
+      "expected": "aabbccddeeefffhhiijjkkllppqqrrssttttuuuuuuuuuuvvvvvvvvwxyz"
+    },
+    {
+      "input": {
+        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*zyxwvutsrqponmlkjihgfedcba"
+      },
+      "expected": "zyxwvutsrqponmlkjihgfedcba"
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz*****"
+      },
+      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwx"
+    },
+    {
+      "input": {
+        "s": "z*yz*zyxw*vyxwv*u*vwxy*ts*rq*ponm*ln*kj*i*hg*fed*cb*a*"
+      },
+      "expected": "yzyxvyxwvwxtrponlkhfec"
+    },
+    {
+      "input": {
+        "s": "abc***def**ghij***klmno**pqrstuv***wxyz"
+      },
+      "expected": "dgklmpqrswxyz"
+    },
+    {
+      "input": {
+        "s": "abcdefghij*klmnopqrst*uvwxyz*zyxwvutsr*qp*on*m*l*k*j*i*h*g*f*e*d*c*b*a"
+      },
+      "expected": "abcdefghiklmnopqrsuvwxyzyxwvutsqoa"
+    },
+    {
+      "input": {
+        "s": "a*ab*abc*abcd*abcde*abcdef*abcdefg*abcdefgh*abcdefghi*abcdefghij*abcdefghijk*abcdefghijkl*abcdefghijklm*abcdefghijklmn*abcdefghijklmno*abcdefghijklmnop*abcdefghijklmnopq*abcdefghijklmnopqr*abcdefghijklmnopqrs*abcdefghijklmnopqrst*abcdefghijklmnopqrstu*abcdefghijklmnopqrstuv*abcdefghijklmnopqrstuvw*abcdefghijklmnopqrstuvwx*abcdefghijklmnopqrstuvwxy*abcdefghijklmnopqrstuvwxyz*"
+      },
+      "expected": "aababcabcdabcdeabcdefabcdefgabcdefghabcdefghiabcdefghijabcdefghijkabcdefghijklabcdefghijklmabcdefghijklmnabcdefghijklmnoabcdefghijklmnopabcdefghijklmnopqabcdefghijklmnopqrabcdefghijklmnopqrsabcdefghijklmnopqrstabcdefghijklmnopqrstuabcdefghijklmnopqrstuvabcdefghijklmnopqrstuvwabcdefghijklmnopqrstuvwxabcdefghijklmnopqrstuvwxy"
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz****"
+      },
+      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxx"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxy**z"
+      },
+      "expected": "abcdefghijklmnopqrstuvwz"
+    },
+    {
+      "input": {
+        "s": "xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz"
+      },
+      "expected": "xyz"
+    },
+    {
+      "input": {
+        "s": "abcde*****fghij*****klmno*****pqrst*****uvwxy*****z"
+      },
+      "expected": "z"
+    },
+    {
+      "input": {
+        "s": "abcdefghij***klmnopqrst***uvwxyz***abcd***efghij***klmno***pqrst***uvwxy***z"
+      },
+      "expected": "abcdefgklmnopquvwaefgklpquvz"
+    },
+    {
+      "input": {
+        "s": "abcdefghijk***lmnopqrstuvwxyz**aaaaaaaaaabbbbbbbbbbccccccccccddddeeeeee****"
+      },
+      "expected": "abcdefghlmnopqrstuvwxaaaaaaaaaabbbbbbbbbbccccccccccddddee"
+    },
+    {
+      "input": {
+        "s": "abcd*efgh*ijkl*mnop*qrst*uvw*x*y*z*"
+      },
+      "expected": "abcefgijkmnoqrsuv"
+    },
+    {
+      "input": {
+        "s": "nested*stars*****in*string*example***"
+      },
+      "expected": "nesteistrinexam"
+    },
+    {
+      "input": {
+        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
+      },
+      "expected": "z"
+    },
+    {
+      "input": {
+        "s": "a*bb*ccc*dddd*eeeee*ffffff*gggggg*hhhhhhh*iiiiiiii*jjjjjjjjj*kkkkkkkkk*llllllllll*mmmmmmmmmm*nnnnnnnnnnn*ooooooooooo*pppppppppppp*qqqqqqqqqqqqq*rrrrrrrrrrrrrr*sssssssssssssss*ttttttttttttttttt*uuuuuuuuuuuuuuuuuu*vvvvvvvvvvvvvvvvvvv*wwwwwwwwwwwwwwwwwwww*xxyyz**"
+      },
+      "expected": "bccdddeeeefffffggggghhhhhhiiiiiiijjjjjjjjkkkkkkkklllllllllmmmmmmmmmnnnnnnnnnnoooooooooopppppppppppqqqqqqqqqqqqrrrrrrrrrrrrrssssssssssssssttttttttttttttttuuuuuuuuuuuuuuuuuvvvvvvvvvvvvvvvvvvwwwwwwwwwwwwwwwwwwwxxy"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxyz*abcdefghijklmnopqrstuvwxyz*"
+      },
+      "expected": "abcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxy"
+    },
+    {
+      "input": {
+        "s": "abcde*fg*hij*k*lmnop*qrs*tuvw*x*y*z*"
+      },
+      "expected": "abcdfhilmnoqrtuv"
+    },
+    {
+      "input": {
+        "s": "abcdefghi*jk*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z**"
+      },
+      "expected": "abcdefgh"
+    },
+    {
+      "input": {
+        "s": "x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x"
+      },
+      "expected": "x"
+    },
+    {
+      "input": {
+        "s": "aabbaa*bbcc*ddcc*eeff*ffgg*hhiijj*kkll*mmnn*oopp*qqrr*sttuu*vwwxxyyzz*****"
+      },
+      "expected": "aabbabbcddceefffghhiijkklmmnoopqqrsttuvwwx"
+    },
+    {
+      "input": {
+        "s": "abc**def**ghi**jkl**mno**pqr**stu**vwx**yz**"
+      },
+      "expected": "adgjmpsv"
+    },
+    {
+      "input": {
+        "s": "mississippi***ipp*ss*m*i**"
+      },
+      "expected": "mississiip"
+    },
+    {
+      "input": {
+        "s": "a*bc*def*ghij*klmno*pqrst*uvwxy*z"
+      },
+      "expected": "bdeghiklmnpqrsuvwxz"
+    },
+    {
+      "input": {
+        "s": "mnopqrstu*****vwxyz*****abcdefghi*****jklmno*****pqrst*****uvw*****xy*****z"
+      },
+      "expected": "mnopz"
+    },
+    {
+      "input": {
+        "s": "abcde*fgh*i*jklmno*pqrstu*v*wxyz*"
+      },
+      "expected": "abcdfgjklmnpqrstwxy"
+    },
+    {
+      "input": {
+        "s": "abc*def*ghi*jkl*mno*pqr*stu*vwx*y*z**"
+      },
+      "expected": "abdeghjkmnpqstv"
+    },
+    {
+      "input": {
+        "s": "a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*"
+      },
+      "expected": ""
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxy**z*"
+      },
+      "expected": "abcdefghijklmnopqrstuvw"
+    },
+    {
+      "input": {
+        "s": "xy*z*ab*cd*ef*gh*ij*kl*mn*op*qr*st*uv*wx*yz*"
+      },
+      "expected": "xacegikmoqsuwy"
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz*"
+      },
+      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyz"
+    },
+    {
+      "input": {
+        "s": "python*is*awesome***so**is**java**"
+      },
+      "expected": "pythoiawesja"
+    },
+    {
+      "input": {
+        "s": "longstringwith*various*characters*and*stars*through*out***"
+      },
+      "expected": "longstringwitvarioucharacteranstarthroug"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxyz*a**b**c**d**e**f**g**h**i**j**k**l**m**n**o**p**q**r**s**t**u**v**w**x**y**z"
+      },
+      "expected": "z"
+    },
+    {
+      "input": {
+        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
+      },
+      "expected": "z"
+    },
+    {
+      "input": {
+        "s": "a*ab*abc*abcd*abcde*abcdef*abcdefg*abcdefgh*abcdefghi*abcdefghij*abcdefghijk"
+      },
+      "expected": "aababcabcdabcdeabcdefabcdefgabcdefghabcdefghiabcdefghijk"
+    },
+    {
+      "input": {
+        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*abcdefghijklmnopqrstuvwxyz*zyxwvutsrqponmlkjihgfedcba*"
+      },
+      "expected": "abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcb"
+    }
+  ],
+  "test_case_count": 65,
+  "optimal_complexity": null,
+  "source_task_id": "removing-stars-from-a-string",
+  "source_question_id": 2390
+}

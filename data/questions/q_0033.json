@@ -1,0 +1,725 @@
+{
+  "question_id": "q_0033",
+  "title": "Maximum Score From Removing Stones",
+  "difficulty": 2,
+  "topic": "Greedy",
+  "topics": [
+    "Greedy",
+    "Math",
+    "Heap (Priority Queue)"
+  ],
+  "description_md": "You are playing a solitaire game with three piles of stones of sizes a\u200b\u200b\u200b\u200b\u200b\u200b, b,\u200b\u200b\u200b\u200b\u200b\u200b and c\u200b\u200b\u200b\u200b\u200b\u200b respectively. Each turn you choose two different non-empty piles, take one stone from each, and add 1 point to your score. The game stops when there are fewer than two non-empty piles (meaning there are no more available moves).\nGiven three integers a\u200b\u200b\u200b\u200b\u200b, b,\u200b\u200b\u200b\u200b\u200b and c\u200b\u200b\u200b\u200b\u200b, return the maximum score you can get.\n\u00a0\nExample 1:\n\nInput: a = 2, b = 4, c = 6\nOutput: 6\nExplanation: The starting state is (2, 4, 6). One optimal set of moves is:\n- Take from 1st and 3rd piles, state is now (1, 4, 5)\n- Take from 1st and 3rd piles, state is now (0, 4, 4)\n- Take from 2nd and 3rd piles, state is now (0, 3, 3)\n- Take from 2nd and 3rd piles, state is now (0, 2, 2)\n- Take from 2nd and 3rd piles, state is now (0, 1, 1)\n- Take from 2nd and 3rd piles, state is now (0, 0, 0)\nThere are fewer than two non-empty piles, so the game ends. Total: 6 points.\n\nExample 2:\n\nInput: a = 4, b = 4, c = 6\nOutput: 7\nExplanation: The starting state is (4, 4, 6). One optimal set of moves is:\n- Take from 1st and 2nd piles, state is now (3, 3, 6)\n- Take from 1st and 3rd piles, state is now (2, 3, 5)\n- Take from 1st and 3rd piles, state is now (1, 3, 4)\n- Take from 1st and 3rd piles, state is now (0, 3, 3)\n- Take from 2nd and 3rd piles, state is now (0, 2, 2)\n- Take from 2nd and 3rd piles, state is now (0, 1, 1)\n- Take from 2nd and 3rd piles, state is now (0, 0, 0)\nThere are fewer than two non-empty piles, so the game ends. Total: 7 points.\n\nExample 3:\n\nInput: a = 1, b = 8, c = 8\nOutput: 8\nExplanation: One optimal set of moves is to take from the 2nd and 3rd piles for 8 turns until they are empty.\nAfter that, there are fewer than two non-empty piles, so the game ends.\n\n\u00a0\nConstraints:\n\n1 <= a, b, c <= 105\n\n",
+  "starter_code": "class Solution:\n    def maximumScore(self, a: int, b: int, c: int) -> int:\n        ",
+  "entry_point": "Solution().maximumScore",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def maximumScore(self, a: int, b: int, c: int) -> int:\n        s = sorted([a, b, c])\n        ans = 0\n        while s[1]:\n            ans += 1\n            s[1] -= 1\n            s[2] -= 1\n            s.sort()\n        return ans\n",
+  "test_cases": [
+    {
+      "input": {
+        "a": 10,
+        "b": 10,
+        "c": 1
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "a": 5,
+        "b": 7,
+        "c": 9
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "a": 5,
+        "b": 5,
+        "c": 5
+      },
+      "expected": 7
+    },
+    {
+      "input": {
+        "a": 1,
+        "b": 8,
+        "c": 8
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "a": 3,
+        "b": 3,
+        "c": 3
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "a": 100000,
+        "b": 1,
+        "c": 1
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "a": 100000,
+        "b": 100000,
+        "c": 100000
+      },
+      "expected": 150000
+    },
+    {
+      "input": {
+        "a": 4,
+        "b": 4,
+        "c": 6
+      },
+      "expected": 7
+    },
+    {
+      "input": {
+        "a": 30,
+        "b": 60,
+        "c": 90
+      },
+      "expected": 90
+    },
+    {
+      "input": {
+        "a": 1,
+        "b": 1,
+        "c": 100000
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "a": 50000,
+        "b": 50000,
+        "c": 1
+      },
+      "expected": 50000
+    },
+    {
+      "input": {
+        "a": 10,
+        "b": 10,
+        "c": 10
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "a": 2,
+        "b": 4,
+        "c": 6
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "a": 5,
+        "b": 10,
+        "c": 15
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "a": 20,
+        "b": 30,
+        "c": 40
+      },
+      "expected": 45
+    },
+    {
+      "input": {
+        "a": 7,
+        "b": 7,
+        "c": 14
+      },
+      "expected": 14
+    },
+    {
+      "input": {
+        "a": 10,
+        "b": 1,
+        "c": 1
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "a": 7,
+        "b": 14,
+        "c": 10
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "a": 1,
+        "b": 1,
+        "c": 2
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "a": 7,
+        "b": 8,
+        "c": 9
+      },
+      "expected": 12
+    },
+    {
+      "input": {
+        "a": 33333,
+        "b": 33333,
+        "c": 33334
+      },
+      "expected": 50000
+    },
+    {
+      "input": {
+        "a": 50000,
+        "b": 50000,
+        "c": 50001
+      },
+      "expected": 75000
+    },
+    {
+      "input": {
+        "a": 1000,
+        "b": 1000,
+        "c": 1000
+      },
+      "expected": 1500
+    },
+    {
+      "input": {
+        "a": 80,
+        "b": 80,
+        "c": 40
+      },
+      "expected": 100
+    },
+    {
+      "input": {
+        "a": 7,
+        "b": 14,
+        "c": 21
+      },
+      "expected": 21
+    },
+    {
+      "input": {
+        "a": 10,
+        "b": 15,
+        "c": 20
+      },
+      "expected": 22
+    },
+    {
+      "input": {
+        "a": 150000,
+        "b": 50000,
+        "c": 100000
+      },
+      "expected": 150000
+    },
+    {
+      "input": {
+        "a": 5000,
+        "b": 5001,
+        "c": 5002
+      },
+      "expected": 7501
+    },
+    {
+      "input": {
+        "a": 33333,
+        "b": 66666,
+        "c": 100000
+      },
+      "expected": 99999
+    },
+    {
+      "input": {
+        "a": 50000,
+        "b": 1,
+        "c": 1
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "a": 60000,
+        "b": 20000,
+        "c": 20000
+      },
+      "expected": 40000
+    },
+    {
+      "input": {
+        "a": 99999,
+        "b": 1,
+        "c": 1
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "a": 5,
+        "b": 5,
+        "c": 100
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "a": 80000,
+        "b": 80000,
+        "c": 1
+      },
+      "expected": 80000
+    },
+    {
+      "input": {
+        "a": 99998,
+        "b": 99999,
+        "c": 100000
+      },
+      "expected": 149998
+    },
+    {
+      "input": {
+        "a": 20,
+        "b": 20,
+        "c": 20
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "a": 50000,
+        "b": 40000,
+        "c": 30000
+      },
+      "expected": 60000
+    },
+    {
+      "input": {
+        "a": 10000,
+        "b": 10000,
+        "c": 1
+      },
+      "expected": 10000
+    },
+    {
+      "input": {
+        "a": 5,
+        "b": 5,
+        "c": 10
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "a": 10000,
+        "b": 10000,
+        "c": 10000
+      },
+      "expected": 15000
+    },
+    {
+      "input": {
+        "a": 42,
+        "b": 27,
+        "c": 19
+      },
+      "expected": 44
+    },
+    {
+      "input": {
+        "a": 45000,
+        "b": 45000,
+        "c": 10000
+      },
+      "expected": 50000
+    },
+    {
+      "input": {
+        "a": 2,
+        "b": 2,
+        "c": 100000
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "a": 25,
+        "b": 25,
+        "c": 24
+      },
+      "expected": 37
+    },
+    {
+      "input": {
+        "a": 500,
+        "b": 500,
+        "c": 1500
+      },
+      "expected": 1000
+    },
+    {
+      "input": {
+        "a": 100,
+        "b": 200,
+        "c": 300
+      },
+      "expected": 300
+    },
+    {
+      "input": {
+        "a": 15,
+        "b": 15,
+        "c": 15
+      },
+      "expected": 22
+    },
+    {
+      "input": {
+        "a": 25,
+        "b": 75,
+        "c": 125
+      },
+      "expected": 100
+    },
+    {
+      "input": {
+        "a": 20,
+        "b": 20,
+        "c": 21
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "a": 20000,
+        "b": 30000,
+        "c": 10000
+      },
+      "expected": 30000
+    },
+    {
+      "input": {
+        "a": 20,
+        "b": 40,
+        "c": 60
+      },
+      "expected": 60
+    },
+    {
+      "input": {
+        "a": 12345,
+        "b": 67890,
+        "c": 11111
+      },
+      "expected": 23456
+    },
+    {
+      "input": {
+        "a": 80000,
+        "b": 10000,
+        "c": 10000
+      },
+      "expected": 20000
+    },
+    {
+      "input": {
+        "a": 12345,
+        "b": 67890,
+        "c": 54321
+      },
+      "expected": 66666
+    },
+    {
+      "input": {
+        "a": 5,
+        "b": 15,
+        "c": 20
+      },
+      "expected": 20
+    },
+    {
+      "input": {
+        "a": 2,
+        "b": 2,
+        "c": 3
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "a": 1,
+        "b": 1,
+        "c": 200000
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "a": 100,
+        "b": 100,
+        "c": 101
+      },
+      "expected": 150
+    },
+    {
+      "input": {
+        "a": 3,
+        "b": 3,
+        "c": 9
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "a": 15,
+        "b": 25,
+        "c": 35
+      },
+      "expected": 37
+    },
+    {
+      "input": {
+        "a": 50000,
+        "b": 50000,
+        "c": 99999
+      },
+      "expected": 99999
+    },
+    {
+      "input": {
+        "a": 10000,
+        "b": 20000,
+        "c": 30000
+      },
+      "expected": 30000
+    },
+    {
+      "input": {
+        "a": 10000,
+        "b": 5000,
+        "c": 5000
+      },
+      "expected": 10000
+    },
+    {
+      "input": {
+        "a": 25000,
+        "b": 25000,
+        "c": 50000
+      },
+      "expected": 50000
+    },
+    {
+      "input": {
+        "a": 99999,
+        "b": 99998,
+        "c": 99997
+      },
+      "expected": 149997
+    },
+    {
+      "input": {
+        "a": 75,
+        "b": 25,
+        "c": 50
+      },
+      "expected": 75
+    },
+    {
+      "input": {
+        "a": 1,
+        "b": 2,
+        "c": 3
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "a": 10,
+        "b": 20,
+        "c": 30
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "a": 3,
+        "b": 9,
+        "c": 9
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "a": 15,
+        "b": 10,
+        "c": 5
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "a": 30,
+        "b": 5,
+        "c": 25
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "a": 50,
+        "b": 50,
+        "c": 100
+      },
+      "expected": 100
+    },
+    {
+      "input": {
+        "a": 100,
+        "b": 100,
+        "c": 100
+      },
+      "expected": 150
+    },
+    {
+      "input": {
+        "a": 99999,
+        "b": 99999,
+        "c": 99999
+      },
+      "expected": 149998
+    },
+    {
+      "input": {
+        "a": 100,
+        "b": 100,
+        "c": 1
+      },
+      "expected": 100
+    },
+    {
+      "input": {
+        "a": 50000,
+        "b": 49999,
+        "c": 49998
+      },
+      "expected": 74998
+    },
+    {
+      "input": {
+        "a": 50,
+        "b": 25,
+        "c": 25
+      },
+      "expected": 50
+    },
+    {
+      "input": {
+        "a": 98765,
+        "b": 43210,
+        "c": 54321
+      },
+      "expected": 97531
+    },
+    {
+      "input": {
+        "a": 5000,
+        "b": 5000,
+        "c": 10000
+      },
+      "expected": 10000
+    },
+    {
+      "input": {
+        "a": 55,
+        "b": 15,
+        "c": 35
+      },
+      "expected": 50
+    },
+    {
+      "input": {
+        "a": 33333,
+        "b": 33334,
+        "c": 33335
+      },
+      "expected": 50001
+    },
+    {
+      "input": {
+        "a": 10000,
+        "b": 10000,
+        "c": 5000
+      },
+      "expected": 12500
+    },
+    {
+      "input": {
+        "a": 30,
+        "b": 50,
+        "c": 20
+      },
+      "expected": 50
+    },
+    {
+      "input": {
+        "a": 30,
+        "b": 30,
+        "c": 30
+      },
+      "expected": 45
+    },
+    {
+      "input": {
+        "a": 60000,
+        "b": 40000,
+        "c": 20000
+      },
+      "expected": 60000
+    },
+    {
+      "input": {
+        "a": 1,
+        "b": 1,
+        "c": 1
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "a": 8,
+        "b": 8,
+        "c": 8
+      },
+      "expected": 12
+    },
+    {
+      "input": {
+        "a": 100000,
+        "b": 50000,
+        "c": 50000
+      },
+      "expected": 100000
+    }
+  ],
+  "test_case_count": 88,
+  "optimal_complexity": null,
+  "source_task_id": "maximum-score-from-removing-stones",
+  "source_question_id": 1753
+}

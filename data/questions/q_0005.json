@@ -1,0 +1,1106 @@
+{
+  "question_id": "q_0005",
+  "title": "Shuffle String",
+  "difficulty": 1,
+  "topic": "Array",
+  "topics": [
+    "Array",
+    "String"
+  ],
+  "description_md": "You are given a string s and an integer array indices of the same length. The string s will be shuffled such that the character at the ith position moves to indices[i] in the shuffled string.\nReturn the shuffled string.\n\u00a0\nExample 1:\n\n\nInput: s = \"codeleet\", indices = [4,5,6,7,0,2,1,3]\nOutput: \"leetcode\"\nExplanation: As shown, \"codeleet\" becomes \"leetcode\" after shuffling.\n\nExample 2:\n\nInput: s = \"abc\", indices = [0,1,2]\nOutput: \"abc\"\nExplanation: After shuffling, each character remains in its position.\n\n\u00a0\nConstraints:\n\ns.length == indices.length == n\n1 <= n <= 100\ns consists of only lowercase English letters.\n0 <= indices[i] < n\nAll values of indices are unique.\n\n",
+  "starter_code": "class Solution:\n    def restoreString(self, s: str, indices: List[int]) -> str:\n        ",
+  "entry_point": "Solution().restoreString",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def restoreString(self, s: str, indices: List[int]) -> str:\n        ans = [0] * len(s)\n        for i, c in enumerate(s):\n            ans[indices[i]] = c\n        return ''.join(ans)\n",
+  "test_cases": [
+    {
+      "input": {
+        "s": "codeleet",
+        "indices": [
+          4,
+          5,
+          6,
+          7,
+          0,
+          2,
+          1,
+          3
+        ]
+      },
+      "expected": "leetcode"
+    },
+    {
+      "input": {
+        "s": "aaiougrt",
+        "indices": [
+          4,
+          0,
+          2,
+          6,
+          7,
+          3,
+          1,
+          5
+        ]
+      },
+      "expected": "arigatou"
+    },
+    {
+      "input": {
+        "s": "aiohn",
+        "indices": [
+          3,
+          1,
+          4,
+          2,
+          0
+        ]
+      },
+      "expected": "nihao"
+    },
+    {
+      "input": {
+        "s": "abc",
+        "indices": [
+          0,
+          1,
+          2
+        ]
+      },
+      "expected": "abc"
+    },
+    {
+      "input": {
+        "s": "art",
+        "indices": [
+          1,
+          0,
+          2
+        ]
+      },
+      "expected": "rat"
+    },
+    {
+      "input": {
+        "s": "abcdefgh",
+        "indices": [
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0
+        ]
+      },
+      "expected": "hgfedcba"
+    },
+    {
+      "input": {
+        "s": "permutation",
+        "indices": [
+          8,
+          5,
+          4,
+          10,
+          0,
+          9,
+          2,
+          6,
+          3,
+          1,
+          7
+        ]
+      },
+      "expected": "uoairetnptm"
+    },
+    {
+      "input": {
+        "s": "development",
+        "indices": [
+          3,
+          6,
+          5,
+          1,
+          0,
+          4,
+          8,
+          9,
+          2,
+          7,
+          10
+        ]
+      },
+      "expected": "leedovenpmt"
+    },
+    {
+      "input": {
+        "s": "exampleinput",
+        "indices": [
+          11,
+          2,
+          5,
+          0,
+          8,
+          1,
+          6,
+          7,
+          4,
+          3,
+          9,
+          10
+        ]
+      },
+      "expected": "mlxpnaeipute"
+    },
+    {
+      "input": {
+        "s": "abcdefghij",
+        "indices": [
+          5,
+          8,
+          1,
+          6,
+          7,
+          0,
+          3,
+          2,
+          9,
+          4
+        ]
+      },
+      "expected": "fchgjadebi"
+    },
+    {
+      "input": {
+        "s": "abcdefgxyz",
+        "indices": [
+          6,
+          1,
+          7,
+          5,
+          8,
+          0,
+          9,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": "fbzyxdaceg"
+    },
+    {
+      "input": {
+        "s": "pneumonia",
+        "indices": [
+          2,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          1,
+          0
+        ]
+      },
+      "expected": "aipnomuen"
+    },
+    {
+      "input": {
+        "s": "randomization",
+        "indices": [
+          4,
+          1,
+          5,
+          0,
+          2,
+          7,
+          8,
+          6,
+          3,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      "expected": "daoarnzmition"
+    },
+    {
+      "input": {
+        "s": "character",
+        "indices": [
+          8,
+          4,
+          2,
+          5,
+          6,
+          1,
+          0,
+          7,
+          3
+        ]
+      },
+      "expected": "tcarhraec"
+    },
+    {
+      "input": {
+        "s": "fqtv",
+        "indices": [
+          1,
+          3,
+          2,
+          0
+        ]
+      },
+      "expected": "vftq"
+    },
+    {
+      "input": {
+        "s": "visualization",
+        "indices": [
+          10,
+          1,
+          9,
+          12,
+          0,
+          2,
+          8,
+          4,
+          6,
+          7,
+          11,
+          3,
+          5
+        ]
+      },
+      "expected": "ailoznatisviu"
+    },
+    {
+      "input": {
+        "s": "waterbottle",
+        "indices": [
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          9,
+          0,
+          10
+        ]
+      },
+      "expected": "ltobretawte"
+    },
+    {
+      "input": {
+        "s": "shuffle",
+        "indices": [
+          4,
+          2,
+          5,
+          1,
+          6,
+          3,
+          0
+        ]
+      },
+      "expected": "efhlsuf"
+    },
+    {
+      "input": {
+        "s": "intermediate",
+        "indices": [
+          11,
+          8,
+          2,
+          0,
+          7,
+          3,
+          4,
+          9,
+          1,
+          6,
+          5,
+          10
+        ]
+      },
+      "expected": "eitmetarndei"
+    },
+    {
+      "input": {
+        "s": "programming",
+        "indices": [
+          10,
+          2,
+          1,
+          7,
+          8,
+          6,
+          5,
+          3,
+          0,
+          9,
+          4
+        ]
+      },
+      "expected": "iormgmagrnp"
+    },
+    {
+      "input": {
+        "s": "alphabet",
+        "indices": [
+          5,
+          6,
+          7,
+          4,
+          3,
+          2,
+          1,
+          0
+        ]
+      },
+      "expected": "tebahalp"
+    },
+    {
+      "input": {
+        "s": "permutation",
+        "indices": [
+          1,
+          10,
+          9,
+          0,
+          8,
+          6,
+          3,
+          5,
+          4,
+          2,
+          7
+        ]
+      },
+      "expected": "mpoaittnure"
+    },
+    {
+      "input": {
+        "s": "shuffling",
+        "indices": [
+          8,
+          4,
+          3,
+          5,
+          7,
+          2,
+          6,
+          1,
+          0
+        ]
+      },
+      "expected": "gnluhfifs"
+    },
+    {
+      "input": {
+        "s": "exampleinput",
+        "indices": [
+          11,
+          4,
+          0,
+          7,
+          8,
+          3,
+          5,
+          6,
+          2,
+          9,
+          1,
+          10
+        ]
+      },
+      "expected": "aunlxeimppte"
+    },
+    {
+      "input": {
+        "s": "generation",
+        "indices": [
+          5,
+          3,
+          6,
+          7,
+          2,
+          1,
+          8,
+          0,
+          4,
+          9
+        ]
+      },
+      "expected": "iareognetn"
+    },
+    {
+      "input": {
+        "s": "xylophone",
+        "indices": [
+          1,
+          4,
+          8,
+          2,
+          7,
+          5,
+          3,
+          6,
+          0
+        ]
+      },
+      "expected": "exooyhnpl"
+    },
+    {
+      "input": {
+        "s": "uniquecharacters",
+        "indices": [
+          12,
+          1,
+          13,
+          2,
+          0,
+          15,
+          5,
+          14,
+          4,
+          7,
+          11,
+          6,
+          8,
+          10,
+          9,
+          3
+        ]
+      },
+      "expected": "unqsaccrtreauihe"
+    },
+    {
+      "input": {
+        "s": "complexstringshuffle",
+        "indices": [
+          15,
+          6,
+          11,
+          19,
+          8,
+          1,
+          0,
+          12,
+          18,
+          5,
+          2,
+          3,
+          10,
+          13,
+          17,
+          14,
+          4,
+          16,
+          7,
+          9
+        ]
+      },
+      "expected": "xeinfrollegmssucfhtp"
+    },
+    {
+      "input": {
+        "s": "alphanumeric",
+        "indices": [
+          9,
+          5,
+          7,
+          3,
+          4,
+          8,
+          10,
+          0,
+          11,
+          2,
+          1,
+          6
+        ]
+      },
+      "expected": "mirhalcpnaue"
+    },
+    {
+      "input": {
+        "s": "abracadabra",
+        "indices": [
+          10,
+          6,
+          5,
+          3,
+          0,
+          9,
+          7,
+          8,
+          2,
+          1,
+          4
+        ]
+      },
+      "expected": "crbaarbdaaa"
+    },
+    {
+      "input": {
+        "s": "python",
+        "indices": [
+          4,
+          0,
+          1,
+          5,
+          3,
+          2
+        ]
+      },
+      "expected": "ytnoph"
+    },
+    {
+      "input": {
+        "s": "algorithm",
+        "indices": [
+          1,
+          2,
+          3,
+          0,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      },
+      "expected": "oalgrithm"
+    },
+    {
+      "input": {
+        "s": "characters",
+        "indices": [
+          9,
+          3,
+          0,
+          7,
+          5,
+          2,
+          1,
+          6,
+          4,
+          8
+        ]
+      },
+      "expected": "atchraersc"
+    },
+    {
+      "input": {
+        "s": "python",
+        "indices": [
+          5,
+          1,
+          2,
+          4,
+          0,
+          3
+        ]
+      },
+      "expected": "oytnhp"
+    },
+    {
+      "input": {
+        "s": "algorithmdesign",
+        "indices": [
+          8,
+          12,
+          1,
+          10,
+          9,
+          13,
+          0,
+          5,
+          2,
+          4,
+          3,
+          6,
+          7,
+          11,
+          14
+        ]
+      },
+      "expected": "tgmedhsiaroglin"
+    },
+    {
+      "input": {
+        "s": "randomized",
+        "indices": [
+          7,
+          1,
+          8,
+          2,
+          0,
+          4,
+          5,
+          9,
+          6,
+          3
+        ]
+      },
+      "expected": "oaddmiernz"
+    },
+    {
+      "input": {
+        "s": "shufflethis",
+        "indices": [
+          8,
+          2,
+          0,
+          5,
+          3,
+          7,
+          4,
+          1,
+          6,
+          9,
+          10,
+          11
+        ]
+      },
+      "expected": "uthfefhlsis"
+    },
+    {
+      "input": {
+        "s": "complex",
+        "indices": [
+          6,
+          4,
+          1,
+          2,
+          5,
+          0,
+          3
+        ]
+      },
+      "expected": "empxolc"
+    },
+    {
+      "input": {
+        "s": "jumble",
+        "indices": [
+          3,
+          0,
+          5,
+          4,
+          2,
+          1
+        ]
+      },
+      "expected": "ueljbm"
+    },
+    {
+      "input": {
+        "s": "rearrange",
+        "indices": [
+          8,
+          4,
+          3,
+          0,
+          5,
+          2,
+          7,
+          6,
+          1
+        ]
+      },
+      "expected": "reaaergnr"
+    },
+    {
+      "input": {
+        "s": "algorithm",
+        "indices": [
+          5,
+          1,
+          4,
+          0,
+          2,
+          7,
+          6,
+          8,
+          3
+        ]
+      },
+      "expected": "olrmgatih"
+    },
+    {
+      "input": {
+        "s": "randomization",
+        "indices": [
+          12,
+          1,
+          6,
+          5,
+          0,
+          11,
+          10,
+          9,
+          8,
+          7,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": "oanoidntazimr"
+    },
+    {
+      "input": {
+        "s": "continuous",
+        "indices": [
+          1,
+          6,
+          5,
+          9,
+          0,
+          3,
+          7,
+          4,
+          8,
+          2
+        ]
+      },
+      "expected": "icsnonouut"
+    },
+    {
+      "input": {
+        "s": "programming",
+        "indices": [
+          2,
+          4,
+          5,
+          0,
+          1,
+          6,
+          3,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      "expected": "grpmroaming"
+    },
+    {
+      "input": {
+        "s": "shufflingstring",
+        "indices": [
+          11,
+          7,
+          9,
+          6,
+          13,
+          2,
+          0,
+          10,
+          1,
+          12,
+          3,
+          4,
+          5,
+          8,
+          14
+        ]
+      },
+      "expected": "igltrifhnunssfg"
+    },
+    {
+      "input": {
+        "s": "complexity",
+        "indices": [
+          3,
+          6,
+          1,
+          5,
+          2,
+          0,
+          7,
+          4,
+          9,
+          8
+        ]
+      },
+      "expected": "emlcipoxyt"
+    },
+    {
+      "input": {
+        "s": "rearrange",
+        "indices": [
+          3,
+          7,
+          5,
+          2,
+          8,
+          0,
+          4,
+          1,
+          6
+        ]
+      },
+      "expected": "agrrnaeer"
+    },
+    {
+      "input": {
+        "s": "python",
+        "indices": [
+          3,
+          1,
+          5,
+          0,
+          2,
+          4
+        ]
+      },
+      "expected": "hyopnt"
+    },
+    {
+      "input": {
+        "s": "algorithm",
+        "indices": [
+          1,
+          0,
+          6,
+          4,
+          2,
+          5,
+          3,
+          7,
+          8
+        ]
+      },
+      "expected": "lartoighm"
+    },
+    {
+      "input": {
+        "s": "algorithm",
+        "indices": [
+          6,
+          4,
+          3,
+          0,
+          5,
+          2,
+          1,
+          8,
+          7
+        ]
+      },
+      "expected": "otiglramh"
+    },
+    {
+      "input": {
+        "s": "permutation",
+        "indices": [
+          8,
+          5,
+          1,
+          6,
+          7,
+          3,
+          9,
+          2,
+          0,
+          4,
+          10
+        ]
+      },
+      "expected": "irttoemupan"
+    },
+    {
+      "input": {
+        "s": "scrambled",
+        "indices": [
+          3,
+          2,
+          0,
+          6,
+          7,
+          4,
+          1,
+          5,
+          8
+        ]
+      },
+      "expected": "rlcsbeamd"
+    },
+    {
+      "input": {
+        "s": "shuffling",
+        "indices": [
+          1,
+          3,
+          6,
+          8,
+          0,
+          2,
+          5,
+          4,
+          7
+        ]
+      },
+      "expected": "fslhniugf"
+    },
+    {
+      "input": {
+        "s": "vivid",
+        "indices": [
+          2,
+          0,
+          4,
+          3,
+          1
+        ]
+      },
+      "expected": "idviv"
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxyz",
+        "indices": [
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0
+        ]
+      },
+      "expected": "zyxwvutsrqponmlkjihgfedcba"
+    },
+    {
+      "input": {
+        "s": "zkrw",
+        "indices": [
+          2,
+          3,
+          0,
+          1
+        ]
+      },
+      "expected": "rwzk"
+    },
+    {
+      "input": {
+        "s": "randomize",
+        "indices": [
+          3,
+          8,
+          0,
+          5,
+          4,
+          7,
+          2,
+          6,
+          1
+        ]
+      },
+      "expected": "neirodzma"
+    },
+    {
+      "input": {
+        "s": "jumbledtext",
+        "indices": [
+          9,
+          0,
+          5,
+          3,
+          8,
+          6,
+          1,
+          2,
+          7,
+          4,
+          10
+        ]
+      },
+      "expected": "udtbxmeeljt"
+    },
+    {
+      "input": {
+        "s": "environment",
+        "indices": [
+          1,
+          7,
+          4,
+          6,
+          2,
+          0,
+          3,
+          8,
+          10,
+          5,
+          9
+        ]
+      },
+      "expected": "oernvninmte"
+    },
+    {
+      "input": {
+        "s": "characters",
+        "indices": [
+          6,
+          2,
+          9,
+          5,
+          7,
+          4,
+          1,
+          0,
+          3,
+          8
+        ]
+      },
+      "expected": "ethrcrcasa"
+    },
+    {
+      "input": {
+        "s": "jfbm",
+        "indices": [
+          3,
+          0,
+          1,
+          2
+        ]
+      },
+      "expected": "fbmj"
+    }
+  ],
+  "test_case_count": 61,
+  "optimal_complexity": null,
+  "source_task_id": "shuffle-string",
+  "source_question_id": 1528
+}
