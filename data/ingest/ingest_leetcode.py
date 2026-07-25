@@ -93,10 +93,23 @@ def has_usable_tests(row) -> bool:
     )
     return bool(has_io) and starter_ok and completion_ok
 
+def uses_tree_or_list_structure(row) -> bool:
+    """Tree/linked-list problems (e.g. Binary Tree Paths, Range Sum of BST)
+    need object-graph reconstruction via tree_node()/list_node() helpers
+    before the reference solution can run — the current flat test_cases
+    schema has no way to represent that conversion step. Excluded from the
+    v1 keep-pile; see data_note.md for follow-up."""
+    starter = row.get("starter_code") or ""
+    return bool(re.search(r"\b(TreeNode|ListNode)\b", starter))
 
 def filter_keep_pile(df: pd.DataFrame) -> pd.DataFrame:
     mask = df.apply(
-        lambda r: is_single_function_entry(r) and has_usable_tests(r), axis=1
+        lambda r: is_single_function_entry(r)
+        and has_usable_tests(r)
+        and not uses_tree_or_list_structure(r)
+        and not uses_external_library(r),
+        axis=1,
+        
     )
     kept = df[mask].copy()
     return kept
@@ -137,15 +150,50 @@ def _parse_kwargs(input_str: str) -> dict:
     tree = ast.parse(f"f({input_str})", mode="eval")
     return {kw.arg: ast.literal_eval(kw.value) for kw in tree.body.keywords}
 
-def _parse_expected(output_str: str):
-    """Most `output` values are valid Python literals (numbers, lists,
-    None), but string-returning problems store a bare, unquoted word
-    (e.g. `leetcode` instead of `'leetcode'`). Fall back to treating it
-    as a raw string when literal_eval can't parse it as-is."""
+def _parse_expected(output_str: str, return_type_hint: str = ""):
+    if return_type_hint == "str":
+        return output_str
+    if return_type_hint == "bool":
+        if output_str in ("true", "True"):
+            return True
+        if output_str in ("false", "False"):
+            return False
     try:
         return ast.literal_eval(output_str)
     except (ValueError, SyntaxError):
         return output_str
+
+def _return_type_hint(starter_code: str) -> str:
+    match = re.search(r"->\s*([\w\[\], ]+):", starter_code or "")
+    return match.group(1).strip() if match else ""
+
+_ALLOWED_IMPORTS = {
+    "typing", "functools", "collections", "itertools", "heapq", "bisect",
+    "string", "operator", "math", "random", "datetime", "re", "sys",
+}
+
+
+def uses_external_library(row) -> bool:
+    """Reference solutions that import third-party packages (e.g.
+    sortedcontainers) can't run in a sandbox restricted to stdlib —
+    excluded from v1 keep-pile, see data_note.md."""
+    code = (row.get("prompt") or "") + (row.get("completion") or "")
+    imports = re.findall(r"^\s*(?:import|from)\s+([\w.]+)", code, flags=re.MULTILINE)
+    return any(imp.split(".")[0] not in _ALLOWED_IMPORTS for imp in imports)
+
+_ERROR_OUTPUT_PREFIXES = (
+    "Error:",
+    "Execution timed out",
+    "Exception:",
+    "Traceback",
+)
+
+
+def _is_error_capture(output_str) -> bool:
+    """Some rows record an execution error or timeout from a broken
+    auto-generated case instead of a real expected value — there's no
+    sound way to test against 'the code should time out'. Skip these."""
+    return isinstance(output_str, str) and output_str.startswith(_ERROR_OUTPUT_PREFIXES)
 
 
 def parse_test_cases(row) -> list:
@@ -166,6 +214,7 @@ def parse_test_cases(row) -> list:
     if not isinstance(raw, (list, tuple)):
         return []
 
+    return_hint = _return_type_hint(row.get("starter_code") or "")
     cases = []
     for item in raw:
         output_str = item.get("output", "")
@@ -173,11 +222,12 @@ def parse_test_cases(row) -> list:
         # case (e.g. mismatched indices) instead of a real expected value.
         # There's no sound way to test against "should raise this exact
         # error string" — skip these.
-        if isinstance(output_str, str) and output_str.startswith("Error:"):
+        
+        if _is_error_capture(output_str):
             continue
         try:
             args = _parse_kwargs(item.get("input", ""))
-            expected = _parse_expected(output_str)
+            expected = _parse_expected(output_str, return_hint)
         except (ValueError, SyntaxError, AttributeError):
             continue
         cases.append({"input": args, "expected": expected})
