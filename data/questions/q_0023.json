@@ -1,411 +1,4590 @@
 {
   "question_id": "q_0023",
-  "title": "Removing Stars From A String",
+  "title": "K Th Nearest Obstacle Queries",
   "difficulty": 2,
-  "topic": "Stack",
+  "topic": "Array",
   "topics": [
-    "Stack",
-    "String",
-    "Simulation"
+    "Array",
+    "Heap (Priority Queue)"
   ],
-  "description_md": "You are given a string s, which contains stars *.\nIn one operation, you can:\n\nChoose a star in s.\nRemove the closest non-star character to its left, as well as remove the star itself.\n\nReturn the string after all stars have been removed.\nNote:\n\nThe input will be generated such that the operation is always possible.\nIt can be shown that the resulting string will always be unique.\n\n\u00a0\nExample 1:\n\nInput: s = \"leet**cod*e\"\nOutput: \"lecoe\"\nExplanation: Performing the removals from left to right:\n- The closest character to the 1st star is 't' in \"leet**cod*e\". s becomes \"lee*cod*e\".\n- The closest character to the 2nd star is 'e' in \"lee*cod*e\". s becomes \"lecod*e\".\n- The closest character to the 3rd star is 'd' in \"lecod*e\". s becomes \"lecoe\".\nThere are no more stars, so we return \"lecoe\".\nExample 2:\n\nInput: s = \"erase*****\"\nOutput: \"\"\nExplanation: The entire string is removed, so we return an empty string.\n\n\u00a0\nConstraints:\n\n1 <= s.length <= 105\ns consists of lowercase English letters and stars *.\nThe operation above can be performed on s.\n\n",
-  "starter_code": "class Solution:\n    def removeStars(self, s: str) -> str:\n        ",
-  "entry_point": "Solution().removeStars",
-  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def removeStars(self, s: str) -> str:\n        ans = []\n        for c in s:\n            if c == '*':\n                ans.pop()\n            else:\n                ans.append(c)\n        return ''.join(ans)\n",
+  "description_md": "There is an infinite 2D plane.\nYou are given a positive integer k. You are also given a 2D array queries, which contains the following queries:\n\nqueries[i] = [x, y]: Build an obstacle at coordinate (x, y) in the plane. It is guaranteed that there is no obstacle at this coordinate when this query is made.\n\nAfter each query, you need to find the distance of the kth nearest obstacle from the origin.\nReturn an integer array results where results[i] denotes the kth nearest obstacle after query i, or results[i] == -1 if there are less than k obstacles.\nNote that initially there are no obstacles anywhere.\nThe distance of an obstacle at coordinate (x, y) from the origin is given by |x| + |y|.\n\u00a0\nExample 1:\n\nInput: queries = [[1,2],[3,4],[2,3],[-3,0]], k = 2\nOutput: [-1,7,5,3]\nExplanation:\n\nInitially, there are 0 obstacles.\nAfter queries[0], there are less than 2 obstacles.\nAfter queries[1], there are obstacles at distances 3 and 7.\nAfter queries[2], there are obstacles at distances 3, 5, and 7.\nAfter queries[3], there are obstacles at distances 3, 3, 5, and 7.\n\n\nExample 2:\n\nInput: queries = [[5,5],[4,4],[3,3]], k = 1\nOutput: [10,8,6]\nExplanation:\n\nAfter queries[0], there is an obstacle at distance 10.\nAfter queries[1], there are obstacles at distances 8 and 10.\nAfter queries[2], there are obstacles at distances 6, 8, and 10.\n\n\n\u00a0\nConstraints:\n\n1 <= queries.length <= 2 * 105\nAll queries[i] are unique.\n-109 <= queries[i][0], queries[i][1] <= 109\n1 <= k <= 105\n\n",
+  "starter_code": "class Solution:\n    def resultsArray(self, queries: List[List[int]], k: int) -> List[int]:\n        ",
+  "entry_point": "Solution().resultsArray",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def resultsArray(self, queries: List[List[int]], k: int) -> List[int]:\n        ans = []\n        pq = []\n        for i, (x, y) in enumerate(queries):\n            heappush(pq, -(abs(x) + abs(y)))\n            if i >= k:\n                heappop(pq)\n            ans.append(-pq[0] if i >= k - 1 else -1)\n        return ans\n",
   "test_cases": [
     {
       "input": {
-        "s": "abc*def*ghi*jkl*mno*pqr*stu*vwx*y*z"
-      },
-      "expected": "abdeghjkmnpqstvwz"
-    },
-    {
-      "input": {
-        "s": "leet**cod*e"
-      },
-      "expected": "lecoe"
-    },
-    {
-      "input": {
-        "s": "a*b*c*d*e*"
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuvwxyz"
-      },
-      "expected": "abcdefghijklmnopqrstuvwxyz"
-    },
-    {
-      "input": {
-        "s": "ab*cd*ef*gh*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*"
-      },
-      "expected": "aceg"
-    },
-    {
-      "input": {
-        "s": "a*ab*abc*abcd*abcde*abcdef*abcdefg*abcdefgh*abcdefghi*abcdefghij*abcdefghijk*abcdefghijkl*abcdefghijklm*abcdefghijklmn*abcdefghijklmno*abcdefghijklmnop*abcdefghijklmnopq*abcdefghijklmnopqr*abcdefghijklmnopqrs*abcdefghijklmnopqrst*abcdefghijklmnopqrstu*abcdefghijklmnopqrstuv*abcdefghijklmnopqrstuvw*abcdefghijklmnopqrstuvwx*abcdefghijklmnopqrstuvwxy*abcdefghijklmnopqrstuvwxyza"
-      },
-      "expected": "aababcabcdabcdeabcdefabcdefgabcdefghabcdefghiabcdefghijabcdefghijkabcdefghijklabcdefghijklmabcdefghijklmnabcdefghijklmnoabcdefghijklmnopabcdefghijklmnopqabcdefghijklmnopqrabcdefghijklmnopqrsabcdefghijklmnopqrstabcdefghijklmnopqrstuabcdefghijklmnopqrstuvabcdefghijklmnopqrstuvwabcdefghijklmnopqrstuvwxabcdefghijklmnopqrstuvwxyza"
-    },
-    {
-      "input": {
-        "s": "abcdef"
-      },
-      "expected": "abcdef"
-    },
-    {
-      "input": {
-        "s": "zyxwvutsrqponmlkjihgfedcba"
-      },
-      "expected": "zyxwvutsrqponmlkjihgfedcba"
-    },
-    {
-      "input": {
-        "s": "a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a"
-      },
-      "expected": "a"
-    },
-    {
-      "input": {
-        "s": "ab*cd*ef*gh*ij*kl*mn*op*qr*st*uv*wx*yz"
-      },
-      "expected": "acegikmoqsuwyz"
-    },
-    {
-      "input": {
-        "s": "abcde"
-      },
-      "expected": "abcde"
-    },
-    {
-      "input": {
-        "s": "abc***"
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "ab*cd*ef*g*hi*j*"
-      },
-      "expected": "aceh"
-    },
-    {
-      "input": {
-        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
-      },
-      "expected": "z"
-    },
-    {
-      "input": {
-        "s": "erase*****"
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "abcd**efgh**ijkl**mnop**qrst**uvw**x**y**z"
-      },
-      "expected": "abefijmnqz"
-    },
-    {
-      "input": {
-        "s": "aaabbbcccddd***eee***fffgggggghhhhiiiiijkkkkkllllmmmmnnnnoooo***pppppqqqqrrrrsssss"
-      },
-      "expected": "aaabbbcccfffgggggghhhhiiiiijkkkkkllllmmmmnnnnopppppqqqqrrrrsssss"
-    },
-    {
-      "input": {
-        "s": "abcde**fghij**klmno**pqrst**uvwxy**z"
-      },
-      "expected": "abcfghklmpqruvwz"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuv*xyzwvutsrponmlkjihgfedcba*"
-      },
-      "expected": "abcdefghijklmnopqrstuxyzwvutsrponmlkjihgfedcb"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuvwxyz*zyxwvutsrqponmlkjihgfedcba*"
-      },
-      "expected": "abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcb"
-    },
-    {
-      "input": {
-        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
-      },
-      "expected": "z"
-    },
-    {
-      "input": {
-        "s": "aaaaaa*bbbbbb*cccccc*dddddd*eeeeee*ffffff*gggggg*hhhhhh*iiiiii*jjjjjj*kkkkkk*llllll*mmmmmm*nnnnnn*oooooo*pppppp*qqqqqq*rrrrrr*ssssss*tttttt*uuuuuu*vvvvvv*wwwwww*xxxxxx*yyyyyy*zzzzzz*"
-      },
-      "expected": "aaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrssssstttttuuuuuvvvvvwwwwwxxxxxyyyyyzzzzz"
-    },
-    {
-      "input": {
-        "s": "abcde*fghij*klmno*pqrst*uvwxy*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
-      },
-      "expected": "abcdfghiklmnpqrsuvwxz"
-    },
-    {
-      "input": {
-        "s": "abc*def*ghi*jkl*mno*pqr*stu*vwx*yz*"
-      },
-      "expected": "abdeghjkmnpqstvwy"
-    },
-    {
-      "input": {
-        "s": "aaa*bbb*ccc*ddd*eee*fff*ggg*hhh*iii*jjj*kkk*lll*mmm*nnn*ooo*ppp*qqq*rrr*sss*ttt*uuu*vvv*www*xxx*yyy*zzz*"
-      },
-      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuvwxyz*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
-      },
-      "expected": "abcdefghijklmnopqrstuvwxyz"
-    },
-    {
-      "input": {
-        "s": "abcde*fg*hi*jkl*mno*pqr*stu*vwx*y*z*"
-      },
-      "expected": "abcdfhjkmnpqstvw"
-    },
-    {
-      "input": {
-        "s": "aabbccddeeefffggg***hhiijjkkllmmnn***oo***ppqqrrssttttuuuuuuuuuuvvvvvvvvwxyz"
-      },
-      "expected": "aabbccddeeefffhhiijjkkllppqqrrssttttuuuuuuuuuuvvvvvvvvwxyz"
-    },
-    {
-      "input": {
-        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*zyxwvutsrqponmlkjihgfedcba"
-      },
-      "expected": "zyxwvutsrqponmlkjihgfedcba"
-    },
-    {
-      "input": {
-        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz*****"
-      },
-      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwx"
-    },
-    {
-      "input": {
-        "s": "z*yz*zyxw*vyxwv*u*vwxy*ts*rq*ponm*ln*kj*i*hg*fed*cb*a*"
-      },
-      "expected": "yzyxvyxwvwxtrponlkhfec"
-    },
-    {
-      "input": {
-        "s": "abc***def**ghij***klmno**pqrstuv***wxyz"
-      },
-      "expected": "dgklmpqrswxyz"
-    },
-    {
-      "input": {
-        "s": "abcdefghij*klmnopqrst*uvwxyz*zyxwvutsr*qp*on*m*l*k*j*i*h*g*f*e*d*c*b*a"
-      },
-      "expected": "abcdefghiklmnopqrsuvwxyzyxwvutsqoa"
-    },
-    {
-      "input": {
-        "s": "a*ab*abc*abcd*abcde*abcdef*abcdefg*abcdefgh*abcdefghi*abcdefghij*abcdefghijk*abcdefghijkl*abcdefghijklm*abcdefghijklmn*abcdefghijklmno*abcdefghijklmnop*abcdefghijklmnopq*abcdefghijklmnopqr*abcdefghijklmnopqrs*abcdefghijklmnopqrst*abcdefghijklmnopqrstu*abcdefghijklmnopqrstuv*abcdefghijklmnopqrstuvw*abcdefghijklmnopqrstuvwx*abcdefghijklmnopqrstuvwxy*abcdefghijklmnopqrstuvwxyz*"
-      },
-      "expected": "aababcabcdabcdeabcdefabcdefgabcdefghabcdefghiabcdefghijabcdefghijkabcdefghijklabcdefghijklmabcdefghijklmnabcdefghijklmnoabcdefghijklmnopabcdefghijklmnopqabcdefghijklmnopqrabcdefghijklmnopqrsabcdefghijklmnopqrstabcdefghijklmnopqrstuabcdefghijklmnopqrstuvabcdefghijklmnopqrstuvwabcdefghijklmnopqrstuvwxabcdefghijklmnopqrstuvwxy"
-    },
-    {
-      "input": {
-        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz****"
-      },
-      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxx"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuvwxy**z"
-      },
-      "expected": "abcdefghijklmnopqrstuvwz"
-    },
-    {
-      "input": {
-        "s": "xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz***xyz"
-      },
-      "expected": "xyz"
-    },
-    {
-      "input": {
-        "s": "abcde*****fghij*****klmno*****pqrst*****uvwxy*****z"
-      },
-      "expected": "z"
-    },
-    {
-      "input": {
-        "s": "abcdefghij***klmnopqrst***uvwxyz***abcd***efghij***klmno***pqrst***uvwxy***z"
-      },
-      "expected": "abcdefgklmnopquvwaefgklpquvz"
-    },
-    {
-      "input": {
-        "s": "abcdefghijk***lmnopqrstuvwxyz**aaaaaaaaaabbbbbbbbbbccccccccccddddeeeeee****"
-      },
-      "expected": "abcdefghlmnopqrstuvwxaaaaaaaaaabbbbbbbbbbccccccccccddddee"
-    },
-    {
-      "input": {
-        "s": "abcd*efgh*ijkl*mnop*qrst*uvw*x*y*z*"
-      },
-      "expected": "abcefgijkmnoqrsuv"
-    },
-    {
-      "input": {
-        "s": "nested*stars*****in*string*example***"
-      },
-      "expected": "nesteistrinexam"
-    },
-    {
-      "input": {
-        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
-      },
-      "expected": "z"
-    },
-    {
-      "input": {
-        "s": "a*bb*ccc*dddd*eeeee*ffffff*gggggg*hhhhhhh*iiiiiiii*jjjjjjjjj*kkkkkkkkk*llllllllll*mmmmmmmmmm*nnnnnnnnnnn*ooooooooooo*pppppppppppp*qqqqqqqqqqqqq*rrrrrrrrrrrrrr*sssssssssssssss*ttttttttttttttttt*uuuuuuuuuuuuuuuuuu*vvvvvvvvvvvvvvvvvvv*wwwwwwwwwwwwwwwwwwww*xxyyz**"
-      },
-      "expected": "bccdddeeeefffffggggghhhhhhiiiiiiijjjjjjjjkkkkkkkklllllllllmmmmmmmmmnnnnnnnnnnoooooooooopppppppppppqqqqqqqqqqqqrrrrrrrrrrrrrssssssssssssssttttttttttttttttuuuuuuuuuuuuuuuuuvvvvvvvvvvvvvvvvvvwwwwwwwwwwwwwwwwwwwxxy"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuvwxyz*abcdefghijklmnopqrstuvwxyz*"
-      },
-      "expected": "abcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxy"
-    },
-    {
-      "input": {
-        "s": "abcde*fg*hij*k*lmnop*qrs*tuvw*x*y*z*"
-      },
-      "expected": "abcdfhilmnoqrtuv"
-    },
-    {
-      "input": {
-        "s": "abcdefghi*jk*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z**"
-      },
-      "expected": "abcdefgh"
-    },
-    {
-      "input": {
-        "s": "x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x"
-      },
-      "expected": "x"
-    },
-    {
-      "input": {
-        "s": "aabbaa*bbcc*ddcc*eeff*ffgg*hhiijj*kkll*mmnn*oopp*qqrr*sttuu*vwwxxyyzz*****"
-      },
-      "expected": "aabbabbcddceefffghhiijkklmmnoopqqrsttuvwwx"
-    },
-    {
-      "input": {
-        "s": "abc**def**ghi**jkl**mno**pqr**stu**vwx**yz**"
-      },
-      "expected": "adgjmpsv"
-    },
-    {
-      "input": {
-        "s": "mississippi***ipp*ss*m*i**"
-      },
-      "expected": "mississiip"
-    },
-    {
-      "input": {
-        "s": "a*bc*def*ghij*klmno*pqrst*uvwxy*z"
-      },
-      "expected": "bdeghiklmnpqrsuvwxz"
-    },
-    {
-      "input": {
-        "s": "mnopqrstu*****vwxyz*****abcdefghi*****jklmno*****pqrst*****uvw*****xy*****z"
-      },
-      "expected": "mnopz"
-    },
-    {
-      "input": {
-        "s": "abcde*fgh*i*jklmno*pqrstu*v*wxyz*"
-      },
-      "expected": "abcdfgjklmnpqrstwxy"
-    },
-    {
-      "input": {
-        "s": "abc*def*ghi*jkl*mno*pqr*stu*vwx*y*z**"
-      },
-      "expected": "abdeghjkmnpqstv"
-    },
-    {
-      "input": {
-        "s": "a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*"
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuvwxy**z*"
-      },
-      "expected": "abcdefghijklmnopqrstuvw"
-    },
-    {
-      "input": {
-        "s": "xy*z*ab*cd*ef*gh*ij*kl*mn*op*qr*st*uv*wx*yz*"
-      },
-      "expected": "xacegikmoqsuwy"
-    },
-    {
-      "input": {
-        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz*"
-      },
-      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyz"
-    },
-    {
-      "input": {
-        "s": "python*is*awesome***so**is**java**"
-      },
-      "expected": "pythoiawesja"
-    },
-    {
-      "input": {
-        "s": "longstringwith*various*characters*and*stars*through*out***"
-      },
-      "expected": "longstringwitvarioucharacteranstarthroug"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuvwxyz*a**b**c**d**e**f**g**h**i**j**k**l**m**n**o**p**q**r**s**t**u**v**w**x**y**z"
-      },
-      "expected": "z"
-    },
-    {
-      "input": {
-        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z"
-      },
-      "expected": "z"
-    },
-    {
-      "input": {
-        "s": "a*ab*abc*abcd*abcde*abcdef*abcdefg*abcdefgh*abcdefghi*abcdefghij*abcdefghijk"
-      },
-      "expected": "aababcabcdabcdeabcdefabcdefgabcdefghabcdefghiabcdefghijk"
-    },
-    {
-      "input": {
-        "s": "a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z*abcdefghijklmnopqrstuvwxyz*zyxwvutsrqponmlkjihgfedcba*"
-      },
-      "expected": "abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcb"
+        "queries": [
+          [
+            5,
+            5
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            3,
+            3
+          ]
+        ],
+        "k": 1
+      },
+      "expected": [
+        10,
+        8,
+        6
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1000000000,
+            1000000000
+          ],
+          [
+            1000000000,
+            -1000000000
+          ]
+        ],
+        "k": 1
+      },
+      "expected": [
+        2000000000,
+        2000000000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            -1
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        2
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            10,
+            10
+          ],
+          [
+            20,
+            20
+          ],
+          [
+            30,
+            30
+          ],
+          [
+            40,
+            40
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        80
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            -3,
+            0
+          ]
+        ],
+        "k": 2
+      },
+      "expected": [
+        -1,
+        7,
+        5,
+        3
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            10
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ],
+          [
+            8,
+            0
+          ],
+          [
+            9,
+            0
+          ],
+          [
+            10,
+            0
+          ]
+        ],
+        "k": 1
+      },
+      "expected": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            -2,
+            0
+          ],
+          [
+            0,
+            -2
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            -3,
+            0
+          ],
+          [
+            0,
+            -3
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1000000000,
+            1000000000
+          ],
+          [
+            1000000000,
+            -1000000000
+          ],
+          [
+            -1000000000,
+            1000000000
+          ],
+          [
+            -1000000000,
+            -1000000000
+          ]
+        ],
+        "k": 1
+      },
+      "expected": [
+        2000000000,
+        2000000000,
+        2000000000,
+        2000000000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -4
+          ],
+          [
+            -5,
+            -5
+          ],
+          [
+            -6,
+            -6
+          ],
+          [
+            -7,
+            -7
+          ],
+          [
+            -8,
+            -8
+          ],
+          [
+            -9,
+            -9
+          ],
+          [
+            -10,
+            -10
+          ]
+        ],
+        "k": 1
+      },
+      "expected": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -100,
+            -100
+          ],
+          [
+            100,
+            -100
+          ],
+          [
+            -100,
+            100
+          ],
+          [
+            100,
+            100
+          ]
+        ],
+        "k": 2
+      },
+      "expected": [
+        -1,
+        200,
+        200,
+        200
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            100,
+            100
+          ],
+          [
+            200,
+            200
+          ],
+          [
+            300,
+            300
+          ],
+          [
+            400,
+            400
+          ],
+          [
+            500,
+            500
+          ],
+          [
+            600,
+            600
+          ],
+          [
+            700,
+            700
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        1000,
+        1000,
+        1000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -2,
+            -3
+          ],
+          [
+            -4,
+            -5
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        13,
+        13,
+        9
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            3,
+            3
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            -2
+          ],
+          [
+            -2,
+            1
+          ],
+          [
+            -1,
+            -2
+          ],
+          [
+            2,
+            -1
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            -2,
+            0
+          ],
+          [
+            0,
+            -2
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            -3,
+            0
+          ],
+          [
+            0,
+            -3
+          ]
+        ],
+        "k": 7
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            1
+          ],
+          [
+            -2,
+            2
+          ],
+          [
+            -3,
+            3
+          ],
+          [
+            -4,
+            4
+          ],
+          [
+            -5,
+            5
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -7,
+            7
+          ],
+          [
+            -8,
+            8
+          ],
+          [
+            -9,
+            9
+          ],
+          [
+            -10,
+            10
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        2,
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -5,
+            5
+          ],
+          [
+            5,
+            -5
+          ],
+          [
+            0,
+            10
+          ],
+          [
+            10,
+            0
+          ],
+          [
+            -10,
+            -10
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1000000000,
+            1000000000
+          ],
+          [
+            -1000000000,
+            -1000000000
+          ],
+          [
+            500000000,
+            500000000
+          ],
+          [
+            -500000000,
+            -500000000
+          ]
+        ],
+        "k": 2
+      },
+      "expected": [
+        -1,
+        2000000000,
+        2000000000,
+        1000000000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -50,
+            -50
+          ],
+          [
+            -50,
+            50
+          ],
+          [
+            50,
+            -50
+          ],
+          [
+            50,
+            50
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            100
+          ],
+          [
+            0,
+            -100
+          ],
+          [
+            100,
+            0
+          ],
+          [
+            -100,
+            0
+          ]
+        ],
+        "k": 2
+      },
+      "expected": [
+        -1,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            -2
+          ],
+          [
+            -2,
+            -3
+          ],
+          [
+            -3,
+            -4
+          ],
+          [
+            -4,
+            -5
+          ],
+          [
+            -5,
+            -6
+          ],
+          [
+            -6,
+            -7
+          ],
+          [
+            -7,
+            -8
+          ],
+          [
+            -8,
+            -9
+          ],
+          [
+            -9,
+            -10
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ],
+          [
+            8,
+            0
+          ],
+          [
+            9,
+            0
+          ],
+          [
+            10,
+            0
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            7
+          ],
+          [
+            0,
+            8
+          ],
+          [
+            0,
+            9
+          ],
+          [
+            0,
+            10
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            19,
+            20
+          ]
+        ],
+        "k": 10
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        39
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            -2
+          ],
+          [
+            -2,
+            2
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            -3
+          ],
+          [
+            -3,
+            3
+          ],
+          [
+            -3,
+            -3
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            999999999,
+            999999999
+          ],
+          [
+            999999998,
+            999999998
+          ],
+          [
+            999999997,
+            999999997
+          ],
+          [
+            999999996,
+            999999996
+          ],
+          [
+            999999995,
+            999999995
+          ],
+          [
+            999999994,
+            999999994
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        1999999998,
+        1999999996
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            10
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            9
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            100,
+            100
+          ],
+          [
+            200,
+            200
+          ],
+          [
+            300,
+            300
+          ],
+          [
+            400,
+            400
+          ],
+          [
+            500,
+            500
+          ]
+        ],
+        "k": 1
+      },
+      "expected": [
+        200,
+        200,
+        200,
+        200,
+        200
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            -2,
+            0
+          ],
+          [
+            0,
+            -2
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            -3,
+            0
+          ],
+          [
+            0,
+            -3
+          ]
+        ],
+        "k": 1
+      },
+      "expected": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            10
+          ]
+        ],
+        "k": 10
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        20
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1000000000,
+            0
+          ],
+          [
+            0,
+            1000000000
+          ],
+          [
+            -1000000000,
+            0
+          ],
+          [
+            0,
+            -1000000000
+          ]
+        ],
+        "k": 2
+      },
+      "expected": [
+        -1,
+        1000000000,
+        1000000000,
+        1000000000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            -1
+          ],
+          [
+            1,
+            -1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            2,
+            -2
+          ],
+          [
+            -2,
+            2
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            3,
+            -3
+          ],
+          [
+            -3,
+            3
+          ],
+          [
+            3,
+            3
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            7
+          ],
+          [
+            0,
+            8
+          ],
+          [
+            0,
+            9
+          ],
+          [
+            0,
+            10
+          ]
+        ],
+        "k": 7
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        7,
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            14,
+            14
+          ]
+        ],
+        "k": 7
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1000,
+            -2000
+          ],
+          [
+            -2000,
+            -3000
+          ],
+          [
+            -3000,
+            -4000
+          ],
+          [
+            -4000,
+            -5000
+          ],
+          [
+            -5000,
+            -6000
+          ],
+          [
+            -6000,
+            -7000
+          ],
+          [
+            -7000,
+            -8000
+          ],
+          [
+            -8000,
+            -9000
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        7000,
+        7000,
+        7000,
+        7000,
+        7000,
+        7000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            19,
+            20
+          ],
+          [
+            21,
+            22
+          ]
+        ],
+        "k": 11
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        43
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            -2,
+            0
+          ],
+          [
+            0,
+            -2
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            0
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            -10,
+            -10
+          ],
+          [
+            10,
+            -10
+          ],
+          [
+            -10,
+            10
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        20
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            10,
+            10
+          ],
+          [
+            20,
+            20
+          ],
+          [
+            30,
+            30
+          ],
+          [
+            40,
+            40
+          ],
+          [
+            50,
+            50
+          ],
+          [
+            60,
+            60
+          ],
+          [
+            70,
+            70
+          ],
+          [
+            80,
+            80
+          ],
+          [
+            90,
+            90
+          ],
+          [
+            100,
+            100
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ],
+          [
+            8,
+            0
+          ],
+          [
+            9,
+            0
+          ],
+          [
+            10,
+            0
+          ]
+        ],
+        "k": 10
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        10
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            -2,
+            0
+          ],
+          [
+            0,
+            -2
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            -3,
+            0
+          ],
+          [
+            0,
+            -3
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        "k": 6
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            15,
+            15
+          ]
+        ],
+        "k": 7
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -5,
+            5
+          ],
+          [
+            -4,
+            4
+          ],
+          [
+            -3,
+            3
+          ],
+          [
+            -2,
+            2
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        10,
+        8,
+        6,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -2,
+            0
+          ],
+          [
+            0,
+            -2
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            -3,
+            0
+          ],
+          [
+            0,
+            -3
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            10,
+            20
+          ],
+          [
+            20,
+            30
+          ],
+          [
+            30,
+            40
+          ],
+          [
+            40,
+            50
+          ],
+          [
+            50,
+            60
+          ],
+          [
+            60,
+            70
+          ],
+          [
+            70,
+            80
+          ],
+          [
+            80,
+            90
+          ],
+          [
+            90,
+            100
+          ]
+        ],
+        "k": 7
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        150,
+        150,
+        150
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            1,
+            -2
+          ],
+          [
+            -2,
+            1
+          ],
+          [
+            3,
+            -3
+          ],
+          [
+            -3,
+            3
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            -1,
+            -1
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        6,
+        6,
+        4,
+        4,
+        3,
+        3
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            1
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            1,
+            -1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            2,
+            -2
+          ],
+          [
+            -2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            3,
+            -3
+          ],
+          [
+            -3,
+            3
+          ]
+        ],
+        "k": 6
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -10,
+            -10
+          ],
+          [
+            -20,
+            -20
+          ],
+          [
+            -30,
+            -30
+          ],
+          [
+            -40,
+            -40
+          ],
+          [
+            -50,
+            -50
+          ],
+          [
+            -60,
+            -60
+          ],
+          [
+            -70,
+            -70
+          ],
+          [
+            -80,
+            -80
+          ],
+          [
+            -90,
+            -90
+          ],
+          [
+            -100,
+            -100
+          ]
+        ],
+        "k": 8
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        160,
+        160,
+        160
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "k": 7
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1000000000,
+            0
+          ],
+          [
+            1000000000,
+            0
+          ],
+          [
+            0,
+            -1000000000
+          ],
+          [
+            0,
+            1000000000
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        1000000000,
+        1000000000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            1,
+            -1
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        2,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            0
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            20,
+            20
+          ],
+          [
+            30,
+            30
+          ],
+          [
+            40,
+            40
+          ],
+          [
+            50,
+            50
+          ],
+          [
+            60,
+            60
+          ],
+          [
+            70,
+            70
+          ],
+          [
+            80,
+            80
+          ],
+          [
+            90,
+            90
+          ],
+          [
+            100,
+            100
+          ]
+        ],
+        "k": 6
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            100,
+            200
+          ],
+          [
+            200,
+            300
+          ],
+          [
+            300,
+            400
+          ],
+          [
+            400,
+            500
+          ],
+          [
+            500,
+            600
+          ],
+          [
+            600,
+            700
+          ],
+          [
+            700,
+            800
+          ],
+          [
+            800,
+            900
+          ]
+        ],
+        "k": 7
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        1500,
+        1500
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            -2
+          ],
+          [
+            -3,
+            -4
+          ],
+          [
+            -5,
+            -6
+          ],
+          [
+            -7,
+            -8
+          ],
+          [
+            -9,
+            -10
+          ],
+          [
+            -11,
+            -12
+          ],
+          [
+            -13,
+            -14
+          ],
+          [
+            -15,
+            -16
+          ],
+          [
+            -17,
+            -18
+          ],
+          [
+            -19,
+            -20
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            1
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            1,
+            -1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            2,
+            -2
+          ],
+          [
+            -2,
+            2
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        0
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1000000000,
+            0
+          ],
+          [
+            0,
+            1000000000
+          ],
+          [
+            -1000000000,
+            0
+          ],
+          [
+            0,
+            -1000000000
+          ],
+          [
+            500000000,
+            500000000
+          ],
+          [
+            -500000000,
+            -500000000
+          ]
+        ],
+        "k": 2
+      },
+      "expected": [
+        -1,
+        1000000000,
+        1000000000,
+        1000000000,
+        1000000000,
+        1000000000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            10,
+            10
+          ],
+          [
+            20,
+            20
+          ],
+          [
+            30,
+            30
+          ],
+          [
+            40,
+            40
+          ],
+          [
+            50,
+            50
+          ],
+          [
+            60,
+            60
+          ],
+          [
+            70,
+            70
+          ],
+          [
+            80,
+            80
+          ],
+          [
+            90,
+            90
+          ],
+          [
+            100,
+            100
+          ]
+        ],
+        "k": 10
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        200
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            15,
+            15
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            -2,
+            0
+          ],
+          [
+            0,
+            -2
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -10,
+            -10
+          ],
+          [
+            -20,
+            -20
+          ],
+          [
+            -30,
+            -30
+          ],
+          [
+            -40,
+            -40
+          ],
+          [
+            -50,
+            -50
+          ],
+          [
+            -60,
+            -60
+          ],
+          [
+            -70,
+            -70
+          ],
+          [
+            -80,
+            -80
+          ],
+          [
+            -90,
+            -90
+          ],
+          [
+            -100,
+            -100
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1000000,
+            1000000
+          ],
+          [
+            2000000,
+            2000000
+          ],
+          [
+            3000000,
+            3000000
+          ],
+          [
+            4000000,
+            4000000
+          ],
+          [
+            5000000,
+            5000000
+          ],
+          [
+            6000000,
+            6000000
+          ],
+          [
+            7000000,
+            7000000
+          ],
+          [
+            8000000,
+            8000000
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        8000000,
+        8000000,
+        8000000,
+        8000000,
+        8000000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1000000000,
+            -1000000000
+          ],
+          [
+            -1000000000,
+            1000000000
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            -2,
+            -2
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        2000000000,
+        2000000000,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -4
+          ],
+          [
+            -5,
+            -5
+          ],
+          [
+            -6,
+            -6
+          ],
+          [
+            -7,
+            -7
+          ],
+          [
+            -8,
+            -8
+          ],
+          [
+            -9,
+            -9
+          ],
+          [
+            -10,
+            -10
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -5,
+            4
+          ],
+          [
+            -4,
+            -5
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            -4
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            -2,
+            -3
+          ],
+          [
+            -3,
+            -2
+          ]
+        ],
+        "k": 2
+      },
+      "expected": [
+        -1,
+        9,
+        9,
+        9,
+        9,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            1,
+            -1
+          ]
+        ],
+        "k": 2
+      },
+      "expected": [
+        -1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1000000000,
+            -1000000000
+          ],
+          [
+            -1000000000,
+            1000000000
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "k": 2
+      },
+      "expected": [
+        -1,
+        2000000000,
+        2000000000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            100,
+            200
+          ],
+          [
+            200,
+            300
+          ],
+          [
+            300,
+            400
+          ],
+          [
+            400,
+            500
+          ],
+          [
+            500,
+            600
+          ],
+          [
+            600,
+            700
+          ],
+          [
+            700,
+            800
+          ],
+          [
+            800,
+            900
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        900,
+        900,
+        900,
+        900,
+        900
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            16,
+            16
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            18,
+            18
+          ],
+          [
+            19,
+            19
+          ],
+          [
+            20,
+            20
+          ]
+        ],
+        "k": 10
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            10
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1000000000,
+            -1000000000
+          ],
+          [
+            -1000000000,
+            1000000000
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        2000000000,
+        2000000000,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            1
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            1,
+            -1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            2,
+            -2
+          ],
+          [
+            -2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            -3,
+            -3
+          ]
+        ],
+        "k": 6
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            -2,
+            0
+          ],
+          [
+            0,
+            -2
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            -3,
+            0
+          ],
+          [
+            0,
+            -3
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1000000000,
+            1000000000
+          ],
+          [
+            -1000000000,
+            -1000000000
+          ],
+          [
+            500000000,
+            500000000
+          ]
+        ],
+        "k": 2
+      },
+      "expected": [
+        -1,
+        2000000000,
+        2000000000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            -2,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            -2
+          ]
+        ],
+        "k": 4
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -5,
+            0
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            0,
+            -5
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            1,
+            -1
+          ],
+          [
+            -1,
+            1
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        5,
+        5,
+        5,
+        5,
+        2,
+        2
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            7
+          ],
+          [
+            0,
+            8
+          ],
+          [
+            0,
+            9
+          ],
+          [
+            0,
+            10
+          ],
+          [
+            0,
+            11
+          ],
+          [
+            0,
+            12
+          ]
+        ],
+        "k": 6
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            1,
+            -1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            -2,
+            -2
+          ]
+        ],
+        "k": 5
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            100,
+            1
+          ],
+          [
+            1,
+            100
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            1000,
+            1000
+          ],
+          [
+            10000,
+            10000
+          ],
+          [
+            100000,
+            100000
+          ],
+          [
+            1000000,
+            1000000
+          ],
+          [
+            10000000,
+            10000000
+          ],
+          [
+            100000000,
+            100000000
+          ],
+          [
+            1000000000,
+            1000000000
+          ]
+        ],
+        "k": 7
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        2000000,
+        2000000,
+        2000000,
+        2000000
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            -1,
+            -2
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            1,
+            -2
+          ],
+          [
+            2,
+            -1
+          ],
+          [
+            -1,
+            2
+          ],
+          [
+            -2,
+            1
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -4
+          ],
+          [
+            -5,
+            -5
+          ],
+          [
+            -6,
+            -6
+          ],
+          [
+            -7,
+            -7
+          ],
+          [
+            -8,
+            -8
+          ],
+          [
+            -9,
+            -9
+          ],
+          [
+            -10,
+            -10
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            1000000000,
+            1000000000
+          ],
+          [
+            500000000,
+            -500000000
+          ],
+          [
+            -1000000000,
+            1000000000
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        2000000000,
+        2000000000,
+        1000000000,
+        4
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            -5,
+            5
+          ],
+          [
+            -4,
+            4
+          ],
+          [
+            -3,
+            3
+          ],
+          [
+            -2,
+            2
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ]
+        ],
+        "k": 3
+      },
+      "expected": [
+        -1,
+        -1,
+        10,
+        8,
+        6,
+        4,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "input": {
+        "queries": [
+          [
+            10,
+            10
+          ],
+          [
+            20,
+            20
+          ],
+          [
+            30,
+            30
+          ],
+          [
+            40,
+            40
+          ],
+          [
+            50,
+            50
+          ],
+          [
+            60,
+            60
+          ],
+          [
+            70,
+            70
+          ],
+          [
+            80,
+            80
+          ],
+          [
+            90,
+            90
+          ],
+          [
+            100,
+            100
+          ]
+        ],
+        "k": 7
+      },
+      "expected": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        140,
+        140,
+        140,
+        140
+      ]
     }
   ],
-  "test_case_count": 65,
+  "test_case_count": 85,
   "optimal_complexity": null,
-  "source_task_id": "removing-stars-from-a-string",
-  "source_question_id": 2390
+  "source_task_id": "k-th-nearest-obstacle-queries",
+  "source_question_id": 3275
 }

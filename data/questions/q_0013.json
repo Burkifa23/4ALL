@@ -1,8410 +1,1658 @@
 {
   "question_id": "q_0013",
-  "title": "High Five",
+  "title": "Valid Word Abbreviation",
   "difficulty": 1,
-  "topic": "Array",
+  "topic": "Two Pointers",
   "topics": [
-    "Array",
-    "Hash Table",
-    "Sorting",
-    "Heap (Priority Queue)"
+    "Two Pointers",
+    "String"
   ],
-  "description_md": "Given a list of the scores of different students, items, where items[i] = [IDi, scorei] represents one score from a student with IDi, calculate each student's top five average.\nReturn the answer as an array of pairs result, where result[j] = [IDj, topFiveAveragej] represents the student with IDj and their top five average. Sort result by IDj in increasing order.\nA student's top five average is calculated by taking the sum of their top five scores and dividing it by 5 using integer division.\n\u00a0\nExample 1:\n\nInput: items = [[1,91],[1,92],[2,93],[2,97],[1,60],[2,77],[1,65],[1,87],[1,100],[2,100],[2,76]]\nOutput: [[1,87],[2,88]]\nExplanation: \nThe student with ID = 1 got scores 91, 92, 60, 65, 87, and 100. Their top five average is (100 + 92 + 91 + 87 + 65) / 5 = 87.\nThe student with ID = 2 got scores 93, 97, 77, 100, and 76. Their top five average is (100 + 97 + 93 + 77 + 76) / 5 = 88.6, but with integer division their average converts to 88.\n\nExample 2:\n\nInput: items = [[1,100],[7,100],[1,100],[7,100],[1,100],[7,100],[1,100],[7,100],[1,100],[7,100]]\nOutput: [[1,100],[7,100]]\n\n\u00a0\nConstraints:\n\n1 <= items.length <= 1000\nitems[i].length == 2\n1 <= IDi <= 1000\n0 <= scorei <= 100\nFor each IDi, there will be at least five scores.\n\n",
-  "starter_code": "class Solution:\n    def highFive(self, items: List[List[int]]) -> List[List[int]]:\n        ",
-  "entry_point": "Solution().highFive",
-  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def highFive(self, items: List[List[int]]) -> List[List[int]]:\n        d = defaultdict(list)\n        m = 0\n        for i, x in items:\n            d[i].append(x)\n            m = max(m, i)\n        ans = []\n        for i in range(1, m + 1):\n            if xs := d[i]:\n                avg = sum(nlargest(5, xs)) // 5\n                ans.append([i, avg])\n        return ans\n",
+  "description_md": "A string can be abbreviated by replacing any number of non-adjacent, non-empty substrings with their lengths. The lengths should not have leading zeros.\nFor example, a string such as \"substitution\" could be abbreviated as (but not limited to):\n\n\"s10n\" (\"s ubstitutio n\")\n\"sub4u4\" (\"sub stit u tion\")\n\"12\" (\"substitution\")\n\"su3i1u2on\" (\"su bst i t u ti on\")\n\"substitution\" (no substrings replaced)\n\nThe following are not valid abbreviations:\n\n\"s55n\" (\"s ubsti tutio n\", the replaced substrings are adjacent)\n\"s010n\" (has leading zeros)\n\"s0ubstitution\" (replaces an empty substring)\n\nGiven a string word and an abbreviation abbr, return whether the string matches the given abbreviation.\nA substring is a contiguous non-empty sequence of characters within a string.\n\u00a0\nExample 1:\n\nInput: word = \"internationalization\", abbr = \"i12iz4n\"\nOutput: true\nExplanation: The word \"internationalization\" can be abbreviated as \"i12iz4n\" (\"i nternational iz atio n\").\n\nExample 2:\n\nInput: word = \"apple\", abbr = \"a2e\"\nOutput: false\nExplanation: The word \"apple\" cannot be abbreviated as \"a2e\".\n\n\u00a0\nConstraints:\n\n1 <= word.length <= 20\nword consists of only lowercase English letters.\n1 <= abbr.length <= 10\nabbr consists of lowercase English letters and digits.\nAll the integers in abbr will fit in a 32-bit integer.\n\n",
+  "starter_code": "class Solution:\n    def validWordAbbreviation(self, word: str, abbr: str) -> bool:\n        ",
+  "entry_point": "Solution().validWordAbbreviation",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def validWordAbbreviation(self, word: str, abbr: str) -> bool:\n        m, n = len(word), len(abbr)\n        i = j = x = 0\n        while i < m and j < n:\n            if abbr[j].isdigit():\n                if abbr[j] == \"0\" and x == 0:\n                    return False\n                x = x * 10 + int(abbr[j])\n            else:\n                i += x\n                x = 0\n                if i >= m or word[i] != abbr[j]:\n                    return False\n                i += 1\n            j += 1\n        return i + x == m and j == n\n",
   "test_cases": [
     {
       "input": {
-        "items": [
-          [
-            1,
-            91
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            2,
-            93
-          ],
-          [
-            2,
-            97
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            2,
-            77
-          ],
-          [
-            1,
-            65
-          ],
-          [
-            1,
-            87
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            76
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          87
-        ],
-        [
-          2,
-          88
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            65
-          ],
-          [
-            3,
-            55
-          ],
-          [
-            4,
-            90
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            4,
-            50
-          ]
-        ]
-      },
-      "expected": [
-        [
-          3,
-          75
-        ],
-        [
-          4,
-          70
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            95
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            92
-          ],
-          [
-            3,
-            78
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            82
-          ],
-          [
-            3,
-            79
-          ]
-        ]
-      },
-      "expected": [
-        [
-          3,
-          80
-        ],
-        [
-          5,
-          88
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            100
-          ],
-          [
-            7,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            7,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            7,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            7,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            7,
-            100
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          100
-        ],
-        [
-          7,
-          100
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            10,
-            80
-          ],
-          [
-            10,
-            85
-          ],
-          [
-            10,
-            90
-          ],
-          [
-            10,
-            95
-          ],
-          [
-            10,
-            100
-          ],
-          [
-            20,
-            60
-          ],
-          [
-            20,
-            70
-          ],
-          [
-            20,
-            80
-          ],
-          [
-            20,
-            90
-          ],
-          [
-            20,
-            100
-          ]
-        ]
-      },
-      "expected": [
-        [
-          10,
-          90
-        ],
-        [
-          20,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            1,
-            50
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            60
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          70
-        ],
-        [
-          2,
-          70
-        ],
-        [
-          3,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            78
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            88
-          ],
-          [
-            2,
-            76
-          ],
-          [
-            2,
-            82
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            88
-          ],
-          [
-            2,
-            79
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          86
-        ],
-        [
-          2,
-          83
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            90
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            4,
-            50
-          ],
-          [
-            4,
-            40
-          ],
-          [
-            4,
-            30
-          ],
-          [
-            4,
-            20
-          ],
-          [
-            4,
-            10
-          ]
-        ]
-      },
-      "expected": [
-        [
-          4,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            99
-          ],
-          [
-            5,
-            98
-          ],
-          [
-            5,
-            97
-          ],
-          [
-            5,
-            96
-          ],
-          [
-            5,
-            95
-          ],
-          [
-            5,
-            94
-          ],
-          [
-            5,
-            93
-          ],
-          [
-            5,
-            92
-          ],
-          [
-            5,
-            91
-          ]
-        ]
-      },
-      "expected": [
-        [
-          5,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            55
-          ],
-          [
-            3,
-            40
-          ],
-          [
-            3,
-            35
-          ]
-        ]
-      },
-      "expected": [
-        [
-          3,
-          90
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            50
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            2,
-            40
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            90
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          78
-        ],
-        [
-          2,
-          74
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            5,
-            91
-          ],
-          [
-            5,
-            92
-          ],
-          [
-            5,
-            93
-          ],
-          [
-            5,
-            94
-          ],
-          [
-            5,
-            95
-          ],
-          [
-            6,
-            100
-          ],
-          [
-            6,
-            99
-          ],
-          [
-            6,
-            98
-          ],
-          [
-            6,
-            97
-          ],
-          [
-            6,
-            96
-          ],
-          [
-            6,
-            95
-          ]
-        ]
-      },
-      "expected": [
-        [
-          5,
-          93
-        ],
-        [
-          6,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            50
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            2,
-            10
-          ],
-          [
-            2,
-            20
-          ],
-          [
-            2,
-            30
-          ],
-          [
-            2,
-            40
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            100
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          70
-        ],
-        [
-          2,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            10,
-            80
-          ],
-          [
-            10,
-            90
-          ],
-          [
-            10,
-            100
-          ],
-          [
-            10,
-            70
-          ],
-          [
-            10,
-            60
-          ],
-          [
-            20,
-            50
-          ],
-          [
-            20,
-            40
-          ],
-          [
-            20,
-            30
-          ],
-          [
-            20,
-            20
-          ],
-          [
-            20,
-            10
-          ],
-          [
-            20,
-            90
-          ]
-        ]
-      },
-      "expected": [
-        [
-          10,
-          80
-        ],
-        [
-          20,
-          46
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            50
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            40
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            50
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          72
-        ],
-        [
-          2,
-          70
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            75
-          ],
-          [
-            1,
-            65
-          ],
-          [
-            1,
-            55
-          ],
-          [
-            1,
-            45
-          ],
-          [
-            2,
-            88
-          ],
-          [
-            2,
-            82
-          ],
-          [
-            2,
-            76
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            64
-          ],
-          [
-            2,
-            58
-          ],
-          [
-            3,
-            99
-          ],
-          [
-            3,
-            94
-          ],
-          [
-            3,
-            89
-          ],
-          [
-            3,
-            84
-          ],
-          [
-            3,
-            79
-          ],
-          [
-            3,
-            74
-          ],
-          [
-            3,
-            69
-          ],
-          [
-            4,
-            90
-          ],
-          [
-            4,
-            85
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            75
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            4,
-            65
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            70
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            40
-          ],
-          [
-            5,
-            30
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          75
-        ],
-        [
-          2,
-          76
-        ],
-        [
-          3,
-          89
-        ],
-        [
-          4,
-          80
-        ],
-        [
-          5,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            88
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            2,
-            65
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            75
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            95
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          93
-        ],
-        [
-          2,
-          85
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            100
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            1,
-            50
-          ],
-          [
-            2,
-            40
-          ],
-          [
-            3,
-            30
-          ],
-          [
-            4,
-            20
-          ],
-          [
-            5,
-            10
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            4,
-            75
-          ],
-          [
-            5,
-            65
-          ],
-          [
-            1,
-            55
-          ],
-          [
-            2,
-            45
-          ],
-          [
-            3,
-            35
-          ],
-          [
-            4,
-            25
-          ],
-          [
-            5,
-            15
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          58
-        ],
-        [
-          2,
-          54
-        ],
-        [
-          3,
-          46
-        ],
-        [
-          4,
-          38
-        ],
-        [
-          5,
-          30
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            85
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            4,
-            85
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            6,
-            85
-          ],
-          [
-            7,
-            85
-          ],
-          [
-            8,
-            85
-          ],
-          [
-            9,
-            85
-          ],
-          [
-            10,
-            85
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            4,
-            85
-          ],
-          [
-            5,
-            85
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          34
-        ],
-        [
-          2,
-          34
-        ],
-        [
-          3,
-          34
-        ],
-        [
-          4,
-          34
-        ],
-        [
-          5,
-          34
-        ],
-        [
-          6,
-          17
-        ],
-        [
-          7,
-          17
-        ],
-        [
-          8,
-          17
-        ],
-        [
-          9,
-          17
-        ],
-        [
-          10,
-          17
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          100
-        ],
-        [
-          2,
-          100
-        ],
-        [
-          3,
-          100
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            4,
-            75
-          ],
-          [
-            4,
-            75
-          ],
-          [
-            4,
-            75
-          ],
-          [
-            4,
-            75
-          ],
-          [
-            4,
-            75
-          ],
-          [
-            5,
-            65
-          ],
-          [
-            5,
-            65
-          ],
-          [
-            5,
-            65
-          ],
-          [
-            5,
-            65
-          ],
-          [
-            5,
-            65
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          90
-        ],
-        [
-          2,
-          100
-        ],
-        [
-          3,
-          85
-        ],
-        [
-          4,
-          75
-        ],
-        [
-          5,
-          65
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            55
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            65
-          ],
-          [
-            5,
-            70
-          ],
-          [
-            5,
-            75
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            95
-          ],
-          [
-            6,
-            30
-          ],
-          [
-            6,
-            35
-          ],
-          [
-            6,
-            40
-          ],
-          [
-            6,
-            45
-          ],
-          [
-            6,
-            50
-          ]
-        ]
-      },
-      "expected": [
-        [
-          5,
-          85
-        ],
-        [
-          6,
-          40
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            60
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            90
-          ],
-          [
-            4,
-            100
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          80
-        ],
-        [
-          2,
-          80
-        ],
-        [
-          3,
-          80
-        ],
-        [
-          4,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            65
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            55
-          ],
-          [
-            3,
-            50
-          ],
-          [
-            3,
-            45
-          ],
-          [
-            3,
-            40
-          ],
-          [
-            3,
-            35
-          ],
-          [
-            3,
-            30
-          ],
-          [
-            3,
-            25
-          ],
-          [
-            3,
-            20
-          ],
-          [
-            3,
-            15
-          ],
-          [
-            3,
-            10
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            3,
-            1
-          ]
-        ]
-      },
-      "expected": [
-        [
-          3,
-          85
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            75
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            75
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            4,
-            95
-          ],
-          [
-            4,
-            90
-          ],
-          [
-            4,
-            85
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            75
-          ],
-          [
-            5,
-            95
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            75
-          ],
-          [
-            6,
-            95
-          ],
-          [
-            6,
-            90
-          ],
-          [
-            6,
-            85
-          ],
-          [
-            6,
-            80
-          ],
-          [
-            6,
-            75
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          85
-        ],
-        [
-          2,
-          85
-        ],
-        [
-          3,
-          85
-        ],
-        [
-          4,
-          85
-        ],
-        [
-          5,
-          85
-        ],
-        [
-          6,
-          85
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            50
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            2,
-            40
-          ],
-          [
-            3,
-            50
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            5,
-            70
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            2,
-            30
-          ],
-          [
-            3,
-            40
-          ],
-          [
-            4,
-            50
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            2,
-            20
-          ],
-          [
-            3,
-            30
-          ],
-          [
-            4,
-            40
-          ],
-          [
-            5,
-            50
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            2,
-            10
-          ],
-          [
-            3,
-            20
-          ],
-          [
-            4,
-            30
-          ],
-          [
-            5,
-            40
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          80
-        ],
-        [
-          2,
-          40
-        ],
-        [
-          3,
-          50
-        ],
-        [
-          4,
-          60
-        ],
-        [
-          5,
-          70
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            98
-          ],
-          [
-            1,
-            97
-          ],
-          [
-            1,
-            96
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            94
-          ],
-          [
-            1,
-            93
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            91
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            89
-          ],
-          [
-            1,
-            88
-          ],
-          [
-            1,
-            87
-          ],
-          [
-            1,
-            86
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            84
-          ],
-          [
-            1,
-            83
-          ],
-          [
-            1,
-            82
-          ],
-          [
-            1,
-            81
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            75
-          ],
-          [
-            1,
-            65
-          ],
-          [
-            1,
-            55
-          ],
-          [
-            1,
-            45
-          ],
-          [
-            1,
-            35
-          ],
-          [
-            1,
-            25
-          ],
-          [
-            1,
-            15
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            40
-          ],
-          [
-            2,
-            30
-          ],
-          [
-            2,
-            20
-          ],
-          [
-            2,
-            10
-          ],
-          [
-            2,
-            0
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          75
-        ],
-        [
-          2,
-          70
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            75
-          ],
-          [
-            1,
-            65
-          ],
-          [
-            1,
-            55
-          ],
-          [
-            1,
-            45
-          ],
-          [
-            1,
-            35
-          ],
-          [
-            1,
-            25
-          ],
-          [
-            1,
-            15
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            99
-          ],
-          [
-            2,
-            98
-          ],
-          [
-            2,
-            97
-          ],
-          [
-            2,
-            96
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            2,
-            94
-          ],
-          [
-            2,
-            93
-          ],
-          [
-            2,
-            92
-          ],
-          [
-            2,
-            91
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          75
-        ],
-        [
-          2,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            50
-          ],
-          [
-            1,
-            51
-          ],
-          [
-            1,
-            52
-          ],
-          [
-            1,
-            53
-          ],
-          [
-            1,
-            54
-          ],
-          [
-            1,
-            55
-          ],
-          [
-            1,
-            56
-          ],
-          [
-            1,
-            57
-          ],
-          [
-            1,
-            58
-          ],
-          [
-            1,
-            59
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            61
-          ],
-          [
-            2,
-            62
-          ],
-          [
-            2,
-            63
-          ],
-          [
-            2,
-            64
-          ],
-          [
-            2,
-            65
-          ],
-          [
-            2,
-            66
-          ],
-          [
-            2,
-            67
-          ],
-          [
-            2,
-            68
-          ],
-          [
-            2,
-            69
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            71
-          ],
-          [
-            3,
-            72
-          ],
-          [
-            3,
-            73
-          ],
-          [
-            3,
-            74
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            76
-          ],
-          [
-            3,
-            77
-          ],
-          [
-            3,
-            78
-          ],
-          [
-            3,
-            79
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            4,
-            81
-          ],
-          [
-            4,
-            82
-          ],
-          [
-            4,
-            83
-          ],
-          [
-            4,
-            84
-          ],
-          [
-            4,
-            85
-          ],
-          [
-            4,
-            86
-          ],
-          [
-            4,
-            87
-          ],
-          [
-            4,
-            88
-          ],
-          [
-            4,
-            89
-          ],
-          [
-            4,
-            90
-          ],
-          [
-            5,
-            91
-          ],
-          [
-            5,
-            92
-          ],
-          [
-            5,
-            93
-          ],
-          [
-            5,
-            94
-          ],
-          [
-            5,
-            95
-          ],
-          [
-            5,
-            96
-          ],
-          [
-            5,
-            97
-          ],
-          [
-            5,
-            98
-          ],
-          [
-            5,
-            99
-          ],
-          [
-            5,
-            100
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          57
-        ],
-        [
-          2,
-          67
-        ],
-        [
-          3,
-          78
-        ],
-        [
-          4,
-          88
-        ],
-        [
-          5,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            98
-          ],
-          [
-            1,
-            97
-          ],
-          [
-            1,
-            96
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            94
-          ],
-          [
-            1,
-            93
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            91
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            2,
-            89
-          ],
-          [
-            2,
-            88
-          ],
-          [
-            2,
-            87
-          ],
-          [
-            2,
-            86
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            2,
-            84
-          ],
-          [
-            2,
-            83
-          ],
-          [
-            2,
-            82
-          ],
-          [
-            2,
-            81
-          ],
-          [
-            2,
-            80
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          97
-        ],
-        [
-          2,
-          87
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            91
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            93
-          ],
-          [
-            1,
-            94
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            96
-          ],
-          [
-            1,
-            97
-          ],
-          [
-            1,
-            98
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            2,
-            91
-          ],
-          [
-            2,
-            92
-          ],
-          [
-            2,
-            93
-          ],
-          [
-            2,
-            94
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            2,
-            96
-          ],
-          [
-            2,
-            97
-          ],
-          [
-            2,
-            98
-          ],
-          [
-            2,
-            99
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            3,
-            91
-          ],
-          [
-            3,
-            92
-          ],
-          [
-            3,
-            93
-          ],
-          [
-            3,
-            94
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            96
-          ],
-          [
-            3,
-            97
-          ],
-          [
-            3,
-            98
-          ],
-          [
-            3,
-            99
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            4,
-            91
-          ],
-          [
-            4,
-            92
-          ],
-          [
-            4,
-            93
-          ],
-          [
-            4,
-            94
-          ],
-          [
-            4,
-            95
-          ],
-          [
-            4,
-            96
-          ],
-          [
-            4,
-            97
-          ],
-          [
-            4,
-            98
-          ],
-          [
-            4,
-            99
-          ],
-          [
-            4,
-            100
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          98
-        ],
-        [
-          2,
-          98
-        ],
-        [
-          3,
-          98
-        ],
-        [
-          4,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            10,
-            90
-          ],
-          [
-            10,
-            95
-          ],
-          [
-            10,
-            85
-          ],
-          [
-            10,
-            80
-          ],
-          [
-            10,
-            75
-          ],
-          [
-            10,
-            65
-          ],
-          [
-            10,
-            60
-          ],
-          [
-            10,
-            55
-          ],
-          [
-            10,
-            50
-          ],
-          [
-            10,
-            45
-          ],
-          [
-            11,
-            90
-          ],
-          [
-            11,
-            95
-          ],
-          [
-            11,
-            85
-          ],
-          [
-            11,
-            80
-          ],
-          [
-            11,
-            75
-          ]
-        ]
-      },
-      "expected": [
-        [
-          10,
-          85
-        ],
-        [
-          11,
-          85
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            78
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            88
-          ],
-          [
-            2,
-            76
-          ],
-          [
-            2,
-            82
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            88
-          ],
-          [
-            2,
-            79
-          ],
-          [
-            3,
-            81
-          ],
-          [
-            3,
-            86
-          ],
-          [
-            3,
-            79
-          ],
-          [
-            3,
-            91
-          ],
-          [
-            3,
-            84
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          86
-        ],
-        [
-          2,
-          83
-        ],
-        [
-          3,
-          84
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            100,
-            50
-          ],
-          [
-            100,
-            60
-          ],
-          [
-            100,
-            70
-          ],
-          [
-            100,
-            80
-          ],
-          [
-            100,
-            90
-          ],
-          [
-            100,
-            100
-          ],
-          [
-            200,
-            100
-          ],
-          [
-            200,
-            90
-          ],
-          [
-            200,
-            80
-          ],
-          [
-            200,
-            70
-          ],
-          [
-            200,
-            60
-          ],
-          [
-            200,
-            50
-          ],
-          [
-            200,
-            40
-          ],
-          [
-            200,
-            30
-          ],
-          [
-            200,
-            20
-          ],
-          [
-            200,
-            10
-          ]
-        ]
-      },
-      "expected": [
-        [
-          100,
-          80
-        ],
-        [
-          200,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            9,
-            55
-          ],
-          [
-            9,
-            60
-          ],
-          [
-            9,
-            65
-          ],
-          [
-            9,
-            70
-          ],
-          [
-            9,
-            75
-          ],
-          [
-            9,
-            80
-          ],
-          [
-            9,
-            85
-          ],
-          [
-            9,
-            90
-          ],
-          [
-            9,
-            95
-          ],
-          [
-            9,
-            100
-          ],
-          [
-            9,
-            105
-          ],
-          [
-            9,
-            110
-          ],
-          [
-            9,
-            115
-          ],
-          [
-            9,
-            120
-          ],
-          [
-            9,
-            125
-          ],
-          [
-            9,
-            130
-          ],
-          [
-            9,
-            135
-          ],
-          [
-            9,
-            140
-          ],
-          [
-            9,
-            145
-          ],
-          [
-            9,
-            150
-          ]
-        ]
-      },
-      "expected": [
-        [
-          9,
-          140
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            98
-          ],
-          [
-            1,
-            97
-          ],
-          [
-            1,
-            96
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            94
-          ],
-          [
-            1,
-            93
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            91
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            89
-          ],
-          [
-            1,
-            88
-          ],
-          [
-            1,
-            87
-          ],
-          [
-            1,
-            86
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            84
-          ],
-          [
-            1,
-            83
-          ],
-          [
-            1,
-            82
-          ],
-          [
-            1,
-            81
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            79
-          ],
-          [
-            1,
-            78
-          ],
-          [
-            1,
-            77
-          ],
-          [
-            1,
-            76
-          ],
-          [
-            1,
-            75
-          ],
-          [
-            1,
-            74
-          ],
-          [
-            1,
-            73
-          ],
-          [
-            1,
-            72
-          ],
-          [
-            1,
-            71
-          ],
-          [
-            1,
-            70
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            55
-          ],
-          [
-            1,
-            75
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            75
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            65
-          ],
-          [
-            3,
-            55
-          ],
-          [
-            3,
-            45
-          ],
-          [
-            3,
-            35
-          ],
-          [
-            3,
-            25
-          ],
-          [
-            4,
-            90
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            4,
-            50
-          ],
-          [
-            4,
-            40
-          ],
-          [
-            4,
-            30
-          ],
-          [
-            4,
-            20
-          ],
-          [
-            4,
-            10
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          84
-        ],
-        [
-          2,
-          90
-        ],
-        [
-          3,
-          75
-        ],
-        [
-          4,
-          70
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            11,
-            100
-          ],
-          [
-            11,
-            99
-          ],
-          [
-            11,
-            98
-          ],
-          [
-            11,
-            97
-          ],
-          [
-            11,
-            96
-          ],
-          [
-            11,
-            95
-          ],
-          [
-            11,
-            94
-          ],
-          [
-            11,
-            93
-          ],
-          [
-            11,
-            92
-          ],
-          [
-            11,
-            91
-          ],
-          [
-            11,
-            90
-          ],
-          [
-            11,
-            89
-          ],
-          [
-            11,
-            88
-          ],
-          [
-            11,
-            87
-          ],
-          [
-            11,
-            86
-          ],
-          [
-            11,
-            85
-          ],
-          [
-            11,
-            84
-          ],
-          [
-            11,
-            83
-          ],
-          [
-            11,
-            82
-          ],
-          [
-            11,
-            81
-          ],
-          [
-            11,
-            80
-          ]
-        ]
-      },
-      "expected": [
-        [
-          11,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            100
-          ]
-        ]
-      },
-      "expected": [
-        [
-          2,
-          100
-        ],
-        [
-          3,
-          100
-        ],
-        [
-          4,
-          100
-        ],
-        [
-          5,
-          100
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            98
-          ],
-          [
-            1,
-            97
-          ],
-          [
-            1,
-            96
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            94
-          ],
-          [
-            1,
-            93
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            91
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            2,
-            84
-          ],
-          [
-            2,
-            83
-          ],
-          [
-            2,
-            82
-          ],
-          [
-            2,
-            81
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            79
-          ],
-          [
-            2,
-            78
-          ],
-          [
-            2,
-            77
-          ],
-          [
-            2,
-            76
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          98
-        ],
-        [
-          2,
-          83
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            49
-          ],
-          [
-            2,
-            49
-          ],
-          [
-            2,
-            49
-          ],
-          [
-            2,
-            49
-          ],
-          [
-            2,
-            49
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            69
-          ],
-          [
-            3,
-            69
-          ],
-          [
-            3,
-            69
-          ],
-          [
-            3,
-            69
-          ],
-          [
-            3,
-            69
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            79
-          ],
-          [
-            4,
-            79
-          ],
-          [
-            4,
-            79
-          ],
-          [
-            4,
-            79
-          ],
-          [
-            4,
-            79
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            84
-          ],
-          [
-            5,
-            84
-          ],
-          [
-            5,
-            84
-          ],
-          [
-            5,
-            84
-          ],
-          [
-            5,
-            84
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          100
-        ],
-        [
-          2,
-          50
-        ],
-        [
-          3,
-          70
-        ],
-        [
-          4,
-          80
-        ],
-        [
-          5,
-          85
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            1,
-            50
-          ],
-          [
-            1,
-            40
-          ],
-          [
-            1,
-            30
-          ],
-          [
-            1,
-            20
-          ],
-          [
-            1,
-            10
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            40
-          ],
-          [
-            2,
-            30
-          ],
-          [
-            2,
-            20
-          ],
-          [
-            2,
-            10
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            65
-          ],
-          [
-            3,
-            55
-          ],
-          [
-            3,
-            45
-          ],
-          [
-            3,
-            35
-          ],
-          [
-            3,
-            25
-          ],
-          [
-            3,
-            15
-          ],
-          [
-            3,
-            5
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          70
-        ],
-        [
-          2,
-          80
-        ],
-        [
-          3,
-          75
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            55
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            65
-          ],
-          [
-            5,
-            70
-          ],
-          [
-            5,
-            75
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            95
-          ],
-          [
-            6,
-            30
-          ],
-          [
-            6,
-            35
-          ],
-          [
-            6,
-            40
-          ],
-          [
-            6,
-            45
-          ],
-          [
-            6,
-            50
-          ],
-          [
-            6,
-            55
-          ],
-          [
-            6,
-            60
-          ],
-          [
-            6,
-            65
-          ],
-          [
-            6,
-            70
-          ],
-          [
-            6,
-            75
-          ]
-        ]
-      },
-      "expected": [
-        [
-          5,
-          85
-        ],
-        [
-          6,
-          65
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            7,
-            60
-          ],
-          [
-            7,
-            65
-          ],
-          [
-            7,
-            70
-          ],
-          [
-            7,
-            75
-          ],
-          [
-            7,
-            80
-          ],
-          [
-            7,
-            85
-          ],
-          [
-            7,
-            90
-          ],
-          [
-            7,
-            95
-          ],
-          [
-            7,
-            100
-          ],
-          [
-            8,
-            40
-          ],
-          [
-            8,
-            45
-          ],
-          [
-            8,
-            50
-          ],
-          [
-            8,
-            55
-          ],
-          [
-            8,
-            60
-          ],
-          [
-            8,
-            65
-          ],
-          [
-            8,
-            70
-          ],
-          [
-            8,
-            75
-          ]
-        ]
-      },
-      "expected": [
-        [
-          7,
-          90
-        ],
-        [
-          8,
-          65
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            95
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            75
-          ],
-          [
-            5,
-            65
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            55
-          ],
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            45
-          ]
-        ]
-      },
-      "expected": [
-        [
-          5,
-          85
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            6,
-            88
-          ],
-          [
-            6,
-            92
-          ],
-          [
-            6,
-            79
-          ],
-          [
-            6,
-            85
-          ],
-          [
-            6,
-            81
-          ],
-          [
-            6,
-            86
-          ],
-          [
-            6,
-            87
-          ],
-          [
-            6,
-            90
-          ],
-          [
-            6,
-            93
-          ],
-          [
-            6,
-            94
-          ],
-          [
-            6,
-            78
-          ],
-          [
-            6,
-            84
-          ],
-          [
-            6,
-            91
-          ],
-          [
-            6,
-            89
-          ],
-          [
-            6,
-            83
-          ]
-        ]
-      },
-      "expected": [
-        [
-          6,
-          92
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            9,
-            100
-          ],
-          [
-            9,
-            99
-          ],
-          [
-            9,
-            98
-          ],
-          [
-            9,
-            97
-          ],
-          [
-            9,
-            96
-          ],
-          [
-            9,
-            95
-          ],
-          [
-            9,
-            94
-          ],
-          [
-            9,
-            93
-          ],
-          [
-            9,
-            92
-          ],
-          [
-            9,
-            91
-          ],
-          [
-            10,
-            100
-          ],
-          [
-            10,
-            99
-          ],
-          [
-            10,
-            98
-          ],
-          [
-            10,
-            97
-          ],
-          [
-            10,
-            96
-          ],
-          [
-            10,
-            95
-          ],
-          [
-            10,
-            94
-          ],
-          [
-            10,
-            93
-          ],
-          [
-            10,
-            92
-          ],
-          [
-            10,
-            91
-          ],
-          [
-            11,
-            100
-          ],
-          [
-            11,
-            99
-          ],
-          [
-            11,
-            98
-          ],
-          [
-            11,
-            97
-          ],
-          [
-            11,
-            96
-          ],
-          [
-            11,
-            95
-          ],
-          [
-            11,
-            94
-          ],
-          [
-            11,
-            93
-          ],
-          [
-            11,
-            92
-          ],
-          [
-            11,
-            91
-          ]
-        ]
-      },
-      "expected": [
-        [
-          9,
-          98
-        ],
-        [
-          10,
-          98
-        ],
-        [
-          11,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            50
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            3,
-            50
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            90
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          70
-        ],
-        [
-          2,
-          70
-        ],
-        [
-          3,
-          70
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            70
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            110
-          ],
-          [
-            5,
-            120
-          ],
-          [
-            5,
-            130
-          ],
-          [
-            5,
-            140
-          ],
-          [
-            5,
-            150
-          ]
-        ]
-      },
-      "expected": [
-        [
-          5,
-          130
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            98
-          ],
-          [
-            1,
-            97
-          ],
-          [
-            1,
-            96
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            99
-          ],
-          [
-            2,
-            98
-          ],
-          [
-            2,
-            97
-          ],
-          [
-            2,
-            96
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            99
-          ],
-          [
-            3,
-            98
-          ],
-          [
-            3,
-            97
-          ],
-          [
-            3,
-            96
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            99
-          ],
-          [
-            4,
-            98
-          ],
-          [
-            4,
-            97
-          ],
-          [
-            4,
-            96
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            5,
-            99
-          ],
-          [
-            5,
-            98
-          ],
-          [
-            5,
-            97
-          ],
-          [
-            5,
-            96
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          98
-        ],
-        [
-          2,
-          98
-        ],
-        [
-          3,
-          98
-        ],
-        [
-          4,
-          98
-        ],
-        [
-          5,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            50
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            6,
-            80
-          ],
-          [
-            7,
-            70
-          ],
-          [
-            8,
-            60
-          ],
-          [
-            9,
-            50
-          ],
-          [
-            10,
-            40
-          ],
-          [
-            11,
-            30
-          ],
-          [
-            12,
-            20
-          ],
-          [
-            13,
-            10
-          ],
-          [
-            14,
-            95
-          ],
-          [
-            15,
-            85
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          10
-        ],
-        [
-          2,
-          12
-        ],
-        [
-          3,
-          14
-        ],
-        [
-          4,
-          16
-        ],
-        [
-          5,
-          18
-        ],
-        [
-          6,
-          16
-        ],
-        [
-          7,
-          14
-        ],
-        [
-          8,
-          12
-        ],
-        [
-          9,
-          10
-        ],
-        [
-          10,
-          8
-        ],
-        [
-          11,
-          6
-        ],
-        [
-          12,
-          4
-        ],
-        [
-          13,
-          2
-        ],
-        [
-          14,
-          19
-        ],
-        [
-          15,
-          17
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            88
-          ],
-          [
-            1,
-            77
-          ],
-          [
-            1,
-            66
-          ],
-          [
-            1,
-            55
-          ],
-          [
-            1,
-            44
-          ],
-          [
-            1,
-            33
-          ],
-          [
-            1,
-            22
-          ],
-          [
-            1,
-            11
-          ],
-          [
-            1,
-            0
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            99
-          ],
-          [
-            2,
-            98
-          ],
-          [
-            2,
-            97
-          ],
-          [
-            2,
-            96
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            2,
-            94
-          ],
-          [
-            2,
-            93
-          ],
-          [
-            2,
-            92
-          ],
-          [
-            2,
-            91
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            3,
-            89
-          ],
-          [
-            3,
-            78
-          ],
-          [
-            3,
-            67
-          ],
-          [
-            3,
-            56
-          ],
-          [
-            3,
-            45
-          ],
-          [
-            3,
-            34
-          ],
-          [
-            3,
-            23
-          ],
-          [
-            3,
-            12
-          ],
-          [
-            3,
-            1
-          ],
-          [
-            3,
-            88
-          ],
-          [
-            3,
-            77
-          ],
-          [
-            3,
-            66
-          ],
-          [
-            3,
-            55
-          ],
-          [
-            3,
-            44
-          ],
-          [
-            3,
-            33
-          ],
-          [
-            3,
-            22
-          ],
-          [
-            3,
-            11
-          ],
-          [
-            3,
-            2
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          66
-        ],
-        [
-          2,
-          98
-        ],
-        [
-          3,
-          79
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            95
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            4,
-            95
-          ],
-          [
-            5,
-            95
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            4,
-            90
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            4,
-            85
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            1,
-            75
-          ],
-          [
-            2,
-            75
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            4,
-            75
-          ],
-          [
-            5,
-            75
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            5,
-            70
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          85
-        ],
-        [
-          2,
-          85
-        ],
-        [
-          3,
-          85
-        ],
-        [
-          4,
-          85
-        ],
-        [
-          5,
-          85
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            98
-          ],
-          [
-            1,
-            97
-          ],
-          [
-            1,
-            96
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            94
-          ],
-          [
-            1,
-            93
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            91
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            99
-          ],
-          [
-            2,
-            98
-          ],
-          [
-            2,
-            97
-          ],
-          [
-            2,
-            96
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          98
-        ],
-        [
-          2,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            3,
-            50
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            10
-          ],
-          [
-            3,
-            20
-          ],
-          [
-            3,
-            30
-          ],
-          [
-            3,
-            40
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            3,
-            15
-          ],
-          [
-            3,
-            25
-          ],
-          [
-            3,
-            35
-          ],
-          [
-            3,
-            45
-          ]
-        ]
-      },
-      "expected": [
-        [
-          3,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            105
-          ],
-          [
-            2,
-            110
-          ],
-          [
-            2,
-            115
-          ],
-          [
-            2,
-            120
-          ],
-          [
-            2,
-            125
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            65
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            105
-          ]
-        ]
-      },
-      "expected": [
-        [
-          2,
-          115
-        ],
-        [
-          3,
-          95
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            55
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            65
-          ],
-          [
-            5,
-            70
-          ],
-          [
-            5,
-            75
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            95
-          ]
-        ]
-      },
-      "expected": [
-        [
-          5,
-          85
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            3,
-            50
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            90
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          80
-        ],
-        [
-          2,
-          80
-        ],
-        [
-          3,
-          70
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            99
-          ],
-          [
-            3,
-            98
-          ],
-          [
-            3,
-            97
-          ],
-          [
-            3,
-            96
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            94
-          ],
-          [
-            3,
-            93
-          ],
-          [
-            3,
-            92
-          ],
-          [
-            3,
-            91
-          ]
-        ]
-      },
-      "expected": [
-        [
-          3,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            75
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            65
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            1,
-            55
-          ],
-          [
-            1,
-            50
-          ],
-          [
-            1,
-            45
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            75
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            65
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            55
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            65
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            55
-          ],
-          [
-            3,
-            50
-          ],
-          [
-            3,
-            45
-          ],
-          [
-            3,
-            40
-          ],
-          [
-            3,
-            35
-          ],
-          [
-            3,
-            30
-          ],
-          [
-            3,
-            25
-          ],
-          [
-            3,
-            20
-          ],
-          [
-            3,
-            15
-          ],
-          [
-            3,
-            10
-          ],
-          [
-            3,
-            5
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          80
-        ],
-        [
-          2,
-          85
-        ],
-        [
-          3,
-          90
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            78
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            88
-          ],
-          [
-            2,
-            76
-          ],
-          [
-            2,
-            82
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            88
-          ],
-          [
-            2,
-            79
-          ],
-          [
-            3,
-            65
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            85
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          86
-        ],
-        [
-          2,
-          83
-        ],
-        [
-          3,
-          75
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            10,
-            88
-          ],
-          [
-            10,
-            89
-          ],
-          [
-            10,
-            90
-          ],
-          [
-            10,
-            91
-          ],
-          [
-            10,
-            92
-          ],
-          [
-            20,
-            70
-          ],
-          [
-            20,
-            71
-          ],
-          [
-            20,
-            72
-          ],
-          [
-            20,
-            73
-          ],
-          [
-            20,
-            74
-          ],
-          [
-            30,
-            60
-          ],
-          [
-            30,
-            61
-          ],
-          [
-            30,
-            62
-          ],
-          [
-            30,
-            63
-          ],
-          [
-            30,
-            64
-          ],
-          [
-            40,
-            50
-          ],
-          [
-            40,
-            51
-          ],
-          [
-            40,
-            52
-          ],
-          [
-            40,
-            53
-          ],
-          [
-            40,
-            54
-          ],
-          [
-            50,
-            40
-          ],
-          [
-            50,
-            41
-          ],
-          [
-            50,
-            42
-          ],
-          [
-            50,
-            43
-          ],
-          [
-            50,
-            44
-          ],
-          [
-            60,
-            30
-          ],
-          [
-            60,
-            31
-          ],
-          [
-            60,
-            32
-          ],
-          [
-            60,
-            33
-          ],
-          [
-            60,
-            34
-          ],
-          [
-            70,
-            20
-          ],
-          [
-            70,
-            21
-          ],
-          [
-            70,
-            22
-          ],
-          [
-            70,
-            23
-          ],
-          [
-            70,
-            24
-          ],
-          [
-            80,
-            10
-          ],
-          [
-            80,
-            11
-          ],
-          [
-            80,
-            12
-          ],
-          [
-            80,
-            13
-          ],
-          [
-            80,
-            14
-          ]
-        ]
-      },
-      "expected": [
-        [
-          10,
-          90
-        ],
-        [
-          20,
-          72
-        ],
-        [
-          30,
-          62
-        ],
-        [
-          40,
-          52
-        ],
-        [
-          50,
-          42
-        ],
-        [
-          60,
-          32
-        ],
-        [
-          70,
-          22
-        ],
-        [
-          80,
-          12
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            9,
-            99
-          ],
-          [
-            9,
-            98
-          ],
-          [
-            9,
-            97
-          ],
-          [
-            9,
-            96
-          ],
-          [
-            9,
-            95
-          ],
-          [
-            9,
-            94
-          ],
-          [
-            9,
-            93
-          ],
-          [
-            9,
-            92
-          ],
-          [
-            9,
-            91
-          ],
-          [
-            9,
-            90
-          ],
-          [
-            10,
-            99
-          ],
-          [
-            10,
-            98
-          ],
-          [
-            10,
-            97
-          ],
-          [
-            10,
-            96
-          ],
-          [
-            10,
-            95
-          ],
-          [
-            10,
-            94
-          ],
-          [
-            10,
-            93
-          ],
-          [
-            10,
-            92
-          ],
-          [
-            10,
-            91
-          ],
-          [
-            10,
-            90
-          ],
-          [
-            11,
-            99
-          ],
-          [
-            11,
-            98
-          ],
-          [
-            11,
-            97
-          ],
-          [
-            11,
-            96
-          ],
-          [
-            11,
-            95
-          ],
-          [
-            11,
-            94
-          ],
-          [
-            11,
-            93
-          ],
-          [
-            11,
-            92
-          ],
-          [
-            11,
-            91
-          ],
-          [
-            11,
-            90
-          ],
-          [
-            12,
-            99
-          ],
-          [
-            12,
-            98
-          ],
-          [
-            12,
-            97
-          ],
-          [
-            12,
-            96
-          ],
-          [
-            12,
-            95
-          ],
-          [
-            12,
-            94
-          ],
-          [
-            12,
-            93
-          ],
-          [
-            12,
-            92
-          ],
-          [
-            12,
-            91
-          ],
-          [
-            12,
-            90
-          ]
-        ]
-      },
-      "expected": [
-        [
-          9,
-          97
-        ],
-        [
-          10,
-          97
-        ],
-        [
-          11,
-          97
-        ],
-        [
-          12,
-          97
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            99
-          ],
-          [
-            3,
-            98
-          ],
-          [
-            3,
-            97
-          ],
-          [
-            3,
-            96
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            94
-          ],
-          [
-            3,
-            93
-          ],
-          [
-            3,
-            92
-          ],
-          [
-            3,
-            91
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            3,
-            89
-          ],
-          [
-            3,
-            88
-          ]
-        ]
-      },
-      "expected": [
-        [
-          3,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            60
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            3,
-            40
-          ],
-          [
-            3,
-            50
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            4,
-            30
-          ],
-          [
-            4,
-            40
-          ],
-          [
-            4,
-            50
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            5,
-            20
-          ],
-          [
-            5,
-            30
-          ],
-          [
-            5,
-            40
-          ],
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            1,
-            30
-          ],
-          [
-            1,
-            40
-          ],
-          [
-            2,
-            20
-          ],
-          [
-            2,
-            30
-          ],
-          [
-            3,
-            10
-          ],
-          [
-            3,
-            20
-          ],
-          [
-            4,
-            10
-          ],
-          [
-            4,
-            20
-          ],
-          [
-            5,
-            10
-          ],
-          [
-            5,
-            20
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          80
-        ],
-        [
-          2,
-          70
-        ],
-        [
-          3,
-          60
-        ],
-        [
-          4,
-          50
-        ],
-        [
-          5,
-          40
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            75
-          ],
-          [
-            1,
-            65
-          ],
-          [
-            1,
-            55
-          ],
-          [
-            1,
-            45
-          ],
-          [
-            1,
-            35
-          ],
-          [
-            1,
-            25
-          ],
-          [
-            1,
-            15
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            2,
-            75
-          ],
-          [
-            2,
-            65
-          ],
-          [
-            2,
-            55
-          ],
-          [
-            2,
-            45
-          ],
-          [
-            2,
-            35
-          ],
-          [
-            2,
-            25
-          ],
-          [
-            2,
-            15
-          ],
-          [
-            2,
-            5
-          ],
-          [
-            2,
-            10
-          ],
-          [
-            2,
-            20
-          ],
-          [
-            2,
-            30
-          ],
-          [
-            2,
-            40
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          75
-        ],
-        [
-          2,
-          75
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            85
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            75
-          ],
-          [
-            5,
-            70
-          ],
-          [
-            5,
-            65
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            55
-          ],
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            45
-          ],
-          [
-            6,
-            90
-          ],
-          [
-            6,
-            85
-          ],
-          [
-            6,
-            80
-          ],
-          [
-            6,
-            75
-          ],
-          [
-            6,
-            70
-          ],
-          [
-            6,
-            65
-          ],
-          [
-            6,
-            60
-          ],
-          [
-            6,
-            55
-          ],
-          [
-            6,
-            50
-          ],
-          [
-            6,
-            45
-          ]
-        ]
-      },
-      "expected": [
-        [
-          5,
-          80
-        ],
-        [
-          6,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            90
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            4,
-            90
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            6,
-            90
-          ],
-          [
-            7,
-            90
-          ],
-          [
-            8,
-            90
-          ],
-          [
-            9,
-            90
-          ],
-          [
-            10,
-            90
-          ],
-          [
-            11,
-            90
-          ],
-          [
-            12,
-            90
-          ],
-          [
-            13,
-            90
-          ],
-          [
-            14,
-            90
-          ],
-          [
-            15,
-            90
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          18
-        ],
-        [
-          2,
-          18
-        ],
-        [
-          3,
-          18
-        ],
-        [
-          4,
-          18
-        ],
-        [
-          5,
-          18
-        ],
-        [
-          6,
-          18
-        ],
-        [
-          7,
-          18
-        ],
-        [
-          8,
-          18
-        ],
-        [
-          9,
-          18
-        ],
-        [
-          10,
-          18
-        ],
-        [
-          11,
-          18
-        ],
-        [
-          12,
-          18
-        ],
-        [
-          13,
-          18
-        ],
-        [
-          14,
-          18
-        ],
-        [
-          15,
-          18
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            3,
-            40
-          ],
-          [
-            3,
-            50
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            4,
-            30
-          ],
-          [
-            4,
-            40
-          ],
-          [
-            4,
-            50
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            5,
-            20
-          ],
-          [
-            5,
-            30
-          ],
-          [
-            5,
-            40
-          ],
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            70
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            100
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          80
-        ],
-        [
-          2,
-          70
-        ],
-        [
-          3,
-          70
-        ],
-        [
-          4,
-          50
-        ],
-        [
-          5,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            98
-          ],
-          [
-            1,
-            97
-          ],
-          [
-            1,
-            96
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            94
-          ],
-          [
-            1,
-            93
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            91
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            2,
-            99
-          ],
-          [
-            2,
-            98
-          ],
-          [
-            2,
-            97
-          ],
-          [
-            2,
-            96
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            2,
-            94
-          ],
-          [
-            2,
-            93
-          ],
-          [
-            2,
-            92
-          ],
-          [
-            2,
-            91
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            3,
-            99
-          ],
-          [
-            3,
-            98
-          ],
-          [
-            3,
-            97
-          ],
-          [
-            3,
-            96
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            3,
-            94
-          ],
-          [
-            3,
-            93
-          ],
-          [
-            3,
-            92
-          ],
-          [
-            3,
-            91
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          98
-        ],
-        [
-          2,
-          98
-        ],
-        [
-          3,
-          98
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            100,
-            85
-          ],
-          [
-            100,
-            88
-          ],
-          [
-            100,
-            91
-          ],
-          [
-            100,
-            94
-          ],
-          [
-            100,
-            97
-          ],
-          [
-            200,
-            86
-          ],
-          [
-            200,
-            89
-          ],
-          [
-            200,
-            92
-          ],
-          [
-            200,
-            95
-          ],
-          [
-            200,
-            98
-          ],
-          [
-            300,
-            87
-          ],
-          [
-            300,
-            90
-          ],
-          [
-            300,
-            93
-          ],
-          [
-            300,
-            96
-          ],
-          [
-            300,
-            99
-          ],
-          [
-            400,
-            84
-          ],
-          [
-            400,
-            87
-          ],
-          [
-            400,
-            90
-          ],
-          [
-            400,
-            93
-          ],
-          [
-            400,
-            96
-          ],
-          [
-            500,
-            83
-          ],
-          [
-            500,
-            86
-          ],
-          [
-            500,
-            89
-          ],
-          [
-            500,
-            92
-          ],
-          [
-            500,
-            95
-          ],
-          [
-            600,
-            82
-          ],
-          [
-            600,
-            85
-          ],
-          [
-            600,
-            88
-          ],
-          [
-            600,
-            91
-          ],
-          [
-            600,
-            94
-          ],
-          [
-            700,
-            81
-          ],
-          [
-            700,
-            84
-          ],
-          [
-            700,
-            87
-          ],
-          [
-            700,
-            90
-          ],
-          [
-            700,
-            93
-          ]
-        ]
-      },
-      "expected": [
-        [
-          100,
-          91
-        ],
-        [
-          200,
-          92
-        ],
-        [
-          300,
-          93
-        ],
-        [
-          400,
-          90
-        ],
-        [
-          500,
-          89
-        ],
-        [
-          600,
-          88
-        ],
-        [
-          700,
-          87
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            50
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            3,
-            50
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            3,
-            100
-          ],
-          [
-            4,
-            50
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            90
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            70
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            100
-          ],
-          [
-            6,
-            50
-          ],
-          [
-            6,
-            60
-          ],
-          [
-            6,
-            70
-          ],
-          [
-            6,
-            80
-          ],
-          [
-            6,
-            90
-          ],
-          [
-            6,
-            100
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          80
-        ],
-        [
-          2,
-          80
-        ],
-        [
-          3,
-          80
-        ],
-        [
-          4,
-          80
-        ],
-        [
-          5,
-          80
-        ],
-        [
-          6,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            70
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            6,
-            60
-          ],
-          [
-            6,
-            70
-          ],
-          [
-            6,
-            80
-          ],
-          [
-            6,
-            90
-          ],
-          [
-            6,
-            100
-          ],
-          [
-            7,
-            70
-          ],
-          [
-            7,
-            80
-          ],
-          [
-            7,
-            90
-          ],
-          [
-            7,
-            100
-          ],
-          [
-            7,
-            10
-          ],
-          [
-            7,
-            20
-          ],
-          [
-            7,
-            30
-          ],
-          [
-            7,
-            40
-          ],
-          [
-            8,
-            80
-          ],
-          [
-            8,
-            90
-          ],
-          [
-            8,
-            100
-          ],
-          [
-            8,
-            10
-          ],
-          [
-            8,
-            20
-          ],
-          [
-            8,
-            30
-          ],
-          [
-            8,
-            40
-          ],
-          [
-            8,
-            50
-          ]
-        ]
-      },
-      "expected": [
-        [
-          5,
-          70
-        ],
-        [
-          6,
-          80
-        ],
-        [
-          7,
-          76
-        ],
-        [
-          8,
-          72
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            3,
-            50
-          ],
-          [
-            3,
-            55
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            65
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            3,
-            95
-          ],
-          [
-            4,
-            100
-          ],
-          [
-            4,
-            90
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            4,
-            50
-          ],
-          [
-            4,
-            40
-          ],
-          [
-            4,
-            30
-          ],
-          [
-            4,
-            20
-          ],
-          [
-            4,
-            10
-          ],
-          [
-            5,
-            10
-          ],
-          [
-            5,
-            20
-          ],
-          [
-            5,
-            30
-          ],
-          [
-            5,
-            40
-          ],
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            70
-          ],
-          [
-            5,
-            80
-          ],
-          [
-            5,
-            90
-          ],
-          [
-            5,
-            100
-          ]
-        ]
-      },
-      "expected": [
-        [
-          3,
-          85
-        ],
-        [
-          4,
-          80
-        ],
-        [
-          5,
-          80
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            85
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            88
-          ],
-          [
-            2,
-            76
-          ],
-          [
-            2,
-            82
-          ],
-          [
-            2,
-            88
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            79
-          ],
-          [
-            1,
-            60
-          ],
-          [
-            1,
-            70
-          ],
-          [
-            1,
-            80
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            2,
-            50
-          ],
-          [
-            2,
-            60
-          ],
-          [
-            2,
-            70
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            90
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          92
-        ],
-        [
-          2,
-          86
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            65
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            55
-          ],
-          [
-            3,
-            50
-          ],
-          [
-            3,
-            45
-          ],
-          [
-            3,
-            40
-          ],
-          [
-            3,
-            35
-          ],
-          [
-            3,
-            30
-          ],
-          [
-            3,
-            25
-          ],
-          [
-            3,
-            20
-          ],
-          [
-            3,
-            15
-          ],
-          [
-            3,
-            10
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            3,
-            0
-          ]
-        ]
-      },
-      "expected": [
-        [
-          3,
-          75
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            88
-          ],
-          [
-            1,
-            92
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            90
-          ],
-          [
-            2,
-            75
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            3,
-            60
-          ],
-          [
-            3,
-            65
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            4,
-            45
-          ],
-          [
-            4,
-            50
-          ],
-          [
-            4,
-            55
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            4,
-            65
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          93
-        ],
-        [
-          2,
-          85
-        ],
-        [
-          3,
-          70
-        ],
-        [
-          4,
-          55
-        ]
-      ]
-    },
-    {
-      "input": {
-        "items": [
-          [
-            1,
-            100
-          ],
-          [
-            1,
-            99
-          ],
-          [
-            1,
-            98
-          ],
-          [
-            1,
-            97
-          ],
-          [
-            1,
-            96
-          ],
-          [
-            1,
-            95
-          ],
-          [
-            2,
-            80
-          ],
-          [
-            2,
-            85
-          ],
-          [
-            2,
-            90
-          ],
-          [
-            2,
-            95
-          ],
-          [
-            2,
-            100
-          ],
-          [
-            3,
-            70
-          ],
-          [
-            3,
-            75
-          ],
-          [
-            3,
-            80
-          ],
-          [
-            3,
-            85
-          ],
-          [
-            3,
-            90
-          ],
-          [
-            4,
-            60
-          ],
-          [
-            4,
-            65
-          ],
-          [
-            4,
-            70
-          ],
-          [
-            4,
-            75
-          ],
-          [
-            4,
-            80
-          ],
-          [
-            5,
-            50
-          ],
-          [
-            5,
-            55
-          ],
-          [
-            5,
-            60
-          ],
-          [
-            5,
-            65
-          ],
-          [
-            5,
-            70
-          ]
-        ]
-      },
-      "expected": [
-        [
-          1,
-          98
-        ],
-        [
-          2,
-          90
-        ],
-        [
-          3,
-          80
-        ],
-        [
-          4,
-          70
-        ],
-        [
-          5,
-          60
-        ]
-      ]
+        "word": "internationalization",
+        "abbr": "i12iz4n"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "substitution",
+        "abbr": "substitution"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "hi",
+        "abbr": "2"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "substitution",
+        "abbr": "su3i1u2on"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "hi",
+        "abbr": "h1"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "he3"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "h4"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "abc",
+        "abbr": "a2"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "world",
+        "abbr": "w1r1d"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "he2ll"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "he2o"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "wo2"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "substitution",
+        "abbr": "12"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "test",
+        "abbr": "tes1"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "test",
+        "abbr": "te2"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "cat",
+        "abbr": "c2t"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "a",
+        "abbr": "a"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "1ord"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "0word"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "w3"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "wor1"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "h3"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "h2ll"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "example",
+        "abbr": "e5"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "apple",
+        "abbr": "a2e"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "substitution",
+        "abbr": "sub4u4"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "dog",
+        "abbr": "d1g"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "w0rd"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "substitution",
+        "abbr": "s10n"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "h3l"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "w1o1r1d"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "4"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "word"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "test",
+        "abbr": "te1t"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "test",
+        "abbr": "t2"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "w1rd"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "hell1"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "word0"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "test",
+        "abbr": "t1st"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "wo1r1"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "2ello"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "a",
+        "abbr": "1"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "wo1d"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "h5"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abc",
+        "abbr": "1bc"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "abc",
+        "abbr": "ab1"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "word",
+        "abbr": "1o1r1d"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "interstellar",
+        "abbr": "i3nt3rs1t1l1a1r"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "congratulations",
+        "abbr": "c7t4s"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "p1r1g2a3m1i1n1g"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcdefghij",
+        "abbr": "1b3d5h9j"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviations",
+        "abbr": "a10n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "explanation",
+        "abbr": "e11n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "5"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "pro1g7"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "congratulations",
+        "abbr": "c11ns"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "encyclopedia",
+        "abbr": "e4c3l1o2p"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "environment",
+        "abbr": "e2v6n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "authentication",
+        "abbr": "a1u3t2h2e1n1t1i1c1a1t1i1o1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n14"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "mississippi",
+        "abbr": "m2i1s3s1i1p1p1i"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "onomatopoeia",
+        "abbr": "o4m3t4p2"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abracadabra",
+        "abbr": "a7a"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "telecommunication",
+        "abbr": "t3l3c12n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "p2r9g"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "classification",
+        "abbr": "c4l4s5"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "synchronization",
+        "abbr": "s1y2n2c2h2r2o2n1i2z1a2t1i1o2n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "abb2viation"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "abbrev5t5"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "algorithm",
+        "abbr": "a5thm"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "substitution",
+        "abbr": "s1u2b1s2t2u2t1i1o1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "serendipity",
+        "abbr": "s4r2d2p"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abracadabra",
+        "abbr": "a3b3c1d1a"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviate",
+        "abbr": "a3b3i4e"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "unbelievable",
+        "abbr": "un20ve"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "he2ll2o"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "methinksitistimeforustearesuptoyou",
+        "abbr": "m3t2k1s2t4"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "05"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "p4r4m5g"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "algorithm",
+        "abbr": "a4th1m"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "congratulations",
+        "abbr": "c8t1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "ab3de"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "pro7g"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "interpretation",
+        "abbr": "i3n2t3r2p2t1i1o1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "aabbccdd",
+        "abbr": "aaaabbcccddd"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "antidisestablishmentarianism",
+        "abbr": "a8d5s2b"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "1b3"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "a5f"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "pr4g5"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f24n1"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "honorificabilitudinitatibus",
+        "abbr": "h2r5c4b"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "aabbccdd",
+        "abbr": "a4b4c4d4"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "communication",
+        "abbr": "c2o2m2m2u1n1i1c1a1t1i1o1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "xylophone",
+        "abbr": "x3l1p"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "13g"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n12"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "electroencephalogram",
+        "abbr": "e19g"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "pr3gram4"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "a10n"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "mississippi",
+        "abbr": "m3ss1s5p"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "incomprehensibilities",
+        "abbr": "i18s"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "5"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "representative",
+        "abbr": "r2e2p1r2e2s2e2n1t2a2t1i1v1e"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "encyclopedia",
+        "abbr": "e6c1d1p"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "sufficiently",
+        "abbr": "s8l2y"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "flocc12nihili3"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "ab7eviat5n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "encyclopedia",
+        "abbr": "e5d3p"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcdefghijklmnopqrstuvwxyz",
+        "abbr": "a25z"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "aabbccddeeff",
+        "abbr": "a1b2c3d4e5f6"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "a12"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "interdisciplinary",
+        "abbr": "i10sc11d"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "pro11"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "beautiful",
+        "abbr": "b3a1u1t1f1u1l"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n20"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "algorithm",
+        "abbr": "al5o4"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "pr9g"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "decompression",
+        "abbr": "d10n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "ab7eviat8"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "12"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n7"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "a1b1c1d1e"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "algorithm",
+        "abbr": "a7m"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "pythonic",
+        "abbr": "py2onic"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "a3breviation"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "acknowledgement",
+        "abbr": "a13nt"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n17"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "microprocessor",
+        "abbr": "m2cro4s2"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "implementation",
+        "abbr": "i4m2p1l1e2m2e2n1t1a2i1o2n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n8"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcdefghij",
+        "abbr": "1a2b3c4d5e6f7g8h9i10j"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n4"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "xylophone",
+        "abbr": "xy2ph1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "supercalifragilisticexpialidocious",
+        "abbr": "s25c"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "a9eviation"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "pr2o7g"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "pneumonoultramicroscopicsilicovolcanoconiosis",
+        "abbr": "p2n23s"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "algorithm",
+        "abbr": "alg6"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "supercalifragilisticexpialidocious",
+        "abbr": "s3pc4l1f1r1g2i1l1s1t1c1e1xp1i1a1l1d1o1c1i1o1u1s"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "pr9ng"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "overcomplicating",
+        "abbr": "o5r3c5p4t4g"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "substitution",
+        "abbr": "su3b4sti1u2o1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "mississippi",
+        "abbr": "m2iss2ipp2"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "ab10n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "unbelievable",
+        "abbr": "u7l3b2v"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "hydroelectric",
+        "abbr": "h8c"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n10"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "congratulations",
+        "abbr": "c2gr4ts"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "responsibilities",
+        "abbr": "r10b1l"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abracadabra",
+        "abbr": "a3b2r3b2r1a"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "acknowledgment",
+        "abbr": "a2c2k1n2o1w2l2e1d2g1m1e1n1t"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "misinterpretation",
+        "abbr": "m4s4r5t2p4n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n5"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "a1bbre2ati1on"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n15"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "mississippi",
+        "abbr": "m3s4s2p"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "congratulations",
+        "abbr": "c7l1t2n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "meticulous",
+        "abbr": "m2e2t1i2c1u1l1o1u1s"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n2"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "algorithm",
+        "abbr": "a6thm"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviate",
+        "abbr": "a5te"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "internationalization",
+        "abbr": "i18n"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "algorithm",
+        "abbr": "alg5m"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n11"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "ab8ion"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "xylophone",
+        "abbr": "x2l2p1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "aabbccdd",
+        "abbr": "a1a1b1b1c1c1d1d1"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "characterization",
+        "abbr": "c1h1a1r2a1c1t1e1r1i1z1a1t1i1o1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "exemplification",
+        "abbr": "e1x2m6n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "representative",
+        "abbr": "r4p3s2t1v"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n6"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "verification",
+        "abbr": "v1e1r1i1f1i1c1a1t1i1o1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "watermelon",
+        "abbr": "w4tm1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "unbelievable",
+        "abbr": "u2n1b2e3l1i2v2l"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "biographies",
+        "abbr": "b1i1o1g1r1a1p1h1i1e1s"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "a1b1c1d1e1"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "explanation",
+        "abbr": "e2x2p1l1a3n2a2t2i1o1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "mississippi",
+        "abbr": "m1i3s1s3p1i"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "floccinau11lpilification"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "congratulations",
+        "abbr": "c12s"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n19"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "multidimensional",
+        "abbr": "m11d"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "challenges",
+        "abbr": "ch1ll4ng3s"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n16"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "fl10nc7n3l"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "visualization",
+        "abbr": "v1i1s1u1a1l1i1z1a1t1i1o1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviations",
+        "abbr": "a11s"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "word": "imperceptible",
+        "abbr": "i3m2p1e2r2c2e2p1t1i1b1l1e"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "configuration",
+        "abbr": "c2o1n5u2a2n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "unbelievable",
+        "abbr": "u1n2b1l1i2e2v1a1b1l1e"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "abbrev9n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n13"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "ab4d"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f1l1o1c1c1n1a1u1c1i1n1h1i1l1i1p1i1l1i1f1i1c1a1t1i1o1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "p11"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "abbrev5tion"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "p10g"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "a0b1c2"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n9"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n18"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "photoelectric",
+        "abbr": "p10c"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "a9"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abbreviation",
+        "abbr": "ab7eviation"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "communication",
+        "abbr": "c2o2m2m2u2n1i1c1a1t1i1o2n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "algorithm",
+        "abbr": "al8"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "aabbccdd",
+        "abbr": "aa2bb2cc2dd2"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "aabbccdd",
+        "abbr": "a2b2c2d2"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "environment",
+        "abbr": "e11"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "fl10nc7n3l8on"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "supercalifragilisticexpialidocious",
+        "abbr": "s25s"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "p4gramming"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n3"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "pro9amming"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "pythonprogramming",
+        "abbr": "p2y1t1h1on5r2g"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "unbelievable",
+        "abbr": "u9l2v"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "congratulations",
+        "abbr": "c2n1g1r1a1t1u1l1a1t1i1o1n1s"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "acknowledgment",
+        "abbr": "a5o2w1n1l1e1d1g1m1e1n1t"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "aabbccdd",
+        "abbr": "aabbccddd"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "congratulations",
+        "abbr": "c2o2n2g2r2a2t2u2l2a2t2i2o1n2s"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "interpretation",
+        "abbr": "i4r5t2p4n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "authentication",
+        "abbr": "a1u3t1h2e2n2t3i1o1n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "pseudopseudohypoparathyroidism",
+        "abbr": "p14p5t5"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "p1rog8"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "environment",
+        "abbr": "e9n"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "supercalifragilisticexpialidocious",
+        "abbr": "s25"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "a2b2c1"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "floccinaucinihilipilification",
+        "abbr": "f12n2i2l8n1"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "hello",
+        "abbr": "h12"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "extraterrestrial",
+        "abbr": "e5t8l"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "p1r0g2am5"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "abcde",
+        "abbr": "abcd5"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "programming",
+        "abbr": "p3r2gr4mm2ng"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "word": "mississippi",
+        "abbr": "m5s6"
+      },
+      "expected": false
     }
   ],
-  "test_case_count": 79,
+  "test_case_count": 234,
   "optimal_complexity": null,
-  "source_task_id": "high-five",
-  "source_question_id": 1086
+  "source_task_id": "valid-word-abbreviation",
+  "source_question_id": 408
 }

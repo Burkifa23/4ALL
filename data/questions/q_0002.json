@@ -1,1204 +1,2605 @@
 {
   "question_id": "q_0002",
-  "title": "Shortest Completing Word",
+  "title": "Semi Ordered Permutation",
   "difficulty": 1,
   "topic": "Array",
   "topics": [
     "Array",
-    "Hash Table",
-    "String"
+    "Simulation"
   ],
-  "description_md": "Given a string licensePlate and an array of strings words, find the shortest completing word in words.\nA completing word is a word that contains all the letters in licensePlate. Ignore numbers and spaces in licensePlate, and treat letters as case insensitive. If a letter appears more than once in licensePlate, then it must appear in the word the same number of times or more.\nFor example, if licensePlate = \"aBc 12c\", then it contains letters 'a', 'b' (ignoring case), and 'c' twice. Possible completing words are \"abccdef\", \"caaacab\", and \"cbca\".\nReturn the shortest completing word in words. It is guaranteed an answer exists. If there are multiple shortest completing words, return the first one that occurs in words.\n\u00a0\nExample 1:\n\nInput: licensePlate = \"1s3 PSt\", words = [\"step\",\"steps\",\"stripe\",\"stepple\"]\nOutput: \"steps\"\nExplanation: licensePlate contains letters 's', 'p', 's' (ignoring case), and 't'.\n\"step\" contains 't' and 'p', but only contains 1 's'.\n\"steps\" contains 't', 'p', and both 's' characters.\n\"stripe\" is missing an 's'.\n\"stepple\" is missing an 's'.\nSince \"steps\" is the only word containing all the letters, that is the answer.\n\nExample 2:\n\nInput: licensePlate = \"1s3 456\", words = [\"looks\",\"pest\",\"stew\",\"show\"]\nOutput: \"pest\"\nExplanation: licensePlate only contains the letter 's'. All the words contain 's', but among these \"pest\", \"stew\", and \"show\" are shortest. The answer is \"pest\" because it is the word that appears earliest of the 3.\n\n\u00a0\nConstraints:\n\n1 <= licensePlate.length <= 7\nlicensePlate contains digits, letters (uppercase or lowercase), or space ' '.\n1 <= words.length <= 1000\n1 <= words[i].length <= 15\nwords[i] consists of lower case English letters.\n\n",
-  "starter_code": "class Solution:\n    def shortestCompletingWord(self, licensePlate: str, words: List[str]) -> str:\n        ",
-  "entry_point": "Solution().shortestCompletingWord",
-  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def shortestCompletingWord(self, licensePlate: str, words: List[str]) -> str:\n        cnt = Counter(c.lower() for c in licensePlate if c.isalpha())\n        ans = None\n        for w in words:\n            if ans and len(w) >= len(ans):\n                continue\n            t = Counter(w)\n            if all(v <= t[c] for c, v in cnt.items()):\n                ans = w\n        return ans\n",
+  "description_md": "You are given a 0-indexed permutation of n integers nums.\nA permutation is called semi-ordered if the first number equals 1 and the last number equals n. You can perform the below operation as many times as you want until you make nums a semi-ordered permutation:\n\nPick two adjacent elements in nums, then swap them.\n\nReturn the minimum number of operations to make nums a semi-ordered permutation.\nA permutation is a sequence of integers from 1 to n of length n containing each number exactly once.\n\u00a0\nExample 1:\n\nInput: nums = [2,1,4,3]\nOutput: 2\nExplanation: We can make the permutation semi-ordered using these sequence of operations: \n1 - swap i = 0 and j = 1. The permutation becomes [1,2,4,3].\n2 - swap i = 2 and j = 3. The permutation becomes [1,2,3,4].\nIt can be proved that there is no sequence of less than two operations that make nums a semi-ordered permutation. \n\nExample 2:\n\nInput: nums = [2,4,1,3]\nOutput: 3\nExplanation: We can make the permutation semi-ordered using these sequence of operations:\n1 - swap i = 1 and j = 2. The permutation becomes [2,1,4,3].\n2 - swap i = 0 and j = 1. The permutation becomes [1,2,4,3].\n3 - swap i = 2 and j = 3. The permutation becomes [1,2,3,4].\nIt can be proved that there is no sequence of less than three operations that make nums a semi-ordered permutation.\n\nExample 3:\n\nInput: nums = [1,3,4,2,5]\nOutput: 0\nExplanation: The permutation is already a semi-ordered permutation.\n\n\u00a0\nConstraints:\n\n2 <= nums.length == n <= 50\n1 <= nums[i]\u00a0<= 50\nnums is a permutation.\n\n",
+  "starter_code": "class Solution:\n    def semiOrderedPermutation(self, nums: List[int]) -> int:\n        ",
+  "entry_point": "Solution().semiOrderedPermutation",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def semiOrderedPermutation(self, nums: List[int]) -> int:\n        n = len(nums)\n        i = nums.index(1)\n        j = nums.index(n)\n        k = 1 if i < j else 2\n        return i + n - j - k\n",
   "test_cases": [
     {
       "input": {
-        "licensePlate": "GrC8950",
-        "words": [
-          "grace",
-          "please"
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1
         ]
       },
-      "expected": "grace"
+      "expected": 7
     },
     {
       "input": {
-        "licensePlate": "Ah71752",
-        "words": [
-          "enough",
-          "these",
-          "playground",
-          "point",
-          "president"
+        "nums": [
+          2,
+          4,
+          1,
+          3
         ]
       },
-      "expected": null
+      "expected": 3
     },
     {
       "input": {
-        "licensePlate": "xyz",
-        "words": [
-          "xzy",
-          "zyx",
-          "yxz",
-          "zxy"
+        "nums": [
+          3,
+          5,
+          4,
+          1,
+          2
         ]
       },
-      "expected": "xzy"
+      "expected": 5
     },
     {
       "input": {
-        "licensePlate": "44472Ml",
-        "words": [
-          "call",
-          "tall",
-          "tell"
+        "nums": [
+          3,
+          1,
+          2,
+          5,
+          4
         ]
       },
-      "expected": null
+      "expected": 2
     },
     {
       "input": {
-        "licensePlate": "a 1 b 2 c 3",
-        "words": [
-          "abc",
-          "cab",
-          "bac",
-          "bca",
-          "acb",
-          "cba"
+        "nums": [
+          1,
+          5,
+          4,
+          3,
+          2
         ]
       },
-      "expected": "abc"
+      "expected": 3
     },
     {
       "input": {
-        "licensePlate": "1s3 456",
-        "words": [
-          "looks",
-          "pest",
-          "stew",
-          "show"
+        "nums": [
+          3,
+          2,
+          5,
+          4,
+          1
         ]
       },
-      "expected": "pest"
+      "expected": 5
     },
     {
       "input": {
-        "licensePlate": "1s3 PSt",
-        "words": [
-          "step",
-          "steps",
-          "stripe",
-          "stepple"
+        "nums": [
+          4,
+          1,
+          2,
+          5,
+          3
         ]
       },
-      "expected": "steps"
+      "expected": 2
     },
     {
       "input": {
-        "licensePlate": "aBc 12c",
-        "words": [
-          "abccdef",
-          "caaacab",
-          "cbca"
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5
         ]
       },
-      "expected": "cbca"
+      "expected": 0
     },
     {
       "input": {
-        "licensePlate": "a1b2c3d4e5f6g7",
-        "words": [
-          "abcdefg",
-          "defghij",
-          "ghijklm",
-          "abcdefghijk",
-          "abcdeghijk",
-          "abcdefg",
-          "abcdefg"
+        "nums": [
+          2,
+          3,
+          4,
+          5,
+          1
         ]
       },
-      "expected": "abcdefg"
+      "expected": 4
     },
     {
       "input": {
-        "licensePlate": "g7h6i5j4k3l2m1n0",
-        "words": [
-          "highlight",
-          "jimmy",
-          "mink",
-          "gnimmik",
-          "kliming",
-          "jimmyhighlight"
+        "nums": [
+          4,
+          5,
+          3,
+          1,
+          2
         ]
       },
-      "expected": null
+      "expected": 5
     },
     {
       "input": {
-        "licensePlate": "zZyYxX",
-        "words": [
-          "zyx",
-          "yxz",
-          "xyzzyx",
-          "zyxzyx",
-          "zzzyyx",
-          "zyzyzy",
-          "xyzzyxzyx"
+        "nums": [
+          1,
+          3,
+          4,
+          2,
+          5
         ]
       },
-      "expected": "xyzzyx"
+      "expected": 0
     },
     {
       "input": {
-        "licensePlate": "hello world!",
-        "words": [
-          "heloworld",
-          "worldhello",
-          "helloworld",
-          "oworlhell",
-          "rldhellow"
+        "nums": [
+          2,
+          1,
+          4,
+          3
         ]
       },
-      "expected": "worldhello"
+      "expected": 2
     },
     {
       "input": {
-        "licensePlate": "q9w8e7r6t5y4u3i2o1p0",
-        "words": [
-          "quickbrownfox",
-          "quizzify",
-          "piano",
-          "typewriter",
-          "pizzafactory",
-          "qwertyuiop"
+        "nums": [
+          3,
+          2,
+          1,
+          5,
+          4
         ]
       },
-      "expected": "qwertyuiop"
+      "expected": 3
     },
     {
       "input": {
-        "licensePlate": "XYZ 789",
-        "words": [
-          "xylophone",
-          "xyzzy",
-          "zyxwvutsrqponmlkjihgfedcba",
-          "zyxzyxzyx"
+        "nums": [
+          10,
+          1,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "nums": [
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          1,
+          20,
+          19,
+          18,
+          17,
+          2
         ]
       },
-      "expected": "xyzzy"
+      "expected": 18
     },
     {
       "input": {
-        "licensePlate": "M1n2o3r4s5",
-        "words": [
-          "modern",
-          "store",
-          "monarchs",
-          "morse",
-          "minors",
-          "modes",
-          "monsters"
+        "nums": [
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          20,
+          19,
+          18,
+          17,
+          16
         ]
       },
-      "expected": "minors"
-    },
-    {
-      "input": {
-        "licensePlate": "A1b2C3d4",
-        "words": [
-          "completeword",
-          "complete",
-          "abcd",
-          "bacdc",
-          "badac"
-        ]
-      },
-      "expected": "abcd"
-    },
-    {
-      "input": {
-        "licensePlate": "q1w2e3r4t5y6",
-        "words": [
-          "qwerty",
-          "typerq",
-          "rqwety",
-          "wertyq",
-          "eqwrt",
-          "rqwet",
-          "qwetrt",
-          "qwrtqe",
-          "qwertyu"
-        ]
-      },
-      "expected": "qwerty"
-    },
-    {
-      "input": {
-        "licensePlate": "A1B2C3D4E5F6",
-        "words": [
-          "abcdef",
-          "defabc",
-          "fedcba",
-          "abcdfe",
-          "abcdefg",
-          "abcdefh",
-          "abcdefij"
-        ]
-      },
-      "expected": "abcdef"
-    },
-    {
-      "input": {
-        "licensePlate": "z9 x8 v7",
-        "words": [
-          "zebra",
-          "vex",
-          "vez",
-          "vexing",
-          "exhibition"
-        ]
-      },
-      "expected": null
-    },
-    {
-      "input": {
-        "licensePlate": "zzz",
-        "words": [
-          "zzzzzz",
-          "zzzz",
-          "zzz",
-          "zzzzz",
-          "zzzzzzz"
-        ]
-      },
-      "expected": "zzz"
-    },
-    {
-      "input": {
-        "licensePlate": "9A8B7C6D5E4F3G2H1I0J",
-        "words": [
-          "abcdefghij",
-          "jihgfedcba",
-          "abcdefghijk",
-          "abcdefghi",
-          "abcdefghijl"
-        ]
-      },
-      "expected": "abcdefghij"
-    },
-    {
-      "input": {
-        "licensePlate": "z9y8x7w6v5u4t3s2r1q0",
-        "words": [
-          "qrstuvwxyz",
-          "zyxwvutsrqponmlkjihgfedcba",
-          "reverse",
-          "alphabet",
-          "zebra",
-          "quran"
-        ]
-      },
-      "expected": "qrstuvwxyz"
-    },
-    {
-      "input": {
-        "licensePlate": "qqq rrr sss",
-        "words": [
-          "qqrrrss",
-          "rrssqqq",
-          "ssqqqrrr",
-          "qqqrrrsss",
-          "ssqqqqrrr"
-        ]
-      },
-      "expected": "qqqrrrsss"
-    },
-    {
-      "input": {
-        "licensePlate": "G7H2K3L4",
-        "words": [
-          "ghkl",
-          "hklg",
-          "klhg",
-          "klgh",
-          "gkhll",
-          "hgkl"
-        ]
-      },
-      "expected": "ghkl"
-    },
-    {
-      "input": {
-        "licensePlate": "9gI2d4e5",
-        "words": [
-          "guide",
-          "gifted",
-          "digging",
-          "gigged",
-          "gadget",
-          "gigged",
-          "gagged",
-          "gagged",
-          "gagged"
-        ]
-      },
-      "expected": "guide"
-    },
-    {
-      "input": {
-        "licensePlate": "l3i2k4e5",
-        "words": [
-          "like",
-          "liker",
-          "likely",
-          "likeable",
-          "likeless"
-        ]
-      },
-      "expected": "like"
-    },
-    {
-      "input": {
-        "licensePlate": "m1n2o3r4",
-        "words": [
-          "immortal",
-          "monarch",
-          "romantic",
-          "moronic",
-          "motorcar"
-        ]
-      },
-      "expected": "monarch"
-    },
-    {
-      "input": {
-        "licensePlate": "f9g8h7j6k5",
-        "words": [
-          "fjkg",
-          "ghfk",
-          "jkhg",
-          "kjgf",
-          "hjgk"
-        ]
-      },
-      "expected": null
-    },
-    {
-      "input": {
-        "licensePlate": "4b 5c2 D",
-        "words": [
-          "bcd",
-          "bcdcd",
-          "bcdc",
-          "bbcd",
-          "bcdb"
-        ]
-      },
-      "expected": "bcd"
-    },
-    {
-      "input": {
-        "licensePlate": "3Rd sTreet",
-        "words": [
-          "street",
-          "retreat",
-          "store",
-          "restrain",
-          "sterret",
-          "druster"
-        ]
-      },
-      "expected": null
-    },
-    {
-      "input": {
-        "licensePlate": "aA1bB2cC",
-        "words": [
-          "abc",
-          "aabbcc",
-          "abbc",
-          "aabbc",
-          "aabbbc",
-          "aabbbcc",
-          "aabbbccc"
-        ]
-      },
-      "expected": "aabbcc"
-    },
-    {
-      "input": {
-        "licensePlate": "mN2mN3",
-        "words": [
-          "mnm",
-          "nmn",
-          "mmn",
-          "mnn",
-          "nmm",
-          "nmmm",
-          "nmmn"
-        ]
-      },
-      "expected": "nmmn"
-    },
-    {
-      "input": {
-        "licensePlate": "q2w3e4r5t6y7u8i9o0p",
-        "words": [
-          "typewriter",
-          "opposite",
-          "ipyroteur",
-          "preoptuitry",
-          "pyroteurizing"
-        ]
-      },
-      "expected": null
-    },
-    {
-      "input": {
-        "licensePlate": "1234567",
-        "words": [
-          "abcdefg",
-          "bcadefg",
-          "cbadefg",
-          "bcaefdg",
-          "bcaefdgh"
-        ]
-      },
-      "expected": "abcdefg"
-    },
-    {
-      "input": {
-        "licensePlate": "x9Y8Z7",
-        "words": [
-          "xyz",
-          "xyzz",
-          "yxz",
-          "zyx",
-          "zxzyx",
-          "zyzzzyx"
-        ]
-      },
-      "expected": "xyz"
-    },
-    {
-      "input": {
-        "licensePlate": "mMnN oO pP",
-        "words": [
-          "mnop",
-          "mnooop",
-          "mnoppp",
-          "mnopppp",
-          "mnoppppp"
-        ]
-      },
-      "expected": null
-    },
-    {
-      "input": {
-        "licensePlate": "aBc12d3E",
-        "words": [
-          "abcde",
-          "abced",
-          "abcdef",
-          "abcd",
-          "abcccde"
-        ]
-      },
-      "expected": "abcde"
-    },
-    {
-      "input": {
-        "licensePlate": "xyz XYZ",
-        "words": [
-          "xyzz",
-          "yzxx",
-          "zxzy",
-          "zyxzyx",
-          "zyxzyxz"
-        ]
-      },
-      "expected": "zyxzyx"
-    },
-    {
-      "input": {
-        "licensePlate": "aBc123cD",
-        "words": [
-          "abcd",
-          "abcc",
-          "accc",
-          "aabbccdd",
-          "abcde"
-        ]
-      },
-      "expected": "aabbccdd"
-    },
-    {
-      "input": {
-        "licensePlate": "z1y2x3w4",
-        "words": [
-          "xyzz",
-          "yzxz",
-          "zxzy",
-          "wxyz",
-          "zyxw"
-        ]
-      },
-      "expected": "wxyz"
-    },
-    {
-      "input": {
-        "licensePlate": "zzzzz",
-        "words": [
-          "zzzz",
-          "zzz",
-          "zzzzzz",
-          "zzzzz",
-          "zzzzzzz",
-          "zzzzzzzz"
-        ]
-      },
-      "expected": "zzzzz"
-    },
-    {
-      "input": {
-        "licensePlate": "aAaAa 123",
-        "words": [
-          "aaaaa",
-          "aaabc",
-          "aabbc",
-          "abcde",
-          "abbbb",
-          "abcdaa"
-        ]
-      },
-      "expected": "aaaaa"
-    },
-    {
-      "input": {
-        "licensePlate": "aAaAaA",
-        "words": [
-          "aaaaaa",
-          "aaaaaab",
-          "aaaaaabc",
-          "aaaaaabcd",
-          "aaaaaabcde"
-        ]
-      },
-      "expected": "aaaaaa"
-    },
-    {
-      "input": {
-        "licensePlate": "9A1B2C3D4E5F6G7H",
-        "words": [
-          "abcdefgh",
-          "bacdefgh",
-          "cabdefgh",
-          "abcdefghi",
-          "abcdefg"
-        ]
-      },
-      "expected": "abcdefgh"
-    },
-    {
-      "input": {
-        "licensePlate": "aA1Bb2Cc3",
-        "words": [
-          "aabbcc",
-          "bbaacc",
-          "ccaabb",
-          "aabbcccc",
-          "aaabbbcc",
-          "aabbcccd"
-        ]
-      },
-      "expected": "aabbcc"
-    },
-    {
-      "input": {
-        "licensePlate": "oNe TwO thReE",
-        "words": [
-          "onetwothree",
-          "twothreeone",
-          "onethreetwo",
-          "threetwoone",
-          "onetwoonetwo",
-          "twotoonetwo",
-          "threethreetwo"
-        ]
-      },
-      "expected": "onetwothree"
-    },
-    {
-      "input": {
-        "licensePlate": "aBcDeFgHiJ1234567890",
-        "words": [
-          "abcdefghij",
-          "bacdefghij",
-          "jihgfedcba",
-          "abcdefghijk",
-          "abcdefghijj"
-        ]
-      },
-      "expected": "abcdefghij"
-    },
-    {
-      "input": {
-        "licensePlate": "s9p8a7t6e5",
-        "words": [
-          "pastel",
-          "pasteler",
-          "paste",
-          "pastoral",
-          "past",
-          "pastor",
-          "pasta"
-        ]
-      },
-      "expected": "paste"
-    },
-    {
-      "input": {
-        "licensePlate": "XyZ 890",
-        "words": [
-          "xyz",
-          "xyzz",
-          "xzyz",
-          "zyxzy",
-          "zyzzx"
-        ]
-      },
-      "expected": "xyz"
-    },
+      "expected": 18
+    },
     {
       "input": {
-        "licensePlate": "XYZ",
-        "words": [
-          "xylophone",
-          "xylem",
-          "yxz",
-          "zyx",
-          "zyxwvut"
+        "nums": [
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50
+        ]
+      },
+      "expected": 14
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          2,
+          5,
+          1,
+          3
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          2,
+          1
+        ]
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "nums": [
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
         ]
       },
-      "expected": "yxz"
+      "expected": 37
     },
     {
       "input": {
-        "licensePlate": "Z9y2z",
-        "words": [
-          "buzzards",
-          "zyzzyva",
-          "yz",
-          "zyzzy",
-          "zzyzzy"
-        ]
-      },
-      "expected": "zyzzy"
-    },
-    {
-      "input": {
-        "licensePlate": "XyZ9",
-        "words": [
-          "zyx",
-          "xyzzy",
-          "yzzx",
-          "xyzz",
-          "zyzzxy"
-        ]
-      },
-      "expected": "zyx"
-    },
-    {
-      "input": {
-        "licensePlate": "f9o8x7",
-        "words": [
-          "fox",
-          "foxy",
-          "foxtrot",
-          "fix",
-          "fixes",
-          "foxtrotted",
-          "foxtrotter"
-        ]
-      },
-      "expected": "fox"
-    },
-    {
-      "input": {
-        "licensePlate": "XYZ 123",
-        "words": [
-          "exactly",
-          "xyzzyx",
-          "zyxzyx",
-          "zyzyzx",
-          "zyzyxzyx"
-        ]
-      },
-      "expected": "xyzzyx"
-    },
-    {
-      "input": {
-        "licensePlate": "1 2 3 a b c d e f g h i j k l m n o p q r s t u v w x y z 1 2 3",
-        "words": [
-          "abcdefghijklmnopqrstuvwxyz",
-          "zyxwvutsrqponmlkjihgfedcba",
-          "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
-          "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz"
-        ]
-      },
-      "expected": "abcdefghijklmnopqrstuvwxyz"
-    },
-    {
-      "input": {
-        "licensePlate": "b1r2e3",
-        "words": [
-          "berber",
-          "bereber",
-          "beriberi",
-          "reberber",
-          "beerbar"
-        ]
-      },
-      "expected": "berber"
-    },
-    {
-      "input": {
-        "licensePlate": "a1B2c3D4",
-        "words": [
-          "abcd",
-          "abdc",
-          "abcde",
-          "bacd",
-          "adcb"
-        ]
-      },
-      "expected": "abcd"
-    },
-    {
-      "input": {
-        "licensePlate": "123aaBBB456",
-        "words": [
-          "aabbb",
-          "abbbb",
-          "baaabbb",
-          "bbbaaab",
-          "bbbaaabbb"
-        ]
-      },
-      "expected": "aabbb"
-    },
-    {
-      "input": {
-        "licensePlate": "!!!abc###",
-        "words": [
-          "abc",
-          "cab",
-          "bac",
-          "bca",
-          "acb",
-          "cba"
-        ]
-      },
-      "expected": "abc"
-    },
-    {
-      "input": {
-        "licensePlate": "aA1bB2cC3",
-        "words": [
-          "abc",
-          "aabbcc",
-          "aaabbbccc",
-          "abbc",
-          "abbbcc"
-        ]
-      },
-      "expected": "aabbcc"
-    },
-    {
-      "input": {
-        "licensePlate": "p1QR2",
-        "words": [
-          "prq",
-          "pqr",
-          "pqrr",
-          "prqq",
-          "pqrrr",
-          "pqqrr"
-        ]
-      },
-      "expected": "prq"
-    },
-    {
-      "input": {
-        "licensePlate": "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-        "words": [
-          "abcdefghijklmnopqrstuvwxyz",
-          "zyxwvutsrqponmlkjihgfedcba",
-          "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
-          "zyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyz"
-        ]
-      },
-      "expected": "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
-    },
-    {
-      "input": {
-        "licensePlate": "f!@#o1b2a3r4",
-        "words": [
-          "barfoot",
-          "aborfra",
-          "barform",
-          "barrofa",
-          "aborfar",
-          "barrage",
-          "baraffe",
-          "barfree"
-        ]
-      },
-      "expected": "barfoot"
-    },
-    {
-      "input": {
-        "licensePlate": "bLUE cAR 2022",
-        "words": [
-          "blueberry",
-          "blueprint",
-          "carbon",
-          "barcelona",
-          "bark"
-        ]
-      },
-      "expected": null
-    },
-    {
-      "input": {
-        "licensePlate": "mN9mN",
-        "words": [
-          "minnesota",
-          "miamin",
-          "manana",
-          "mimic",
-          "mimicry",
-          "mining",
-          "minimum"
-        ]
-      },
-      "expected": null
-    },
-    {
-      "input": {
-        "licensePlate": "xyZ123 456",
-        "words": [
-          "xyzxyz",
-          "zyxzyx",
-          "xyzzx",
-          "yxzxz",
-          "zxyzyx"
-        ]
-      },
-      "expected": "xyzzx"
-    },
-    {
-      "input": {
-        "licensePlate": "!@#$%^&*()_+aBc123",
-        "words": [
-          "abc",
-          "cba",
-          "bac",
-          "bca",
-          "cab",
-          "acb",
-          "aab",
-          "abb",
-          "bba",
-          "bbc",
-          "bcb",
-          "bacb",
-          "bcab",
-          "bacab",
-          "bacabc",
-          "bacabcd",
-          "bacabcde",
-          "bacabcdef",
-          "bacabcdefg"
-        ]
-      },
-      "expected": "abc"
-    },
-    {
-      "input": {
-        "licensePlate": "abc def ghi",
-        "words": [
-          "abcdefghi",
-          "defghibac",
-          "ghidefab",
-          "bacdefghi",
-          "abcdefghij"
-        ]
-      },
-      "expected": "abcdefghi"
-    },
-    {
-      "input": {
-        "licensePlate": "a1b2c3d4e5",
-        "words": [
-          "abcde",
-          "bcdea",
-          "cabde",
-          "decab",
-          "edcba",
-          "abcdde",
-          "abcdee",
-          "abcdeee",
-          "abcdeeee"
-        ]
-      },
-      "expected": "abcde"
-    },
-    {
-      "input": {
-        "licensePlate": "Gh00t2!@#",
-        "words": [
-          "ghostly",
-          "gnostic",
-          "ghost",
-          "tongue",
-          "tooth"
-        ]
-      },
-      "expected": "ghost"
-    },
-    {
-      "input": {
-        "licensePlate": "m2i5n4i3s5",
-        "words": [
-          "immisions",
-          "minimises",
-          "administs",
-          "ministers",
-          "misissues"
-        ]
-      },
-      "expected": "immisions"
-    },
-    {
-      "input": {
-        "licensePlate": "!@#$%^&*()",
-        "words": [
-          "abcdef",
-          "ghijkl",
-          "mnopqr",
-          "stuvwx",
-          "yzabcf"
-        ]
-      },
-      "expected": "abcdef"
-    },
-    {
-      "input": {
-        "licensePlate": "a2b3c4d5e6",
-        "words": [
-          "alphabet",
-          "bacded",
-          "abacax",
-          "decalbac",
-          "abacbac"
-        ]
-      },
-      "expected": "bacded"
-    },
-    {
-      "input": {
-        "licensePlate": "xyZ 123",
-        "words": [
-          "xyzzy",
-          "zyxwvutsrqponmlkjihgfedcba",
-          "zyxzyxzyx",
-          "xyzz",
-          "zyx",
-          "xyzx",
-          "xyzxy",
-          "xyzxyz",
-          "xyzxyzz",
-          "xyzxyzxy"
-        ]
-      },
-      "expected": "zyx"
-    },
-    {
-      "input": {
-        "licensePlate": "mno890",
-        "words": [
-          "mno",
-          "mon",
-          "nom",
-          "omn",
-          "nmo",
-          "omnmo",
-          "mnomo",
-          "omonomn"
-        ]
-      },
-      "expected": "mno"
-    },
-    {
-      "input": {
-        "licensePlate": "mno9PQR8",
-        "words": [
-          "mnopqr",
-          "nopqmr",
-          "pqmrno",
-          "mnopq",
-          "pqmnopr",
-          "mnopqrq"
-        ]
-      },
-      "expected": "mnopqr"
-    },
-    {
-      "input": {
-        "licensePlate": "1a2b3c4d5e",
-        "words": [
-          "abcde",
-          "abcdef",
-          "abcdefg",
-          "abcdefgh",
-          "abcdefghi",
-          "abcdefghij"
-        ]
-      },
-      "expected": "abcde"
-    },
-    {
-      "input": {
-        "licensePlate": "aA bB cC",
-        "words": [
-          "abc",
-          "abccba",
-          "cab",
-          "bcaac",
-          "acbac"
-        ]
-      },
-      "expected": "abccba"
-    },
-    {
-      "input": {
-        "licensePlate": "zzz",
-        "words": [
-          "zzzz",
-          "zzz",
-          "zzzzz",
-          "zzzzzz",
-          "zzzzzzz",
-          "zzzzzzzz",
-          "zzzzzzzzz",
-          "zzzzzzzzzz"
-        ]
-      },
-      "expected": "zzz"
-    },
-    {
-      "input": {
-        "licensePlate": "123abc ABC321",
-        "words": [
-          "cba",
-          "abc",
-          "bac",
-          "bca",
-          "cab",
-          "acb",
-          "aab",
-          "abb",
-          "bba",
-          "bbc",
-          "bcb",
-          "bacb",
-          "bcab",
-          "bacab",
-          "bacabc",
-          "bacabcd",
-          "bacabcde",
-          "bacabcdef",
-          "bacabcdefg"
-        ]
-      },
-      "expected": "bacabc"
-    },
-    {
-      "input": {
-        "licensePlate": "q9w8e7r6",
-        "words": [
-          "qwerty",
-          "qwertas",
-          "qwertyui",
-          "qwertyuio",
-          "qwertyuiop"
-        ]
-      },
-      "expected": "qwerty"
-    },
-    {
-      "input": {
-        "licensePlate": "qQwWeEr RtTyYuUiIoOpP",
-        "words": [
-          "qwertyuiop",
-          "qwertyuio",
-          "qwertyuiopp",
-          "qwertyuioppq",
-          "qwertyuiopqq"
-        ]
-      },
-      "expected": null
-    },
-    {
-      "input": {
-        "licensePlate": "xYz987",
-        "words": [
-          "xyz",
-          "yzx",
-          "zxy",
-          "xzy",
-          "yxz",
-          "zyx",
-          "xxxyyzzz"
-        ]
-      },
-      "expected": "xyz"
-    },
-    {
-      "input": {
-        "licensePlate": "XYZ 987",
-        "words": [
-          "xyzz",
-          "zyxw",
-          "zyxv",
-          "zyxuv",
-          "zyxwvut"
-        ]
-      },
-      "expected": "xyzz"
-    },
-    {
-      "input": {
-        "licensePlate": "P2l3l4o5",
-        "words": [
-          "poll",
-          "pillar",
-          "pollock",
-          "polyope",
-          "plaster",
-          "polyope"
-        ]
-      },
-      "expected": "poll"
+        "nums": [
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 37
+    },
+    {
+      "input": {
+        "nums": [
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 27
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          1,
+          2,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          3,
+          5,
+          1,
+          2
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "nums": [
+          50,
+          49,
+          48,
+          47,
+          46,
+          45,
+          44,
+          43,
+          42,
+          41,
+          40,
+          39,
+          38,
+          37,
+          36,
+          35,
+          34,
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          26,
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 97
+    },
+    {
+      "input": {
+        "nums": [
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 47
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          1,
+          2
+        ]
+      },
+      "expected": 49
+    },
+    {
+      "input": {
+        "nums": [
+          48,
+          29,
+          10,
+          34,
+          32,
+          15,
+          19,
+          2,
+          25,
+          47,
+          35,
+          13,
+          44,
+          12,
+          8,
+          41,
+          17,
+          40,
+          21,
+          4,
+          42,
+          18,
+          33,
+          36,
+          22,
+          39,
+          26,
+          7,
+          5,
+          43,
+          6,
+          37,
+          31,
+          27,
+          30,
+          24,
+          20,
+          1,
+          23,
+          38,
+          9,
+          28,
+          16,
+          3,
+          11,
+          14,
+          45,
+          46,
+          49,
+          50
+        ]
+      },
+      "expected": 37
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": 18
+    },
+    {
+      "input": {
+        "nums": [
+          30,
+          29,
+          28,
+          27,
+          26,
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 57
+    },
+    {
+      "input": {
+        "nums": [
+          15,
+          1,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": 14
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          5,
+          1,
+          3,
+          2
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          3,
+          2,
+          1,
+          4
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "nums": [
+          23,
+          15,
+          32,
+          1,
+          10,
+          45,
+          2,
+          11,
+          50,
+          8,
+          13,
+          19,
+          6,
+          9,
+          17,
+          27,
+          20,
+          21,
+          22,
+          3,
+          24,
+          25,
+          26,
+          28,
+          29,
+          30,
+          31,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          46,
+          47,
+          48,
+          49
+        ]
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": 23
+    },
+    {
+      "input": {
+        "nums": [
+          30,
+          29,
+          28,
+          27,
+          26,
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          31
+        ]
+      },
+      "expected": 29
+    },
+    {
+      "input": {
+        "nums": [
+          49,
+          1,
+          48,
+          47,
+          46,
+          45,
+          44,
+          43,
+          42,
+          41,
+          40,
+          39,
+          38,
+          37,
+          36,
+          35,
+          34,
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          26,
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": 48
+    },
+    {
+      "input": {
+        "nums": [
+          49,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          1,
+          50
+        ]
+      },
+      "expected": 48
+    },
+    {
+      "input": {
+        "nums": [
+          48,
+          49,
+          50,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": 93
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          5,
+          2,
+          3,
+          1
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "nums": [
+          7,
+          5,
+          6,
+          4,
+          1,
+          3,
+          2
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          1,
+          4,
+          2,
+          3
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          2,
+          3,
+          4,
+          1
+        ]
+      },
+      "expected": 7
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          5,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "nums": [
+          50,
+          49,
+          48,
+          47,
+          46,
+          45,
+          44,
+          43,
+          42,
+          41,
+          40,
+          39,
+          38,
+          37,
+          36,
+          35,
+          34,
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          26,
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 97
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          1
+        ]
+      },
+      "expected": 46
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          1
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          1,
+          3,
+          5,
+          2
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          1,
+          2
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          1
+        ]
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "nums": [
+          10,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          1
+        ]
+      },
+      "expected": 17
+    },
+    {
+      "input": {
+        "nums": [
+          25,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50
+        ]
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "nums": [
+          40,
+          39,
+          38,
+          37,
+          36,
+          35,
+          34,
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          26,
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 77
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          5,
+          4,
+          1,
+          3
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "nums": [
+          49,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          1
+        ]
+      },
+      "expected": 95
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          1
+        ]
+      },
+      "expected": 48
+    },
+    {
+      "input": {
+        "nums": [
+          45,
+          1,
+          2,
+          3,
+          46,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44
+        ]
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          1,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          19,
+          20,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          1
+        ]
+      },
+      "expected": 35
+    },
+    {
+      "input": {
+        "nums": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 17
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          5,
+          2,
+          4,
+          1
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "nums": [
+          47,
+          48,
+          49,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46
+        ]
+      },
+      "expected": 48
+    },
+    {
+      "input": {
+        "nums": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 17
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          5,
+          4,
+          1,
+          3
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          5,
+          4,
+          1
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          2,
+          3,
+          1,
+          4
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "nums": [
+          45,
+          44,
+          43,
+          42,
+          41,
+          40,
+          39,
+          38,
+          37,
+          36,
+          35,
+          34,
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          26,
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          46
+        ]
+      },
+      "expected": 44
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          1,
+          2,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45
+        ]
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 7
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          5,
+          4,
+          3,
+          1
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "nums": [
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          26,
+          27,
+          28,
+          29,
+          30,
+          1
+        ]
+      },
+      "expected": 29
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          3,
+          4,
+          1,
+          2
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "nums": [
+          48,
+          49,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ]
+      },
+      "expected": 48
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          5,
+          1,
+          4,
+          2
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          50,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ]
+      },
+      "expected": 48
+    },
+    {
+      "input": {
+        "nums": [
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          26
+        ]
+      },
+      "expected": 24
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50
+        ]
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "nums": [
+          45,
+          1,
+          44,
+          43,
+          42,
+          41,
+          40,
+          39,
+          38,
+          37,
+          36,
+          35,
+          34,
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          26,
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": 44
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          2,
+          5,
+          4,
+          1,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          1,
+          5,
+          4
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          3,
+          2,
+          1,
+          5
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "nums": [
+          47,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          48,
+          49,
+          50,
+          1
+        ]
+      },
+      "expected": 49
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          5,
+          1,
+          4,
+          2
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          5,
+          3,
+          4,
+          2
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          2,
+          3,
+          1,
+          5
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "nums": [
+          10,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          1
+        ]
+      },
+      "expected": 17
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          1,
+          3,
+          5,
+          4,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "nums": [
+          47,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          1
+        ]
+      },
+      "expected": 91
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          3,
+          5,
+          1,
+          2
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          5,
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "nums": [
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          1,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": 4
     }
   ],
-  "test_case_count": 85,
+  "test_case_count": 99,
   "optimal_complexity": null,
-  "source_task_id": "shortest-completing-word",
-  "source_question_id": 748
+  "source_task_id": "semi-ordered-permutation",
+  "source_question_id": 2717
 }

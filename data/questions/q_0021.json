@@ -1,740 +1,2888 @@
 {
   "question_id": "q_0021",
-  "title": "Paint Fence",
+  "title": "Number Of Zero Filled Subarrays",
   "difficulty": 2,
-  "topic": "Dynamic Programming",
+  "topic": "Array",
   "topics": [
-    "Dynamic Programming"
+    "Array",
+    "Math"
   ],
-  "description_md": "You are painting a fence of n posts with k different colors. You must paint the posts following these rules:\n\nEvery post must be painted exactly one color.\nThere cannot be three or more consecutive posts with the same color.\n\nGiven the two integers n and k, return the number of ways you can paint the fence.\n\u00a0\nExample 1:\n\n\nInput: n = 3, k = 2\nOutput: 6\nExplanation: All the possibilities are shown.\nNote that painting all the posts red or all the posts green is invalid because there cannot be three posts in a row with the same color.\n\nExample 2:\n\nInput: n = 1, k = 1\nOutput: 1\n\nExample 3:\n\nInput: n = 7, k = 2\nOutput: 42\n\n\u00a0\nConstraints:\n\n1 <= n <= 50\n1 <= k <= 105\nThe testcases are generated such that the answer is in the range [0, 231 - 1] for the given n and k.\n\n",
-  "starter_code": "class Solution:\n    def numWays(self, n: int, k: int) -> int:\n        ",
-  "entry_point": "Solution().numWays",
-  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def numWays(self, n: int, k: int) -> int:\n        f = [0] * n\n        g = [0] * n\n        f[0] = k\n        for i in range(1, n):\n            f[i] = (f[i - 1] + g[i - 1]) * (k - 1)\n            g[i] = f[i - 1]\n        return f[-1] + g[-1]\n",
+  "description_md": "Given an integer array nums, return the number of subarrays filled with 0.\nA subarray is a contiguous non-empty sequence of elements within an array.\n\u00a0\nExample 1:\n\nInput: nums = [1,3,0,0,2,0,0,4]\nOutput: 6\nExplanation: \nThere are 4 occurrences of [0] as a subarray.\nThere are 2 occurrences of [0,0] as a subarray.\nThere is no occurrence of a subarray with a size more than 2 filled with 0. Therefore, we return 6.\nExample 2:\n\nInput: nums = [0,0,0,2,0,0]\nOutput: 9\nExplanation:\nThere are 5 occurrences of [0] as a subarray.\nThere are 3 occurrences of [0,0] as a subarray.\nThere is 1 occurrence of [0,0,0] as a subarray.\nThere is no occurrence of a subarray with a size more than 3 filled with 0. Therefore, we return 9.\n\nExample 3:\n\nInput: nums = [2,10,2019]\nOutput: 0\nExplanation: There is no subarray filled with 0. Therefore, we return 0.\n\n\u00a0\nConstraints:\n\n1 <= nums.length <= 105\n-109 <= nums[i] <= 109\n\n",
+  "starter_code": "class Solution:\n    def zeroFilledSubarray(self, nums: List[int]) -> int:\n        ",
+  "entry_point": "Solution().zeroFilledSubarray",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def zeroFilledSubarray(self, nums: List[int]) -> int:\n        ans = cnt = 0\n        for v in nums:\n            cnt = 0 if v else cnt + 1\n            ans += cnt\n        return ans\n",
   "test_cases": [
     {
       "input": {
-        "n": 15,
-        "k": 2
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ]
       },
-      "expected": 1974
+      "expected": 45
     },
     {
       "input": {
-        "n": 50,
-        "k": 100000
-      },
-      "expected": 9999999952000470103497974877463882973999752808161992015107745866422079306034625361145344447150025657641979544935635622518492524146014318959903717694542512167388769172663190491369774185925201548324161216740390990987623051800760407999592000170000000000
-    },
-    {
-      "input": {
-        "n": 1,
-        "k": 1
+        "nums": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
       },
       "expected": 1
     },
     {
       "input": {
-        "n": 3,
-        "k": 2
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 55
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          0
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          3,
+          0,
+          0,
+          2,
+          0,
+          0,
+          4
+        ]
       },
       "expected": 6
     },
     {
       "input": {
-        "n": 5,
-        "k": 1
+        "nums": [
+          1
+        ]
       },
       "expected": 0
     },
     {
       "input": {
-        "n": 20,
-        "k": 50
-      },
-      "expected": 9469551703547193879850071929642500
-    },
-    {
-      "input": {
-        "n": 10,
-        "k": 3
-      },
-      "expected": 27408
-    },
-    {
-      "input": {
-        "n": 50,
-        "k": 10
-      },
-      "expected": 64221618338674163619212551744715546727431459993700
-    },
-    {
-      "input": {
-        "n": 7,
-        "k": 2
-      },
-      "expected": 42
-    },
-    {
-      "input": {
-        "n": 4,
-        "k": 1
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "n": 10,
-        "k": 5
-      },
-      "expected": 7348480
-    },
-    {
-      "input": {
-        "n": 5,
-        "k": 10
-      },
-      "expected": 97200
-    },
-    {
-      "input": {
-        "n": 2,
-        "k": 1
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          0
+        ]
       },
       "expected": 1
     },
     {
       "input": {
-        "n": 2,
-        "k": 3
+        "nums": [
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5
+        ]
+      },
+      "expected": 21
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          2,
+          0,
+          0
+        ]
       },
       "expected": 9
     },
     {
       "input": {
-        "n": 4,
-        "k": 3
-      },
-      "expected": 66
-    },
-    {
-      "input": {
-        "n": 5,
-        "k": 3
-      },
-      "expected": 180
-    },
-    {
-      "input": {
-        "n": 30,
-        "k": 2
-      },
-      "expected": 2692538
-    },
-    {
-      "input": {
-        "n": 50,
-        "k": 5
-      },
-      "expected": 16535782640425905735969222216908800
-    },
-    {
-      "input": {
-        "n": 20,
-        "k": 10
-      },
-      "expected": 84658667828908637700
-    },
-    {
-      "input": {
-        "n": 12,
-        "k": 7
-      },
-      "expected": 11501644896
-    },
-    {
-      "input": {
-        "n": 15,
-        "k": 3
-      },
-      "expected": 4171776
-    },
-    {
-      "input": {
-        "n": 40,
-        "k": 100000
-      },
-      "expected": 99999999620003700629987749461117424190626611159774584147814002883721021868328199710909447292743660530491316462484508727846003471647637261403138201907875935811364921337322967499931100233999740000100000
-    },
-    {
-      "input": {
-        "n": 10,
-        "k": 1
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
       },
       "expected": 0
     },
     {
       "input": {
-        "n": 45,
-        "k": 100
+        "nums": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
       },
-      "expected": 995750031911895429654448891601160344725076745761603290482390368082541128296281802429139900
+      "expected": 45
     },
     {
       "input": {
-        "n": 50,
-        "k": 2
+        "nums": [
+          2,
+          10,
+          2019
+        ]
       },
-      "expected": 40730022148
+      "expected": 0
     },
     {
       "input": {
-        "n": 2,
-        "k": 5
+        "nums": [
+          0
+        ]
       },
-      "expected": 25
+      "expected": 1
     },
     {
       "input": {
-        "n": 25,
-        "k": 20
+        "nums": [
+          1,
+          0,
+          1,
+          0,
+          1,
+          0
+        ]
       },
-      "expected": 317568357189921946564531760025620
+      "expected": 3
     },
     {
       "input": {
-        "n": 30,
-        "k": 20000
+        "nums": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0
+        ]
       },
-      "expected": 1073741748841698379484335880961020298720119191598534316480300885720078955495136225827805275893867614219082156707840152003599980000
+      "expected": 4
     },
     {
       "input": {
-        "n": 45,
-        "k": 50000
-      },
-      "expected": 28421708941560158655047401483051173293663261645904195679757424600797938823080588496854922795500225352930571890211938886724168770621231884683744546223156454423077124274179838552599581411624675775003625034999950000
-    },
-    {
-      "input": {
-        "n": 33,
-        "k": 8
-      },
-      "expected": 407992243047774765711266327672
-    },
-    {
-      "input": {
-        "n": 10,
-        "k": 100000
-      },
-      "expected": 99999999920000700014999750000600008999940000100000
-    },
-    {
-      "input": {
-        "n": 8,
-        "k": 3
-      },
-      "expected": 3672
-    },
-    {
-      "input": {
-        "n": 20,
-        "k": 7
-      },
-      "expected": 57269354438886912
-    },
-    {
-      "input": {
-        "n": 4,
-        "k": 2
+        "nums": [
+          0,
+          0,
+          0,
+          0
+        ]
       },
       "expected": 10
     },
     {
       "input": {
-        "n": 35,
-        "k": 5000
+        "nums": [
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ]
       },
-      "expected": 2910379204714972618368103558802135112437571033011875813247971671242931702436917711819398146923234934660857300160199975250300000000
+      "expected": 9
     },
     {
       "input": {
-        "n": 49,
-        "k": 99999
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1,
+          0
+        ]
       },
-      "expected": 99951011288383259931564045605348096606512977878127426226546681184347240561505568829821619776420383510088073244412418800059411779061435493063874833271465070416037017811839663649158711625129854213855129138754961677805986553714966024705330364022784
+      "expected": 1
     },
     {
       "input": {
-        "n": 40,
-        "k": 2
+        "nums": [
+          0,
+          1,
+          0,
+          2,
+          0,
+          3,
+          0
+        ]
       },
-      "expected": 331160282
+      "expected": 4
     },
     {
       "input": {
-        "n": 1,
-        "k": 5
+        "nums": [
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "nums": [
+          10,
+          20,
+          30,
+          0,
+          0,
+          0,
+          40,
+          50,
+          60,
+          0,
+          0,
+          70
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 18
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          5,
+          0,
+          0,
+          0,
+          6,
+          0,
+          0,
+          0,
+          7
+        ]
+      },
+      "expected": 52
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 37
+    },
+    {
+      "input": {
+        "nums": [
+          999999999,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 190
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "expected": 300
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      },
+      "expected": 7
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 210
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 63
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 175
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "nums": [
+          1000000000,
+          0,
+          0,
+          0,
+          -1000000000,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 502
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 45
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          0,
+          2,
+          2,
+          2,
+          0,
+          0,
+          0,
+          0,
+          3,
+          3,
+          3,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 37
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          4,
+          0,
+          5,
+          0,
+          6,
+          0,
+          7,
+          0,
+          8,
+          0,
+          9,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 19
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          10,
+          11,
+          12,
+          13,
+          14
+        ]
+      },
+      "expected": 45
+    },
+    {
+      "input": {
+        "nums": [
+          100,
+          0,
+          0,
+          0,
+          0,
+          0,
+          200,
+          0,
+          0,
+          0,
+          300,
+          0,
+          0,
+          0,
+          400,
+          0,
+          0,
+          0,
+          500
+        ]
+      },
+      "expected": 33
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1
+        ]
+      },
+      "expected": 39
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 50
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 45
+    },
+    {
+      "input": {
+        "nums": [
+          10,
+          0,
+          0,
+          10,
+          0,
+          10,
+          0,
+          0,
+          10,
+          0,
+          0,
+          0,
+          10,
+          0,
+          0,
+          0,
+          0,
+          10,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 38
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 2850
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          4,
+          0,
+          5,
+          0
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 54
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 1596
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          4,
+          0,
+          5,
+          0
+        ]
       },
       "expected": 5
     },
     {
       "input": {
-        "n": 15,
-        "k": 7
-      },
-      "expected": 3734184996864
-    },
-    {
-      "input": {
-        "n": 8,
-        "k": 8
-      },
-      "expected": 15388352
-    },
-    {
-      "input": {
-        "n": 25,
-        "k": 100
-      },
-      "expected": 99772405924850985256505622172378380436989683840100
-    },
-    {
-      "input": {
-        "n": 15,
-        "k": 100000
-      },
-      "expected": 999999998700012000549989999961002239983899936001489992400009000039999900000
-    },
-    {
-      "input": {
-        "n": 5,
-        "k": 4
-      },
-      "expected": 864
-    },
-    {
-      "input": {
-        "n": 49,
-        "k": 2
-      },
-      "expected": 25172538050
-    },
-    {
-      "input": {
-        "n": 30,
-        "k": 7
-      },
-      "expected": 13470235960809990817824768
-    },
-    {
-      "input": {
-        "n": 35,
-        "k": 100
-      },
-      "expected": 9967365568875105385884863244180601333550953690962746605728641802120000
-    },
-    {
-      "input": {
-        "n": 1,
-        "k": 100000
-      },
-      "expected": 100000
-    },
-    {
-      "input": {
-        "n": 25,
-        "k": 2
-      },
-      "expected": 242786
-    },
-    {
-      "input": {
-        "n": 25,
-        "k": 50000
-      },
-      "expected": 2980232211351919274326324314318672163302392871005965301639287160344502172185624995132866312281249350010499960000050000
-    },
-    {
-      "input": {
-        "n": 25,
-        "k": 100000
-      },
-      "expected": 99999999770002200209995999922102753997789185609597061737751014520104387770212159019999377003443992999989600083999840000100000
-    },
-    {
-      "input": {
-        "n": 20,
-        "k": 5
-      },
-      "expected": 50612096204800
-    },
-    {
-      "input": {
-        "n": 22,
-        "k": 9
-      },
-      "expected": 784949351486331027456
-    },
-    {
-      "input": {
-        "n": 5,
-        "k": 5
-      },
-      "expected": 2800
-    },
-    {
-      "input": {
-        "n": 30,
-        "k": 3
-      },
-      "expected": 14711350935552
-    },
-    {
-      "input": {
-        "n": 35,
-        "k": 7
-      },
-      "expected": 206586368447979697428149305344
-    },
-    {
-      "input": {
-        "n": 12,
-        "k": 10
-      },
-      "expected": 911315617290
-    },
-    {
-      "input": {
-        "n": 12,
-        "k": 10000
-      },
-      "expected": 999999900009002799510001004999610007000299990000
-    },
-    {
-      "input": {
-        "n": 40,
-        "k": 50
-      },
-      "expected": 89602741156971186576848194582434056147913306182627726061058222935050
-    },
-    {
-      "input": {
-        "n": 35,
-        "k": 3
-      },
-      "expected": 2239218190909440
-    },
-    {
-      "input": {
-        "n": 15,
-        "k": 15
-      },
-      "expected": 414567428748533760
-    },
-    {
-      "input": {
-        "n": 20,
-        "k": 2
-      },
-      "expected": 21892
-    },
-    {
-      "input": {
-        "n": 49,
-        "k": 3
-      },
-      "expected": 2890275329929503571968
-    },
-    {
-      "input": {
-        "n": 49,
-        "k": 50
-      },
-      "expected": 174388418958707976132495599422315195551321101858063926373636941158868843553644920050
-    },
-    {
-      "input": {
-        "n": 25,
-        "k": 1000
-      },
-      "expected": 999977022209599223753770865603151524530416714160993773443299896083984001000
-    },
-    {
-      "input": {
-        "n": 5,
-        "k": 100000
-      },
-      "expected": 9999999997000020000000000
-    },
-    {
-      "input": {
-        "n": 30,
-        "k": 5
-      },
-      "expected": 348586958385808670720
-    },
-    {
-      "input": {
-        "n": 20,
-        "k": 3
-      },
-      "expected": 634987008
-    },
-    {
-      "input": {
-        "n": 30,
-        "k": 1
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "n": 40,
-        "k": 50000
-      },
-      "expected": 90949468794887807307175503876924559151107081938691540856308664691503678460623124701186645661116529337768436183311345396195389785509588878816359255122460323239420859370693779249935000050000
-    },
-    {
-      "input": {
-        "n": 25,
-        "k": 5
-      },
-      "expected": 132825888566804480
-    },
-    {
-      "input": {
-        "n": 35,
-        "k": 30
-      },
-      "expected": 4828302424321938917457579794849294424245181605164800
-    },
-    {
-      "input": {
-        "n": 25,
-        "k": 10000
-      },
-      "expected": 9999997700220209959992212753977818569597617175114521043677032159199937703443929998960083998400010000
-    },
-    {
-      "input": {
-        "n": 42,
-        "k": 2
-      },
-      "expected": 866988874
-    },
-    {
-      "input": {
-        "n": 27,
-        "k": 10
-      },
-      "expected": 793731690733155352946777790
-    },
-    {
-      "input": {
-        "n": 45,
-        "k": 1000
-      },
-      "expected": 999957042818391667753785447550126192569330183844675051647047945638540344685568740578938651376947284860330629011252227197124029013999000
-    },
-    {
-      "input": {
-        "n": 40,
-        "k": 1000
-      },
-      "expected": 999962037628769628442930171326501255813935595941273094779207838953024124084375279771057154213987250319749311233974001000
-    },
-    {
-      "input": {
-        "n": 45,
-        "k": 15
-      },
-      "expected": 70100013203862820252158826988883466045468054923509760
-    },
-    {
-      "input": {
-        "n": 50,
-        "k": 3
-      },
-      "expected": 7896379049230303494144
-    },
-    {
-      "input": {
-        "n": 4,
-        "k": 4
-      },
-      "expected": 228
-    },
-    {
-      "input": {
-        "n": 25,
-        "k": 1
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "n": 15,
-        "k": 100
-      },
-      "expected": 998712539963223837482409039900
-    },
-    {
-      "input": {
-        "n": 49,
-        "k": 100000
-      },
-      "expected": 99999999530004600989980638860536162659651628002247294995378143204787900203641454148891887100911812723235818458208757409403333574885730875773816094836838999139515428510124916987761235051042263801137257159944507702311937999857600359999680000100000
-    },
-    {
-      "input": {
-        "n": 35,
-        "k": 50000
-      },
-      "expected": 291038300725705943302344470866242105832051767032898458360152646584626067576566806732257337227638186312510439361671894618603180659108591686265945749975250030000000000
-    },
-    {
-      "input": {
-        "n": 15,
-        "k": 1
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "n": 10,
-        "k": 10
-      },
-      "expected": 9282568410
-    },
-    {
-      "input": {
-        "n": 50,
-        "k": 100
-      },
-      "expected": 9952571356412657726381564909919525409044075662747289070319607611923677876616169583970453167592170000
-    },
-    {
-      "input": {
-        "n": 30,
-        "k": 20
-      },
-      "expected": 1004151076547626230786266566362256795580
-    },
-    {
-      "input": {
-        "n": 40,
-        "k": 20
-      },
-      "expected": 10039746098689777957200971626557993327809319603621620
-    },
-    {
-      "input": {
-        "n": 47,
-        "k": 5000
-      },
-      "expected": 710541457034313051290484603248594260678488454539345543230944707727101837527620429606035600637725264416314535686762408801653878584805972101916304818657952689599955000400000000
-    },
-    {
-      "input": {
-        "n": 6,
-        "k": 100
-      },
-      "expected": 999603009900
-    },
-    {
-      "input": {
-        "n": 35,
-        "k": 2
-      },
-      "expected": 29860704
-    },
-    {
-      "input": {
-        "n": 9,
-        "k": 50000
-      },
-      "expected": 1953124994531343753124900000625004999950000
-    },
-    {
-      "input": {
-        "n": 15,
-        "k": 10
-      },
-      "expected": 886481740149390
-    },
-    {
-      "input": {
-        "n": 35,
-        "k": 5
-      },
-      "expected": 914828192514254359756800
-    },
-    {
-      "input": {
-        "n": 30,
-        "k": 100000
-      },
-      "expected": 999999997200027003249937498276058190174873841243964837285013265897406177303093752257083928348489350012178296040407392173031739942400019000089999900000
-    },
-    {
-      "input": {
-        "n": 25,
-        "k": 30
-      },
-      "expected": 8265309825758255006277731320484013630
-    },
-    {
-      "input": {
-        "n": 48,
-        "k": 500
-      },
-      "expected": 3552061312021803694641285550786487050792994883214147498910757830914643435165384888634893642773774043131571043068997827191378749500
-    },
-    {
-      "input": {
-        "n": 35,
-        "k": 50
-      },
-      "expected": 287291863842135288088949795966532967764016355355305412780000
-    },
-    {
-      "input": {
-        "n": 12,
-        "k": 12
-      },
-      "expected": 8353663189476
-    },
-    {
-      "input": {
-        "n": 25,
-        "k": 50
-      },
-      "expected": 2953434806047058459526357024483280610460050
-    },
-    {
-      "input": {
-        "n": 49,
-        "k": 10
-      },
-      "expected": 6481580482890944147517769612900651151794438116810
-    },
-    {
-      "input": {
-        "n": 45,
-        "k": 20
-      },
-      "expected": 31745674986236020522693749791045360604849067349519696877580
-    },
-    {
-      "input": {
-        "n": 30,
-        "k": 100
-      },
-      "expected": 997230185834338989682696063818771585742574439604682419089900
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 1891
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      },
+      "expected": 22
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 780
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          6,
+          7,
+          8,
+          9,
+          10,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 76
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 990
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1000000000
+        ]
+      },
+      "expected": 325
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          4,
+          0,
+          5,
+          0,
+          6,
+          0,
+          7,
+          0,
+          8,
+          0,
+          9,
+          0,
+          10
+        ]
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 1275
+    },
+    {
+      "input": {
+        "nums": [
+          9,
+          0,
+          0,
+          8,
+          0,
+          0,
+          7,
+          0,
+          0,
+          6,
+          0,
+          0,
+          5,
+          0,
+          0,
+          4,
+          0,
+          0,
+          3,
+          0,
+          0,
+          2,
+          0,
+          0,
+          1,
+          0
+        ]
+      },
+      "expected": 25
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          4,
+          0,
+          5
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      },
+      "expected": 13
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 171
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ]
+      },
+      "expected": 12
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 4753
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          5
+        ]
+      },
+      "expected": 11
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1
+        ]
+      },
+      "expected": 34
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "nums": [
+          999999999,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          -999999999
+        ]
+      },
+      "expected": 190
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          6,
+          7,
+          8,
+          9,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          10
+        ]
+      },
+      "expected": 42
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          0,
+          0,
+          0,
+          4,
+          5,
+          0,
+          0,
+          6,
+          7,
+          0,
+          0,
+          0,
+          0,
+          8
+        ]
+      },
+      "expected": 19
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5
+        ]
+      },
+      "expected": 25
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "nums": [
+          1000000000,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 300
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          5,
+          0,
+          0,
+          0,
+          6,
+          0,
+          0,
+          0,
+          7,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          9,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 54
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0
+        ]
+      },
+      "expected": 22
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          3,
+          0,
+          0,
+          4,
+          0,
+          0
+        ]
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 55
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5
+        ]
+      },
+      "expected": 60
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 210
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 84
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 325
+    },
+    {
+      "input": {
+        "nums": [
+          9,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          7,
+          0,
+          0,
+          0,
+          6,
+          0,
+          5,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          2,
+          0,
+          0,
+          1,
+          0
+        ]
+      },
+      "expected": 36
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 106
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          3,
+          0,
+          0
+        ]
+      },
+      "expected": 12
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": 21
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 34
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          5,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 34
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          4,
+          0,
+          5,
+          0,
+          6,
+          0,
+          7,
+          0,
+          8,
+          0,
+          9,
+          0
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 62
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 496
+    },
+    {
+      "input": {
+        "nums": [
+          1000000000,
+          1000000000,
+          1000000000,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1000000000,
+          1000000000,
+          1000000000
+        ]
+      },
+      "expected": 153
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          3,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          5,
+          0,
+          0,
+          6,
+          0,
+          0,
+          0,
+          0,
+          7,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          9
+        ]
+      },
+      "expected": 67
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          6,
+          7,
+          8,
+          9,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 38
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 595
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          2,
+          2,
+          2,
+          0,
+          0,
+          0,
+          3,
+          3,
+          3,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 24
     }
   ],
-  "test_case_count": 103,
+  "test_case_count": 99,
   "optimal_complexity": null,
-  "source_task_id": "paint-fence",
-  "source_question_id": 276
+  "source_task_id": "number-of-zero-filled-subarrays",
+  "source_question_id": 2348
 }

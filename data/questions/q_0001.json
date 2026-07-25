@@ -1,3581 +1,2776 @@
 {
   "question_id": "q_0001",
-  "title": "Final Prices With A Special Discount In A Shop",
+  "title": "Delete Greatest Value In Each Row",
   "difficulty": 1,
-  "topic": "Stack",
+  "topic": "Array",
   "topics": [
-    "Stack",
     "Array",
-    "Monotonic Stack"
+    "Matrix",
+    "Sorting",
+    "Simulation",
+    "Heap (Priority Queue)"
   ],
-  "description_md": "You are given an integer array prices where prices[i] is the price of the ith item in a shop.\nThere is a special discount for items in the shop. If you buy the ith item, then you will receive a discount equivalent to prices[j] where j is the minimum index such that j > i and prices[j] <= prices[i]. Otherwise, you will not receive any discount at all.\nReturn an integer array answer where answer[i] is the final price you will pay for the ith item of the shop, considering the special discount.\n\u00a0\nExample 1:\n\nInput: prices = [8,4,6,2,3]\nOutput: [4,2,4,2,3]\nExplanation: \nFor item 0 with price[0]=8 you will receive a discount equivalent to prices[1]=4, therefore, the final price you will pay is 8 - 4 = 4.\nFor item 1 with price[1]=4 you will receive a discount equivalent to prices[3]=2, therefore, the final price you will pay is 4 - 2 = 2.\nFor item 2 with price[2]=6 you will receive a discount equivalent to prices[3]=2, therefore, the final price you will pay is 6 - 2 = 4.\nFor items 3 and 4 you will not receive any discount at all.\n\nExample 2:\n\nInput: prices = [1,2,3,4,5]\nOutput: [1,2,3,4,5]\nExplanation: In this case, for all items, you will not receive any discount at all.\n\nExample 3:\n\nInput: prices = [10,1,1,6]\nOutput: [9,0,1,6]\n\n\u00a0\nConstraints:\n\n1 <= prices.length <= 500\n1 <= prices[i] <= 1000\n\n",
-  "starter_code": "class Solution:\n    def finalPrices(self, prices: List[int]) -> List[int]:\n        ",
-  "entry_point": "Solution().finalPrices",
-  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def finalPrices(self, prices: List[int]) -> List[int]:\n        stk = []\n        for i in reversed(range(len(prices))):\n            x = prices[i]\n            while stk and x < stk[-1]:\n                stk.pop()\n            if stk:\n                prices[i] -= stk[-1]\n            stk.append(x)\n        return prices\n",
+  "description_md": "You are given an m x n matrix grid consisting of positive integers.\nPerform the following operation until grid becomes empty:\n\nDelete the element with the greatest value from each row. If multiple such elements exist, delete any of them.\nAdd the maximum of deleted elements to the answer.\n\nNote that the number of columns decreases by one after each operation.\nReturn the answer after performing the operations described above.\n\u00a0\nExample 1:\n\n\nInput: grid = [[1,2,4],[3,3,1]]\nOutput: 8\nExplanation: The diagram above shows the removed values in each step.\n- In the first operation, we remove 4 from the first row and 3 from the second row (notice that, there are two cells with value 3 and we can remove any of them). We add 4 to the answer.\n- In the second operation, we remove 2 from the first row and 3 from the second row. We add 3 to the answer.\n- In the third operation, we remove 1 from the first row and 1 from the second row. We add 1 to the answer.\nThe final answer = 4 + 3 + 1 = 8.\n\nExample 2:\n\n\nInput: grid = [[10]]\nOutput: 10\nExplanation: The diagram above shows the removed values in each step.\n- In the first operation, we remove 10 from the first row. We add 10 to the answer.\nThe final answer = 10.\n\n\u00a0\nConstraints:\n\nm == grid.length\nn == grid[i].length\n1 <= m, n <= 50\n1 <= grid[i][j] <= 100\n\n",
+  "starter_code": "class Solution:\n    def deleteGreatestValue(self, grid: List[List[int]]) -> int:\n        ",
+  "entry_point": "Solution().deleteGreatestValue",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def deleteGreatestValue(self, grid: List[List[int]]) -> int:\n        for row in grid:\n            row.sort()\n        return sum(max(col) for col in zip(*grid))\n",
   "test_cases": [
     {
       "input": {
-        "prices": [
-          5,
-          5,
-          5,
-          5,
-          5
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          8,
-          4,
-          6,
-          2,
-          3
-        ]
-      },
-      "expected": [
-        4,
-        2,
-        4,
-        2,
-        3
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          10,
-          15,
-          20,
-          25,
-          30,
-          35,
-          40,
-          45,
-          50
-        ]
-      },
-      "expected": [
-        5,
-        10,
-        15,
-        20,
-        25,
-        30,
-        35,
-        40,
-        45,
-        50
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          9,
-          8,
-          7,
-          6,
-          5
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          3,
-          5,
-          7,
-          9,
-          11,
-          13,
-          15,
-          17
-        ]
-      },
-      "expected": [
-        1,
-        3,
-        5,
-        7,
-        9,
-        11,
-        13,
-        15,
-        17
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          60,
-          70,
-          80,
-          90,
-          100
-        ]
-      },
-      "expected": [
-        60,
-        70,
-        80,
-        90,
-        100
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          10,
-          10,
-          10,
-          10,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          1,
-          4,
-          2,
-          3
-        ]
-      },
-      "expected": [
-        4,
-        1,
-        2,
-        2,
-        3
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          50,
-          45,
-          40,
-          35,
-          30,
-          25,
-          20,
-          15,
-          10,
-          5
-        ]
-      },
-      "expected": [
-        5,
-        5,
-        5,
-        5,
-        5,
-        5,
-        5,
-        5,
-        5,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          100,
-          50,
-          25,
-          12,
-          6,
-          3,
-          1
-        ]
-      },
-      "expected": [
-        50,
-        25,
-        13,
-        6,
-        3,
-        2,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
-        ]
-      },
-      "expected": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          1,
-          1,
-          6
-        ]
-      },
-      "expected": [
-        9,
-        0,
-        1,
-        6
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          1,
-          3,
-          4,
-          6,
-          2
-        ]
-      },
-      "expected": [
-        4,
-        1,
-        1,
-        2,
-        4,
-        2
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          3,
-          3,
-          3,
-          2,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        1,
-        0,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          100,
-          90,
-          80,
-          70,
-          60
-        ]
-      },
-      "expected": [
-        10,
-        10,
-        10,
-        10,
-        60
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          100,
-          200,
-          300,
-          200,
-          100
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        100,
-        100,
-        100
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          3,
-          4,
-          5
-        ]
-      },
-      "expected": [
-        1,
-        2,
-        3,
-        4,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          2,
-          3,
-          1
-        ]
-      },
-      "expected": [
-        1,
-        2,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          100,
-          50,
-          50,
-          100,
-          50,
-          25,
-          25,
-          100
-        ]
-      },
-      "expected": [
-        50,
-        0,
-        0,
-        50,
-        25,
-        0,
-        25,
-        100
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          5,
-          10,
-          5,
-          10,
-          5,
-          10,
-          5,
-          10,
-          5,
-          10,
-          5,
-          10,
-          5,
-          10
-        ]
-      },
-      "expected": [
-        5,
-        0,
-        5,
-        0,
-        5,
-        0,
-        5,
-        0,
-        5,
-        0,
-        5,
-        0,
-        5,
-        5,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          100,
-          50,
-          25,
-          12,
-          6,
-          3,
-          1,
-          0,
-          0,
-          0
-        ]
-      },
-      "expected": [
-        50,
-        25,
-        13,
-        6,
-        3,
-        2,
-        1,
-        0,
-        0,
-        0
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          3,
-          2,
-          3,
-          4,
-          5,
-          4,
-          5,
-          6
-        ]
-      },
-      "expected": [
-        1,
-        0,
-        1,
-        2,
-        3,
-        0,
-        1,
-        4,
-        5,
-        6
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          1,
-          2,
-          1,
-          2,
-          1,
-          2,
-          1,
-          2,
-          1,
-          2,
-          1,
-          2,
-          1,
-          2
-        ]
-      },
-      "expected": [
-        0,
-        1,
-        0,
-        1,
-        0,
-        1,
-        0,
-        1,
-        0,
-        1,
-        0,
-        1,
-        0,
-        1,
-        1,
-        2
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          2,
-          4,
-          6,
-          8,
-          10,
-          12,
-          14,
-          16,
-          18,
-          20
-        ]
-      },
-      "expected": [
-        2,
-        4,
-        6,
-        8,
-        10,
-        12,
-        14,
-        16,
-        18,
-        20
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          100,
-          2,
-          99,
-          3,
-          98,
-          4,
-          97,
-          5,
-          96
-        ]
-      },
-      "expected": [
-        1,
-        98,
-        2,
-        96,
-        3,
-        94,
-        4,
-        92,
-        5,
-        96
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          5,
-          15,
-          5,
-          20,
-          10,
-          25,
-          15,
-          30,
-          20
-        ]
-      },
-      "expected": [
-        5,
-        0,
-        10,
-        5,
-        10,
-        10,
-        10,
-        15,
-        10,
-        20
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          2,
-          3,
-          4
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        2,
-        3,
-        4
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        1,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          7,
-          5,
-          6,
-          4,
-          3,
-          2,
-          1,
-          8,
-          9,
-          10
-        ]
-      },
-      "expected": [
-        2,
-        1,
-        2,
-        1,
-        1,
-        1,
-        1,
-        8,
-        9,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          2,
-          3,
-          3,
-          2,
-          1,
-          1,
-          2,
-          3,
-          2,
-          1,
-          1,
-          2,
-          3,
-          2,
-          1,
-          1,
-          2,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          1,
-          2,
-          3,
-          4,
-          5
-        ]
-      },
-      "expected": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        1,
-        2,
-        3,
-        4,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          10,
-          2,
-          9,
-          3,
-          8,
-          4,
-          7,
-          5,
-          6,
-          1,
-          10,
-          2,
-          9,
-          3,
-          8,
-          4,
-          7,
-          5,
-          6
-        ]
-      },
-      "expected": [
-        0,
-        8,
-        1,
-        6,
-        2,
-        4,
-        3,
-        2,
-        4,
-        5,
-        1,
-        8,
-        2,
-        6,
-        3,
-        4,
-        4,
-        2,
-        5,
-        6
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1000,
-          1000,
-          1000,
-          1000,
-          1000,
-          1000,
-          1000,
-          1000,
-          1000,
-          1000
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1000
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          5,
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          1,
-          1,
-          2,
-          2,
-          2,
-          3,
-          3,
-          3,
-          4,
-          4,
-          4,
-          5,
-          5,
-          5
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        1,
-        0,
-        0,
-        2,
-        0,
-        0,
-        3,
-        0,
-        0,
-        4,
-        0,
-        0,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          4,
-          4,
-          4,
-          4,
-          4,
-          3,
-          3,
-          3,
-          3,
-          3,
-          2,
-          2,
-          2,
-          2,
-          2,
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1000,
-          500,
-          250,
-          125,
-          62,
-          31,
-          15,
-          7,
-          3,
-          1
-        ]
-      },
-      "expected": [
-        500,
-        250,
-        125,
-        63,
-        31,
-        16,
-        8,
-        4,
-        2,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          20,
-          30,
-          40,
-          50,
-          40,
-          30,
-          20,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        10,
-        10,
-        10,
-        10,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          20,
-          10,
-          20,
-          10,
-          20,
-          10,
-          20,
-          10,
-          20
-        ]
-      },
-      "expected": [
-        0,
-        10,
-        0,
-        10,
-        0,
-        10,
-        0,
-        10,
-        10,
-        20
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          3,
-          2,
-          1,
-          2,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          30,
-          20,
-          10,
-          10,
-          20,
-          30,
-          40,
-          50,
-          40,
-          30,
-          20,
-          10
-        ]
-      },
-      "expected": [
-        10,
-        10,
-        0,
-        0,
-        0,
-        0,
-        0,
-        10,
-        10,
-        10,
-        10,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          4,
-          3,
-          2,
-          1,
-          2,
-          3,
-          4,
-          5
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        2,
-        3,
-        4,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          8,
-          6,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        2,
-        0,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          0
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          300,
-          200,
-          100,
-          50,
-          25,
-          12,
-          6,
-          3,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
-      },
-      "expected": [
-        100,
-        100,
-        50,
-        25,
-        13,
-        6,
-        3,
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          8,
-          4,
-          6,
-          2,
-          3,
-          8,
-          4,
-          6,
-          2,
-          3
-        ]
-      },
-      "expected": [
-        4,
-        2,
-        4,
-        0,
-        1,
-        4,
-        2,
-        4,
-        2,
-        3
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        1,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          3,
-          2,
-          4,
-          3,
-          5,
-          4,
-          6,
-          5,
-          7
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        2,
-        1,
-        3,
-        1,
-        4,
-        1,
-        5,
-        7
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          3,
-          5,
-          7,
-          9,
-          11,
-          13,
-          15,
-          17,
-          19,
-          21,
-          23,
-          25
-        ]
-      },
-      "expected": [
-        1,
-        3,
-        5,
-        7,
-        9,
-        11,
-        13,
-        15,
-        17,
-        19,
-        21,
-        23,
-        25
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          15,
-          10,
-          5,
-          10,
-          15,
-          5,
-          10,
-          15,
-          20,
-          10
-        ]
-      },
-      "expected": [
-        5,
-        5,
-        0,
-        5,
-        10,
-        5,
-        0,
-        5,
-        10,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          20,
-          30,
-          10,
-          20,
-          30,
-          10,
-          20,
-          30
-        ]
-      },
-      "expected": [
-        0,
-        10,
-        20,
-        0,
-        10,
-        20,
-        10,
-        20,
-        30
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          3,
-          6,
-          5,
-          1,
-          8,
-          7,
-          9,
-          2,
-          4,
-          10
-        ]
-      },
-      "expected": [
-        2,
-        1,
-        4,
-        1,
-        1,
-        5,
-        7,
-        2,
-        4,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          2,
-          3,
-          2,
-          3,
-          2,
-          3,
-          2,
-          3,
-          2,
-          3
-        ]
-      },
-      "expected": [
-        0,
-        1,
-        0,
-        1,
-        0,
-        1,
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          8,
-          5,
-          7,
-          6,
-          4,
-          5,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        3,
-        1,
-        1,
-        2,
-        1,
-        2,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          100,
-          50,
-          25,
-          12,
-          6,
-          3,
-          1,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ]
-      },
-      "expected": [
-        50,
-        25,
-        13,
-        6,
-        3,
-        2,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          50,
-          20,
-          30,
-          10,
-          20,
-          30,
-          40,
-          50,
-          60,
-          70
-        ]
-      },
-      "expected": [
-        30,
-        10,
-        20,
-        10,
-        20,
-        30,
-        40,
-        50,
-        60,
-        70
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          10,
-          9,
-          8,
-          7,
-          6,
-          5
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          0,
-          -1,
-          -2,
-          -3,
-          -4,
-          -5
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        -5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          500,
-          100,
-          200,
-          300,
-          400,
-          500,
-          600,
-          700,
-          800,
-          900
-        ]
-      },
-      "expected": [
-        400,
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          100,
-          1,
-          200,
-          2,
-          300,
-          3,
-          400,
-          4,
-          500,
-          5
-        ]
-      },
-      "expected": [
-        99,
-        1,
-        198,
-        2,
-        297,
-        3,
-        396,
-        4,
-        495,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          999,
-          1000,
-          998,
-          997,
-          996,
-          995,
-          994,
-          993,
-          992,
-          991,
-          990,
-          989,
-          988,
-          987,
-          986,
-          985,
-          984,
-          983,
-          982,
-          981,
-          980
-        ]
-      },
-      "expected": [
-        1,
-        2,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        980
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          100,
-          200,
-          150,
-          250,
-          300,
-          220,
-          180,
-          160,
-          170
-        ]
-      },
-      "expected": [
-        100,
-        50,
-        150,
-        30,
-        80,
-        40,
-        20,
-        160,
-        170
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          100,
-          90,
-          80,
-          70,
-          60,
-          50,
-          40,
-          30,
-          20,
-          10
-        ]
-      },
-      "expected": [
-        10,
-        10,
-        10,
-        10,
-        10,
-        10,
-        10,
-        10,
-        10,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9
-        ]
-      },
-      "expected": [
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          10,
-          15,
-          20,
-          15,
-          10,
-          5,
-          10,
-          15,
-          20,
-          15,
-          10,
-          5
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        5,
-        5,
-        5,
-        0,
-        0,
-        0,
-        5,
-        5,
-        5,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          3,
-          3,
-          3,
-          3,
-          1,
-          1,
-          1,
-          1,
-          5,
-          5,
-          5,
-          5
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        2,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          15,
-          25,
-          10,
-          20,
-          5,
-          30,
-          25,
-          40,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        5,
-        15,
-        5,
-        15,
-        5,
-        5,
-        15,
-        30,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        4,
-        0,
-        0,
-        0,
-        0,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          9,
-          8,
-          7,
-          6,
-          5
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1000,
-          1000,
-          1000,
-          1000,
-          1000
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        1000
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          1,
-          4,
-          3,
-          2,
-          6,
-          7,
-          8,
-          10,
-          9
-        ]
-      },
-      "expected": [
-        4,
-        1,
-        1,
-        1,
-        2,
-        6,
-        7,
-        8,
-        1,
-        9
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          8,
-          4,
-          6,
-          2,
-          3,
-          5,
-          7,
-          1,
-          9,
-          10
-        ]
-      },
-      "expected": [
-        4,
-        2,
-        4,
-        1,
-        2,
-        4,
-        6,
-        1,
-        9,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          500,
-          400,
-          300,
-          200,
-          100,
-          50,
-          25,
-          12,
-          6,
-          3,
-          1
-        ]
-      },
-      "expected": [
-        100,
-        100,
-        100,
-        100,
-        50,
-        25,
-        13,
-        6,
-        3,
-        2,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          250,
-          200,
-          150,
-          100,
-          50,
-          100,
-          150,
-          200,
-          250,
-          300
-        ]
-      },
-      "expected": [
-        50,
-        50,
-        50,
-        50,
-        50,
-        100,
-        150,
-        200,
-        250,
-        300
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          20,
-          18,
-          16,
-          14,
-          12,
-          10,
-          8,
-          6,
-          4,
-          2
-        ]
-      },
-      "expected": [
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          10,
-          9,
-          8,
-          7,
-          6
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        6
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        1,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          30,
-          25,
-          20,
-          15,
-          10,
-          5,
-          10,
-          15,
-          20,
-          25
-        ]
-      },
-      "expected": [
-        5,
-        5,
-        5,
-        5,
-        5,
-        5,
-        10,
-        15,
-        20,
-        25
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          4,
-          3,
-          2,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          4,
-          3,
-          2,
-          1,
-          1,
-          2,
-          3,
-          4,
-          5
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        2,
-        3,
-        4,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          19,
-          17,
-          15,
-          13,
-          11,
-          9,
-          7,
-          5,
-          3,
-          1
-        ]
-      },
-      "expected": [
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        50
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          2,
-          2,
-          2,
-          2,
-          2,
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          10,
-          5,
-          10,
-          5,
-          10,
-          5,
-          10,
-          5,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        5,
-        0,
-        5,
-        0,
-        5,
-        0,
-        5,
-        5,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          0,
-          0,
-          0
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          2,
-          1,
-          1,
-          2,
-          2,
-          1,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        1,
-        0,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          100,
-          50,
-          25,
-          200,
-          100,
-          50,
-          25,
-          200
-        ]
-      },
-      "expected": [
-        50,
-        25,
-        0,
-        100,
-        50,
-        25,
-        25,
-        200
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          3,
-          2,
-          4,
-          3,
-          5,
-          4,
-          6,
-          5,
-          7,
-          6,
-          8,
-          7,
-          9,
-          8
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        2,
-        1,
-        3,
-        1,
-        4,
-        1,
-        5,
-        1,
-        6,
-        1,
-        7,
-        1,
-        8
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          3,
-          2,
-          1,
-          2,
-          3,
-          2,
-          1,
-          2,
-          3,
-          2,
-          1,
-          2,
-          3
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        1,
-        1,
-        1,
-        2,
-        3
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          10
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          3,
-          5,
-          7,
-          9,
-          11,
-          13,
-          15,
-          17,
-          19
-        ]
-      },
-      "expected": [
-        1,
-        3,
-        5,
-        7,
-        9,
-        11,
-        13,
-        15,
-        17,
-        19
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10,
-          1,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        0,
-        9,
-        1,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          3,
-          2,
-          3,
-          2,
-          3,
-          2,
-          3,
-          2,
-          3,
-          2
-        ]
-      },
-      "expected": [
-        1,
-        0,
-        1,
-        0,
-        1,
-        0,
-        1,
-        0,
-        1,
-        2
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          0,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          0
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          3,
-          2,
-          2,
-          1,
-          4,
-          3,
-          2,
-          1,
-          5,
-          4,
-          3,
-          2,
-          1,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        0,
-        1,
-        0,
-        1,
-        0,
-        1,
-        1,
-        1,
-        0,
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          20,
-          30,
-          40,
-          50,
-          40,
-          30,
-          20,
-          10,
-          5
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        10,
-        10,
-        10,
-        10,
-        5,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          1,
-          2,
-          2,
-          3,
-          3,
-          4,
-          4,
-          5,
-          5,
-          6,
-          6,
-          7,
-          7,
-          8,
-          8,
-          9,
-          9,
-          10,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        1,
-        0,
-        2,
-        0,
-        3,
-        0,
-        4,
-        0,
-        5,
-        0,
-        6,
-        0,
-        7,
-        0,
-        8,
-        0,
-        9,
-        0,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          1,
-          2,
-          3,
-          4,
-          5
-        ]
-      },
-      "expected": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        1,
-        2,
-        3,
-        4,
-        5
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          50,
-          40,
-          30,
-          20,
-          10,
-          20,
-          30,
-          40,
-          50,
-          60,
-          70,
-          80,
-          90,
-          100,
-          110,
-          120,
-          130,
-          140,
-          150,
-          160
-        ]
-      },
-      "expected": [
-        10,
-        10,
-        10,
-        10,
-        10,
-        20,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
-        100,
-        110,
-        120,
-        130,
-        140,
-        150,
-        160
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          1,
-          2,
-          3,
-          4
-        ]
-      },
-      "expected": [
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        1,
-        2,
-        3,
-        4
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
-        ]
-      },
-      "expected": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          50,
-          25,
-          75,
-          100,
-          50,
-          75,
-          100,
-          125
-        ]
-      },
-      "expected": [
-        25,
-        25,
-        25,
-        50,
-        50,
-        75,
-        100,
-        125
-      ]
-    },
-    {
-      "input": {
-        "prices": [
-          100,
-          200,
-          300,
-          400,
-          500,
-          400,
-          300,
-          200,
-          100
-        ]
-      },
-      "expected": [
-        0,
-        0,
-        0,
-        0,
-        100,
-        100,
-        100,
-        100,
-        100
-      ]
+        "grid": [
+          [
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            9,
+            8,
+            7
+          ],
+          [
+            6,
+            5,
+            4
+          ],
+          [
+            3,
+            2,
+            1
+          ]
+        ]
+      },
+      "expected": 24
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            5,
+            1,
+            3
+          ],
+          [
+            4,
+            2,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ]
+        ]
+      },
+      "expected": 24
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            5,
+            1,
+            3
+          ],
+          [
+            9,
+            3,
+            5
+          ],
+          [
+            7,
+            6,
+            2
+          ]
+        ]
+      },
+      "expected": 18
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            10
+          ]
+        ]
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            4
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ]
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            7
+          ],
+          [
+            2,
+            6
+          ]
+        ]
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            3,
+            5,
+            7
+          ],
+          [
+            2,
+            4,
+            6,
+            8
+          ]
+        ]
+      },
+      "expected": 20
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            7
+          ]
+        ]
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            3,
+            5,
+            7
+          ],
+          [
+            10,
+            8,
+            6,
+            4
+          ]
+        ]
+      },
+      "expected": 28
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            5,
+            6
+          ]
+        ]
+      },
+      "expected": 11
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2
+          ]
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            100,
+            100
+          ],
+          [
+            100,
+            100
+          ],
+          [
+            100,
+            100
+          ]
+        ]
+      },
+      "expected": 200
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            3,
+            5
+          ],
+          [
+            2,
+            4,
+            6
+          ],
+          [
+            3,
+            6,
+            9
+          ],
+          [
+            4,
+            8,
+            12
+          ]
+        ]
+      },
+      "expected": 24
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ],
+          [
+            10,
+            11,
+            12
+          ],
+          [
+            13,
+            14,
+            15
+          ],
+          [
+            16,
+            17,
+            18
+          ]
+        ]
+      },
+      "expected": 51
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            50,
+            49,
+            48,
+            47
+          ],
+          [
+            46,
+            45,
+            44,
+            43
+          ],
+          [
+            42,
+            41,
+            40,
+            39
+          ],
+          [
+            38,
+            37,
+            36,
+            35
+          ]
+        ]
+      },
+      "expected": 194
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            45,
+            23,
+            67,
+            89,
+            12
+          ],
+          [
+            90,
+            34,
+            56,
+            78,
+            10
+          ],
+          [
+            11,
+            13,
+            15,
+            17,
+            19
+          ],
+          [
+            21,
+            22,
+            24,
+            25,
+            26
+          ]
+        ]
+      },
+      "expected": 279
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            3,
+            1,
+            4,
+            1,
+            5,
+            9
+          ],
+          [
+            2,
+            6,
+            5,
+            3,
+            5,
+            9
+          ],
+          [
+            8,
+            9,
+            7,
+            9,
+            3,
+            2
+          ],
+          [
+            4,
+            5,
+            6,
+            8,
+            0,
+            1
+          ]
+        ]
+      },
+      "expected": 38
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            4,
+            8,
+            12,
+            16,
+            20
+          ],
+          [
+            3,
+            7,
+            11,
+            15,
+            19
+          ],
+          [
+            2,
+            6,
+            10,
+            14,
+            18
+          ],
+          [
+            1,
+            5,
+            9,
+            13,
+            17
+          ]
+        ]
+      },
+      "expected": 60
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            23,
+            34,
+            45,
+            56
+          ],
+          [
+            12,
+            23,
+            34,
+            45
+          ],
+          [
+            56,
+            67,
+            78,
+            89
+          ],
+          [
+            90,
+            10,
+            20,
+            30
+          ]
+        ]
+      },
+      "expected": 291
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            7,
+            8,
+            9
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            7,
+            8,
+            9
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            1,
+            2,
+            3
+          ]
+        ]
+      },
+      "expected": 24
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          [
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          [
+            2,
+            4,
+            6,
+            8,
+            10,
+            1,
+            3,
+            5,
+            7,
+            9
+          ],
+          [
+            3,
+            6,
+            9,
+            12,
+            15,
+            18,
+            21,
+            24,
+            27,
+            30
+          ]
+        ]
+      },
+      "expected": 165
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            3,
+            5,
+            7,
+            9
+          ],
+          [
+            10,
+            8,
+            6,
+            4,
+            2
+          ],
+          [
+            11,
+            13,
+            15,
+            17,
+            19
+          ],
+          [
+            20,
+            18,
+            16,
+            14,
+            12
+          ]
+        ]
+      },
+      "expected": 80
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            50,
+            45,
+            40
+          ],
+          [
+            35,
+            30,
+            25
+          ],
+          [
+            20,
+            15,
+            10
+          ],
+          [
+            5,
+            10,
+            15
+          ],
+          [
+            20,
+            25,
+            30
+          ]
+        ]
+      },
+      "expected": 135
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            10,
+            20,
+            30,
+            40,
+            50
+          ],
+          [
+            50,
+            40,
+            30,
+            20,
+            10
+          ],
+          [
+            60,
+            70,
+            80,
+            90,
+            100
+          ],
+          [
+            100,
+            90,
+            80,
+            70,
+            60
+          ]
+        ]
+      },
+      "expected": 400
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          [
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ]
+        ]
+      },
+      "expected": 55
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            100,
+            99,
+            98,
+            97,
+            96
+          ],
+          [
+            95,
+            94,
+            93,
+            92,
+            91
+          ],
+          [
+            90,
+            89,
+            88,
+            87,
+            86
+          ]
+        ]
+      },
+      "expected": 490
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            24,
+            17,
+            56,
+            38,
+            45
+          ],
+          [
+            89,
+            21,
+            37,
+            62,
+            11
+          ],
+          [
+            48,
+            93,
+            71,
+            19,
+            81
+          ],
+          [
+            25,
+            76,
+            53,
+            90,
+            32
+          ]
+        ]
+      },
+      "expected": 318
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          [
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          [
+            1,
+            6,
+            2,
+            5,
+            3,
+            4
+          ]
+        ]
+      },
+      "expected": 21
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            10,
+            20,
+            30,
+            40,
+            50
+          ],
+          [
+            50,
+            40,
+            30,
+            20,
+            10
+          ],
+          [
+            25,
+            75,
+            25,
+            75,
+            25
+          ],
+          [
+            75,
+            25,
+            75,
+            25,
+            75
+          ]
+        ]
+      },
+      "expected": 275
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            4,
+            2,
+            9,
+            1
+          ],
+          [
+            8,
+            5,
+            6,
+            7
+          ],
+          [
+            3,
+            11,
+            12,
+            10
+          ]
+        ]
+      },
+      "expected": 38
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            20,
+            5,
+            15
+          ],
+          [
+            10,
+            10,
+            30
+          ],
+          [
+            40,
+            25,
+            5
+          ]
+        ]
+      },
+      "expected": 75
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            23,
+            54,
+            76
+          ],
+          [
+            34,
+            56,
+            23
+          ],
+          [
+            89,
+            12,
+            45
+          ],
+          [
+            56,
+            78,
+            90
+          ]
+        ]
+      },
+      "expected": 224
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            45,
+            12,
+            67,
+            34
+          ],
+          [
+            89,
+            23,
+            56,
+            78
+          ],
+          [
+            90,
+            45,
+            34,
+            12
+          ],
+          [
+            78,
+            90,
+            45,
+            67
+          ]
+        ]
+      },
+      "expected": 280
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ],
+          [
+            10,
+            11,
+            12
+          ],
+          [
+            13,
+            14,
+            15
+          ]
+        ]
+      },
+      "expected": 42
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          [
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          [
+            1,
+            5,
+            2,
+            4,
+            3
+          ],
+          [
+            3,
+            4,
+            5,
+            1,
+            2
+          ]
+        ]
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            100,
+            90,
+            80
+          ],
+          [
+            70,
+            60,
+            50
+          ],
+          [
+            40,
+            30,
+            20
+          ],
+          [
+            10,
+            5,
+            1
+          ]
+        ]
+      },
+      "expected": 270
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            2,
+            1,
+            3,
+            4,
+            6,
+            5,
+            7
+          ],
+          [
+            3,
+            4,
+            5,
+            6,
+            7,
+            1,
+            2
+          ]
+        ]
+      },
+      "expected": 28
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          [
+            6,
+            6,
+            6,
+            6,
+            6,
+            6
+          ]
+        ]
+      },
+      "expected": 36
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            9,
+            7,
+            5,
+            3
+          ],
+          [
+            8,
+            6,
+            4,
+            2
+          ],
+          [
+            7,
+            5,
+            3,
+            1
+          ]
+        ]
+      },
+      "expected": 24
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            45,
+            55,
+            65
+          ],
+          [
+            35,
+            45,
+            55
+          ],
+          [
+            25,
+            35,
+            45
+          ],
+          [
+            15,
+            25,
+            35
+          ]
+        ]
+      },
+      "expected": 165
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            4,
+            1,
+            7
+          ],
+          [
+            8,
+            2,
+            6
+          ],
+          [
+            3,
+            9,
+            5
+          ],
+          [
+            5,
+            3,
+            8
+          ]
+        ]
+      },
+      "expected": 18
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          [
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          [
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        ]
+      },
+      "expected": 65
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            23,
+            34,
+            45,
+            56
+          ],
+          [
+            56,
+            45,
+            34,
+            23
+          ],
+          [
+            23,
+            45,
+            56,
+            34
+          ],
+          [
+            34,
+            56,
+            23,
+            45
+          ]
+        ]
+      },
+      "expected": 158
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            3,
+            5,
+            7,
+            9
+          ],
+          [
+            2,
+            4,
+            6,
+            8,
+            10
+          ],
+          [
+            10,
+            8,
+            6,
+            4,
+            2
+          ],
+          [
+            9,
+            7,
+            5,
+            3,
+            1
+          ]
+        ]
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            5,
+            3
+          ],
+          [
+            2,
+            8,
+            7
+          ],
+          [
+            4,
+            6,
+            9
+          ],
+          [
+            11,
+            13,
+            12
+          ]
+        ]
+      },
+      "expected": 36
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            30,
+            20,
+            10
+          ],
+          [
+            60,
+            50,
+            40
+          ],
+          [
+            90,
+            80,
+            70
+          ],
+          [
+            120,
+            110,
+            100
+          ]
+        ]
+      },
+      "expected": 330
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            15,
+            25,
+            35,
+            45,
+            55,
+            65,
+            75,
+            85,
+            95
+          ],
+          [
+            95,
+            85,
+            75,
+            65,
+            55,
+            45,
+            35,
+            25,
+            15
+          ],
+          [
+            10,
+            20,
+            30,
+            40,
+            50,
+            60,
+            70,
+            80,
+            90
+          ]
+        ]
+      },
+      "expected": 495
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            100,
+            1
+          ],
+          [
+            100,
+            1,
+            100
+          ],
+          [
+            1,
+            100,
+            1
+          ],
+          [
+            100,
+            1,
+            100
+          ]
+        ]
+      },
+      "expected": 201
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            50,
+            49,
+            48
+          ],
+          [
+            47,
+            46,
+            45
+          ],
+          [
+            44,
+            43,
+            42
+          ],
+          [
+            41,
+            40,
+            39
+          ]
+        ]
+      },
+      "expected": 147
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            3,
+            1,
+            2
+          ],
+          [
+            6,
+            5,
+            4
+          ],
+          [
+            9,
+            8,
+            7
+          ],
+          [
+            12,
+            11,
+            10
+          ]
+        ]
+      },
+      "expected": 33
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            50,
+            40,
+            30
+          ],
+          [
+            40,
+            30,
+            20
+          ],
+          [
+            30,
+            20,
+            10
+          ],
+          [
+            20,
+            10,
+            5
+          ]
+        ]
+      },
+      "expected": 120
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            10
+          ],
+          [
+            20
+          ],
+          [
+            30
+          ],
+          [
+            40
+          ],
+          [
+            50
+          ],
+          [
+            60
+          ]
+        ]
+      },
+      "expected": 60
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            42,
+            24,
+            36,
+            18,
+            72
+          ],
+          [
+            54,
+            12,
+            60,
+            84,
+            30
+          ],
+          [
+            90,
+            45,
+            15,
+            75,
+            60
+          ]
+        ]
+      },
+      "expected": 288
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            100,
+            99,
+            98,
+            97
+          ],
+          [
+            96,
+            95,
+            94,
+            93
+          ],
+          [
+            92,
+            91,
+            90,
+            89
+          ],
+          [
+            88,
+            87,
+            86,
+            85
+          ]
+        ]
+      },
+      "expected": 394
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            100,
+            90,
+            80
+          ],
+          [
+            70,
+            60,
+            50
+          ],
+          [
+            40,
+            30,
+            20
+          ],
+          [
+            10,
+            20,
+            30
+          ]
+        ]
+      },
+      "expected": 270
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            9,
+            1,
+            5,
+            3
+          ],
+          [
+            4,
+            8,
+            2,
+            7
+          ],
+          [
+            6,
+            10,
+            1,
+            12
+          ]
+        ]
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            25,
+            15,
+            35,
+            5
+          ],
+          [
+            10,
+            45,
+            55,
+            20
+          ],
+          [
+            50,
+            30,
+            60,
+            40
+          ]
+        ]
+      },
+      "expected": 180
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            100,
+            99,
+            98,
+            97,
+            96
+          ],
+          [
+            95,
+            94,
+            93,
+            92,
+            91
+          ],
+          [
+            90,
+            89,
+            88,
+            87,
+            86
+          ]
+        ]
+      },
+      "expected": 490
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            15,
+            20,
+            25,
+            30
+          ],
+          [
+            35,
+            40,
+            45,
+            50
+          ],
+          [
+            55,
+            60,
+            65,
+            70
+          ],
+          [
+            75,
+            80,
+            85,
+            90
+          ],
+          [
+            95,
+            100,
+            105,
+            110
+          ]
+        ]
+      },
+      "expected": 410
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            9,
+            7,
+            5,
+            3,
+            1
+          ],
+          [
+            8,
+            6,
+            4,
+            2,
+            0
+          ],
+          [
+            7,
+            5,
+            3,
+            1,
+            9
+          ]
+        ]
+      },
+      "expected": 25
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            99,
+            98,
+            97,
+            96
+          ],
+          [
+            95,
+            94,
+            93,
+            92
+          ],
+          [
+            91,
+            90,
+            89,
+            88
+          ]
+        ]
+      },
+      "expected": 390
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            10,
+            20,
+            30
+          ],
+          [
+            15,
+            25,
+            35
+          ],
+          [
+            20,
+            30,
+            40
+          ],
+          [
+            25,
+            35,
+            45
+          ]
+        ]
+      },
+      "expected": 105
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          [
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          [
+            10,
+            9,
+            8,
+            7,
+            6
+          ]
+        ]
+      },
+      "expected": 40
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            99,
+            2,
+            98
+          ],
+          [
+            3,
+            97,
+            4,
+            96
+          ],
+          [
+            5,
+            95,
+            6,
+            94
+          ],
+          [
+            7,
+            93,
+            8,
+            92
+          ]
+        ]
+      },
+      "expected": 212
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            50,
+            40,
+            30
+          ],
+          [
+            20,
+            10,
+            0
+          ],
+          [
+            80,
+            70,
+            60
+          ],
+          [
+            100,
+            90,
+            120
+          ]
+        ]
+      },
+      "expected": 310
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            100,
+            99,
+            98
+          ],
+          [
+            97,
+            96,
+            95
+          ],
+          [
+            94,
+            93,
+            92
+          ],
+          [
+            91,
+            90,
+            89
+          ]
+        ]
+      },
+      "expected": 297
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            5,
+            1,
+            9,
+            2
+          ],
+          [
+            8,
+            6,
+            3,
+            7
+          ],
+          [
+            4,
+            10,
+            1,
+            11
+          ]
+        ]
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        ]
+      },
+      "expected": 45
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            19,
+            20
+          ]
+        ]
+      },
+      "expected": 39
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            100,
+            50,
+            25,
+            10
+          ],
+          [
+            90,
+            60,
+            40,
+            30
+          ],
+          [
+            80,
+            70,
+            35,
+            15
+          ],
+          [
+            75,
+            65,
+            55,
+            45
+          ]
+        ]
+      },
+      "expected": 270
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            10,
+            20,
+            30,
+            40,
+            50
+          ],
+          [
+            50,
+            40,
+            30,
+            20,
+            10
+          ],
+          [
+            60,
+            70,
+            80,
+            90,
+            100
+          ]
+        ]
+      },
+      "expected": 400
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            9,
+            5,
+            1,
+            7
+          ],
+          [
+            8,
+            4,
+            2,
+            6
+          ],
+          [
+            3,
+            11,
+            10,
+            12
+          ]
+        ]
+      },
+      "expected": 36
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            5,
+            6
+          ]
+        ]
+      },
+      "expected": 11
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            47,
+            83,
+            29
+          ],
+          [
+            91,
+            7,
+            36
+          ],
+          [
+            42,
+            54,
+            67
+          ],
+          [
+            22,
+            88,
+            15
+          ]
+        ]
+      },
+      "expected": 187
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            99,
+            98,
+            97
+          ],
+          [
+            96,
+            95,
+            94
+          ],
+          [
+            93,
+            92,
+            91
+          ],
+          [
+            90,
+            89,
+            88
+          ],
+          [
+            87,
+            86,
+            85
+          ]
+        ]
+      },
+      "expected": 294
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            10,
+            100,
+            1000
+          ],
+          [
+            1000,
+            100,
+            10,
+            1
+          ],
+          [
+            1,
+            1000,
+            10,
+            100
+          ],
+          [
+            10,
+            100,
+            1000,
+            1
+          ]
+        ]
+      },
+      "expected": 1111
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          [
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          [
+            2,
+            3,
+            4,
+            5,
+            1
+          ],
+          [
+            5,
+            1,
+            2,
+            3,
+            4
+          ]
+        ]
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          [
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          [
+            2,
+            4,
+            6,
+            8,
+            10,
+            1,
+            3,
+            5,
+            7,
+            9
+          ]
+        ]
+      },
+      "expected": 55
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            100,
+            1,
+            2,
+            3
+          ],
+          [
+            3,
+            2,
+            1,
+            100
+          ],
+          [
+            100,
+            100,
+            1,
+            1
+          ],
+          [
+            1,
+            100,
+            100,
+            100
+          ]
+        ]
+      },
+      "expected": 301
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            7,
+            5,
+            3,
+            1
+          ],
+          [
+            8,
+            6,
+            4,
+            2
+          ],
+          [
+            9,
+            7,
+            5,
+            3
+          ],
+          [
+            10,
+            8,
+            6,
+            4
+          ]
+        ]
+      },
+      "expected": 28
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            15,
+            20,
+            25,
+            30
+          ],
+          [
+            10,
+            15,
+            20,
+            25
+          ],
+          [
+            5,
+            10,
+            15,
+            20
+          ],
+          [
+            1,
+            5,
+            10,
+            15
+          ]
+        ]
+      },
+      "expected": 90
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            7,
+            3,
+            5,
+            9
+          ],
+          [
+            1,
+            4,
+            8,
+            2
+          ],
+          [
+            6,
+            10,
+            12,
+            11
+          ]
+        ]
+      },
+      "expected": 39
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            15,
+            14,
+            13,
+            12,
+            11
+          ],
+          [
+            10,
+            9,
+            8,
+            7,
+            6
+          ],
+          [
+            5,
+            4,
+            3,
+            2,
+            1
+          ]
+        ]
+      },
+      "expected": 65
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            100,
+            1,
+            2,
+            3,
+            4
+          ],
+          [
+            99,
+            5,
+            6,
+            7,
+            8
+          ],
+          [
+            98,
+            9,
+            10,
+            11,
+            12
+          ],
+          [
+            97,
+            13,
+            14,
+            15,
+            16
+          ]
+        ]
+      },
+      "expected": 158
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            42,
+            23,
+            65,
+            12,
+            34
+          ],
+          [
+            56,
+            78,
+            90,
+            23,
+            45
+          ],
+          [
+            89,
+            12,
+            34,
+            56,
+            78
+          ]
+        ]
+      },
+      "expected": 292
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            10,
+            15,
+            5,
+            20
+          ],
+          [
+            12,
+            18,
+            8,
+            6
+          ],
+          [
+            7,
+            11,
+            13,
+            19
+          ]
+        ]
+      },
+      "expected": 53
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          [
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          [
+            12,
+            11,
+            10,
+            9,
+            8,
+            7
+          ]
+        ]
+      },
+      "expected": 57
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            42,
+            42,
+            42,
+            42
+          ],
+          [
+            42,
+            42,
+            42,
+            42
+          ],
+          [
+            42,
+            42,
+            42,
+            42
+          ],
+          [
+            42,
+            42,
+            42,
+            42
+          ]
+        ]
+      },
+      "expected": 168
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          [
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          [
+            1,
+            3,
+            5,
+            2,
+            4,
+            6
+          ],
+          [
+            6,
+            4,
+            2,
+            5,
+            3,
+            1
+          ]
+        ]
+      },
+      "expected": 21
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            100,
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            100,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            100,
+            9
+          ],
+          [
+            10,
+            11,
+            12,
+            100
+          ]
+        ]
+      },
+      "expected": 133
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            10,
+            20,
+            30,
+            40,
+            50
+          ],
+          [
+            50,
+            40,
+            30,
+            20,
+            10
+          ],
+          [
+            10,
+            30,
+            50,
+            20,
+            40
+          ],
+          [
+            20,
+            40,
+            10,
+            50,
+            30
+          ]
+        ]
+      },
+      "expected": 150
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            33,
+            54,
+            21,
+            45
+          ],
+          [
+            11,
+            99,
+            32,
+            16
+          ],
+          [
+            82,
+            76,
+            41,
+            53
+          ],
+          [
+            65,
+            29,
+            37,
+            44
+          ]
+        ]
+      },
+      "expected": 269
     }
   ],
-  "test_case_count": 117,
+  "test_case_count": 93,
   "optimal_complexity": null,
-  "source_task_id": "final-prices-with-a-special-discount-in-a-shop",
-  "source_question_id": 1475
+  "source_task_id": "delete-greatest-value-in-each-row",
+  "source_question_id": 2500
 }

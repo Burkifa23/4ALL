@@ -1,2400 +1,4649 @@
 {
   "question_id": "q_0028",
-  "title": "Fruits Into Baskets Iii",
+  "title": "Largest Plus Sign",
   "difficulty": 2,
-  "topic": "Segment Tree",
+  "topic": "Array",
   "topics": [
-    "Segment Tree",
     "Array",
-    "Binary Search",
-    "Ordered Set"
+    "Dynamic Programming"
   ],
-  "description_md": "You are given two arrays of integers, fruits and baskets, each of length n, where fruits[i] represents the quantity of the ith type of fruit, and baskets[j] represents the capacity of the jth basket.\nFrom left to right, place the fruits according to these rules:\n\nEach fruit type must be placed in the leftmost available basket with a capacity greater than or equal to the quantity of that fruit type.\nEach basket can hold only one type of fruit.\nIf a fruit type cannot be placed in any basket, it remains unplaced.\n\nReturn the number of fruit types that remain unplaced after all possible allocations are made.\n\u00a0\nExample 1:\n\nInput: fruits = [4,2,5], baskets = [3,5,4]\nOutput: 1\nExplanation:\n\nfruits[0] = 4 is placed in baskets[1] = 5.\nfruits[1] = 2 is placed in baskets[0] = 3.\nfruits[2] = 5 cannot be placed in baskets[2] = 4.\n\nSince one fruit type remains unplaced, we return 1.\n\nExample 2:\n\nInput: fruits = [3,6,1], baskets = [6,4,7]\nOutput: 0\nExplanation:\n\nfruits[0] = 3 is placed in baskets[0] = 6.\nfruits[1] = 6 cannot be placed in baskets[1] = 4 (insufficient capacity) but can be placed in the next available basket, baskets[2] = 7.\nfruits[2] = 1 is placed in baskets[1] = 4.\n\nSince all fruits are successfully placed, we return 0.\n\n\u00a0\nConstraints:\n\nn == fruits.length == baskets.length\n1 <= n <= 105\n1 <= fruits[i], baskets[i] <= 109\n\n",
-  "starter_code": "class Solution:\n    def numOfUnplacedFruits(self, fruits: List[int], baskets: List[int]) -> int:\n        ",
-  "entry_point": "Solution().numOfUnplacedFruits",
-  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nmn = int(1e10)\nclass SegmentTree:\n    def __init__(self,n):\n        # f\u8bb0\u5f55\u7684\u662f\u7279\u5b9a\u533a\u95f4\uff0cf[k]\uff0c\u5e8f\u53f7\u4e3ak\u7684\u70b9\uff1a\u8be5\u8282\u70b9\u638c\u7ba1\u7684\u7d22\u5f15\u4e3al,r\uff0c\u503c\u533a\u95f4l~r\u7684\u6570\u5b57\u603b\u548c\n        self.f = [mn for i in range(4*n)]\n    \n    def update(self,k,l,r,i,x):\n        # \u5e8f\u53f7\u4e3ak\u7684\u7d22\u5f15\uff0c\u638c\u7ba1\u7684\u8303\u56f4\u662fl~r\n        if l == r:\n            self.f[k] = x\n            # \u53f6\u5b50\u8282\u70b9\n            return \n        mid = (l+r)//2\n        # \u770b\u7d22\u5f15i\u5728\u5de6\u53f3\u5b50\u6811\u7684\u54ea\u4e00\u8fb9\u3002\u9012\u5f52\u66f4\u65b0\n        if i <= mid: # \u5728\u5de6\u5b50\u6811\n            self.update(2*k,l,mid,i,x)\n        elif i > mid: # \u5728\u53f3\u5b50\u6811\n            self.update(2*k+1,mid+1,r,i,x)\n        self.f[k] = min(self.f[2*k],self.f[2*k+1])\n    \n    def query(self,k,l,r,start,end):\n        # start~end\u59cb\u7ec8\u662fl~r\u7684\u5b50\u533a\u95f4\n        # \u5e8f\u53f7\u4e3ak\u7684\u7d22\u5f15\uff0c\u638c\u7ba1\u7684\u8303\u56f4\u662fl~r\n        # \u5728\u6574\u68f5\u6811\u4e0a\u8fdb\u884c\u641c\u5bfb start~end \u7d22\u5f15\u6240\u6c47\u603b\u7684\u8303\u56f4\u548c\n        if l == start and r == end:\n            return self.f[k]\n        mid = (l+r)//2\n        if end <= mid: # \u5982\u679cstart~end\u5b8c\u5168\u5728\u5de6\u534a\u8fb9\uff0c\u5219\u53ea\u9700\u8981\u7b97\u5de6\u5b50\u6811\n            return self.query(2*k,l,mid,start,end)\n        if mid < start: # \u5982\u679cstart~end\u5b8c\u5168\u5728\u53f3\u534a\u8fb9\uff0c\u5219\u53ea\u9700\u8981\u7b97\u53f3\u5b50\u6811\n            return self.query(2*k+1,mid+1,r,start,end)\n        # \u5426\u5219\uff0c\u9700\u8981\u540c\u65f6\u8003\u8651\u5de6\u53f3\u5b69\u5b50\n        leftPart = self.query(2*k,l,mid,start,mid) # \u6ce8\u610f\uff1a\u5728\u8fd9\u91cc\u6700\u540e\u4e00\u4e2a\u53c2\u6570\u662fmid\u800c\u4e0d\u662fend\n        rightPart = self.query(2*k+1,mid+1,r,mid+1,end) # \u6ce8\u610f\uff1a\u5728\u8fd9\u91cc\u5012\u6570\u7b2c\u4e8c\u4e2a\u53c2\u6570\u662fmid+1\u800c\u4e0d\u662fstart\n        # \u56e0\u4e3a\uff1a# start~end\u59cb\u7ec8\u662fl~r\u7684\u5b50\u533a\u95f4\uff0c\u5426\u5219\u9012\u5f52\u4f1a\u6ca1\u6709\u51fa\u53e3\n        return min(leftPart,rightPart)\n\nclass Solution:\n    def numOfUnplacedFruits(self, fruits: List[int], baskets: List[int]) -> int:\n        '''\n        \u79bb\u6563\u5316 + \u7ebf\u6bb5\u6811\n        '''\n        n = len(fruits)\n        # \u79bb\u6563\u5316\n        arr = set(fruits + baskets)\n        dt = {}\n        arr = sorted(list(arr))\n        for i,num in enumerate(arr):\n            dt[num] = i\n\n        # init\n        tree = SegmentTree(len(arr))\n        # \u76f8\u540c baskets[j] \u7684\u503c\u5bf9\u5e94\u7684\u4e0b\u6807\u961f\u5217\n        pos = defaultdict(deque)\n        for i,num in enumerate(baskets):\n            if num not in pos:\n                tree.update(1,0,len(arr)-1,dt[num],i)\n                \n            pos[num].append(i)\n\n        res = 0\n        for num in fruits:\n            # \u67e5\u8be2[num,\u221e\uff09 \u7684\u6700\u5c0f\u4e0b\u6807\uff0c\u79bb\u6563\u5316\u540e\u5bf9\u5e94 [ dt[num],len(arr)-1 ]\n            j = tree.query(1,0,len(arr)-1,dt[num],len(arr)-1)\n            # \u627e\u4e0d\u5230\u5bf9\u5e94\u4e0b\u6807\n            if j == mn:\n                res += 1\n                continue\n\n            \n            tmp = baskets[j]\n            pos[tmp].popleft()\n            # \u82e5\u5b58\u5728\uff0cbaskets[j] \u5bf9\u5e94\u7684\u4e0b\u4e00\u4e2a\u4e0b\u6807\uff0c\u5219\u5355\u70b9\u66f4\u65b0\n            if pos[tmp]:\n                tree.update(1,0,len(arr)-1,dt[tmp],pos[tmp][0])\n            # \u82e5\u4e0d\u5b58\u5728\uff0c\u5c31\u66f4\u65b0\u4e3a\u4e00\u4e2a\u8f83\u5927\u503c mn\n            else:\n                tree.update(1,0,len(arr)-1,dt[tmp],mn)\n        \n        return res\n",
+  "description_md": "You are given an integer n. You have an n x n binary grid grid with all values initially 1's except for some indices given in the array mines. The ith element of the array mines is defined as mines[i] = [xi, yi] where grid[xi][yi] == 0.\nReturn the order of the largest axis-aligned plus sign of 1's contained in grid. If there is none, return 0.\nAn axis-aligned plus sign of 1's of order k has some center grid[r][c] == 1 along with four arms of length k - 1 going up, down, left, and right, and made of 1's. Note that there could be 0's or 1's beyond the arms of the plus sign, only the relevant area of the plus sign is checked for 1's.\n\u00a0\nExample 1:\n\n\nInput: n = 5, mines = [[4,2]]\nOutput: 2\nExplanation: In the above grid, the largest plus sign can only be of order 2. One of them is shown.\n\nExample 2:\n\n\nInput: n = 1, mines = [[0,0]]\nOutput: 0\nExplanation: There is no plus sign, so return 0.\n\n\u00a0\nConstraints:\n\n1 <= n <= 500\n1 <= mines.length <= 5000\n0 <= xi, yi < n\nAll the pairs (xi, yi) are unique.\n\n",
+  "starter_code": "class Solution:\n    def orderOfLargestPlusSign(self, n: int, mines: List[List[int]]) -> int:\n        ",
+  "entry_point": "Solution().orderOfLargestPlusSign",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def orderOfLargestPlusSign(self, n: int, mines: List[List[int]]) -> int:\n        dp = [[n] * n for _ in range(n)]\n        for x, y in mines:\n            dp[x][y] = 0\n        for i in range(n):\n            left = right = up = down = 0\n            for j, k in zip(range(n), reversed(range(n))):\n                left = left + 1 if dp[i][j] else 0\n                right = right + 1 if dp[i][k] else 0\n                up = up + 1 if dp[j][i] else 0\n                down = down + 1 if dp[k][i] else 0\n                dp[i][j] = min(dp[i][j], left)\n                dp[i][k] = min(dp[i][k], right)\n                dp[j][i] = min(dp[j][i], up)\n                dp[k][i] = min(dp[k][i], down)\n        return max(max(v) for v in dp)\n",
   "test_cases": [
     {
       "input": {
-        "fruits": [
-          5,
-          5,
-          5,
-          5,
-          5
-        ],
-        "baskets": [
-          1,
-          2,
-          3,
-          4,
-          5
-        ]
-      },
-      "expected": 4
-    },
-    {
-      "input": {
-        "fruits": [
-          4,
-          2,
-          5
-        ],
-        "baskets": [
-          3,
-          5,
-          4
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          1,
-          1,
-          1
-        ],
-        "baskets": [
-          1,
-          1,
-          1,
-          1
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1000000000,
-          1000000000
-        ],
-        "baskets": [
-          999999999,
-          1000000000
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          1000000000
-        ],
-        "baskets": [
-          1000000000
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          2,
-          3,
-          4
-        ],
-        "baskets": [
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": 2
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          1,
-          1,
-          1,
-          1
-        ],
-        "baskets": [
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          2,
-          3,
-          4
-        ],
-        "baskets": [
-          10,
-          10,
-          10,
-          10
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          9,
-          8,
-          7,
-          6
-        ],
-        "baskets": [
-          6,
-          7,
-          8,
-          9,
-          10
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          5,
-          5,
-          5,
-          5
-        ],
-        "baskets": [
-          5,
-          5,
-          5,
-          5
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          10,
-          100,
-          1000
-        ],
-        "baskets": [
-          1000,
-          100,
-          10,
-          1
-        ]
-      },
-      "expected": 2
-    },
-    {
-      "input": {
-        "fruits": [
-          7,
-          8,
-          9
-        ],
-        "baskets": [
-          6,
-          7,
-          8
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          10,
-          10
-        ],
-        "baskets": [
-          5,
-          5,
-          5
+        "n": 7,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            6
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            6
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            4,
+            6
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            6,
+            1
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            6,
+            3
+          ],
+          [
+            6,
+            4
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            6
+          ]
         ]
       },
       "expected": 3
     },
     {
       "input": {
-        "fruits": [
-          1,
-          2,
-          3,
-          4,
-          5
-        ],
-        "baskets": [
-          5,
-          4,
-          3,
-          2,
-          1
+        "n": 4,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            3
+          ]
         ]
       },
       "expected": 2
     },
     {
       "input": {
-        "fruits": [
-          10,
-          20,
-          30
-        ],
-        "baskets": [
-          5,
-          15,
-          25
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          3,
-          6,
-          1
-        ],
-        "baskets": [
-          6,
-          4,
-          7
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          9,
-          7,
-          5,
-          3,
-          1
-        ],
-        "baskets": [
-          1,
-          3,
-          5,
-          7,
-          9
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50,
-          60,
-          70,
-          80,
-          90,
-          100
-        ],
-        "baskets": [
-          5,
-          15,
-          25,
-          35,
-          45,
-          55,
-          65,
-          75,
-          85,
-          95
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          5,
-          15,
-          25,
-          35,
-          45
-        ],
-        "baskets": [
-          10,
-          20,
-          30,
-          40,
-          50
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          5,
-          5,
-          5,
-          5,
-          5
-        ],
-        "baskets": [
-          5,
-          5,
-          5,
-          5,
-          5
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          3,
-          5,
-          7,
-          9,
-          11,
-          13,
-          15,
-          17,
-          19
-        ],
-        "baskets": [
-          19,
-          17,
-          15,
-          13,
-          11,
-          9,
-          7,
-          5,
-          3,
-          1
-        ]
-      },
-      "expected": 5
-    },
-    {
-      "input": {
-        "fruits": [
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5
-        ],
-        "baskets": [
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5,
-          5
-        ],
-        "baskets": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
-        ]
-      },
-      "expected": 4
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
-        ],
-        "baskets": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          2,
-          4,
-          6,
-          8,
-          10,
-          12,
-          14,
-          16,
-          18,
-          20
-        ],
-        "baskets": [
-          19,
-          17,
-          15,
-          13,
-          11,
-          9,
-          7,
-          5,
-          3,
-          1
-        ]
-      },
-      "expected": 5
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
-        ],
-        "baskets": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50
-        ],
-        "baskets": [
-          50,
-          40,
-          30,
-          20,
-          10
-        ]
-      },
-      "expected": 2
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50
-        ],
-        "baskets": [
-          20,
-          30,
-          40,
-          50,
-          60
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1000000000,
-          500000000,
-          250000000,
-          125000000,
-          62500000
-        ],
-        "baskets": [
-          62500000,
-          125000000,
-          250000000,
-          500000000,
-          1000000000
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          15,
-          14,
-          13,
-          12,
-          11,
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ],
-        "baskets": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          1,
-          2,
-          2,
-          3,
-          3,
-          4,
-          4,
-          5,
-          5
-        ],
-        "baskets": [
-          1,
-          1,
-          2,
-          2,
-          3,
-          3,
-          4,
-          4,
-          5,
-          5
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1,
-          1
-        ],
-        "baskets": [
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          100,
-          200,
-          300,
-          400,
-          500,
-          600,
-          700,
-          800,
-          900,
-          1000
-        ],
-        "baskets": [
-          1000,
-          900,
-          800,
-          700,
-          600,
-          500,
-          400,
-          300,
-          200,
-          100
-        ]
-      },
-      "expected": 5
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50
-        ],
-        "baskets": [
-          25,
-          35,
-          15,
-          45,
-          55
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50,
-          60
-        ],
-        "baskets": [
-          15,
-          25,
-          35,
-          45,
-          55,
-          65
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50,
-          60,
-          70,
-          80,
-          90,
-          100
-        ],
-        "baskets": [
-          100,
-          90,
-          80,
-          70,
-          60,
-          50,
-          40,
-          30,
-          20,
-          10
-        ]
-      },
-      "expected": 5
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ],
-        "baskets": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          3,
-          3,
-          3,
-          3,
-          3,
-          3,
-          3,
-          3,
-          3,
-          3
-        ],
-        "baskets": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          10
-        ]
-      },
-      "expected": 9
-    },
-    {
-      "input": {
-        "fruits": [
-          1000000000,
-          999999999,
-          888888888,
-          777777777,
-          666666666
-        ],
-        "baskets": [
-          999999999,
-          888888888,
-          777777777,
-          666666666,
-          555555555
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          1000000000
-        ],
-        "baskets": [
-          999999999
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          3,
-          5,
-          7,
-          9,
-          11,
-          13,
-          15,
-          17,
-          19
-        ],
-        "baskets": [
-          2,
-          4,
-          6,
-          8,
-          10,
-          12,
-          14,
-          16,
-          18,
-          20
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
-        ],
-        "baskets": [
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": 5
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          2,
-          4,
-          8,
-          16,
-          32,
-          64,
-          128,
-          256,
-          512
-        ],
-        "baskets": [
-          1024,
-          512,
-          256,
-          128,
-          64,
-          32,
-          16,
-          8,
-          4,
-          2
-        ]
-      },
-      "expected": 4
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50,
-          60,
-          70,
-          80,
-          90,
-          100
-        ],
-        "baskets": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
-      },
-      "expected": 10
-    },
-    {
-      "input": {
-        "fruits": [
-          7,
-          3,
-          8,
-          2,
-          9,
-          5
-        ],
-        "baskets": [
-          10,
-          5,
-          8,
-          4,
-          9,
-          6
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
-        ],
-        "baskets": [
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          5,
-          5,
-          5,
-          5,
-          5
-        ],
-        "baskets": [
-          1,
-          1,
-          1,
-          1,
-          10
-        ]
-      },
-      "expected": 4
-    },
-    {
-      "input": {
-        "fruits": [
-          5,
-          10,
-          15,
-          20,
-          25,
-          30,
-          35,
-          40,
-          45,
-          50,
-          55,
-          60
-        ],
-        "baskets": [
-          60,
-          55,
-          50,
-          45,
-          40,
-          35,
-          30,
-          25,
-          20,
-          15,
-          10,
-          5
-        ]
-      },
-      "expected": 6
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          3,
-          5,
-          7,
-          9,
-          11,
-          13
-        ],
-        "baskets": [
-          13,
-          11,
-          9,
-          7,
-          5,
-          3,
-          1
+        "n": 5,
+        "mines": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            3
+          ]
         ]
       },
       "expected": 3
     },
     {
       "input": {
-        "fruits": [
-          10,
-          10,
-          10,
-          10,
-          10,
-          10
-        ],
-        "baskets": [
-          5,
-          5,
-          5,
-          5,
-          5,
-          5
+        "n": 5,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            4,
+            4
+          ]
         ]
       },
-      "expected": 6
+      "expected": 3
     },
     {
       "input": {
-        "fruits": [
-          1,
-          3,
-          5,
-          7,
-          9,
-          11,
-          13,
-          15,
-          17,
-          19
-        ],
-        "baskets": [
-          2,
-          4,
-          6,
-          8,
-          10,
-          12,
-          14,
-          16,
-          18,
-          20
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50
-        ],
-        "baskets": [
-          5,
-          15,
-          25,
-          35,
-          45
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          2,
-          4,
-          6,
-          8,
-          10,
-          12,
-          14,
-          16,
-          18,
-          20
-        ],
-        "baskets": [
-          1,
-          3,
-          5,
-          7,
-          9,
-          11,
-          13,
-          15,
-          17,
-          19
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50,
-          60,
-          70,
-          80,
-          90,
-          100,
-          110,
-          120
-        ],
-        "baskets": [
-          120,
-          110,
-          100,
-          90,
-          80,
-          70,
-          60,
-          50,
-          40,
-          30,
-          20,
-          10
-        ]
-      },
-      "expected": 6
-    },
-    {
-      "input": {
-        "fruits": [
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ],
-        "baskets": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          100,
-          200,
-          300,
-          400,
-          500
-        ],
-        "baskets": [
-          500,
-          400,
-          300,
-          200,
-          100
+        "n": 6,
+        "mines": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ]
         ]
       },
       "expected": 2
     },
     {
       "input": {
-        "fruits": [
-          1,
-          10,
-          100,
-          1000,
-          10000,
-          100000,
-          1000000,
-          10000000,
-          100000000,
-          1000000000
-        ],
-        "baskets": [
-          10,
-          100,
-          1000,
-          10000,
-          100000,
-          1000000,
-          10000000,
-          100000000,
-          1000000000,
-          1
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          5,
-          10,
-          15,
-          20,
-          25,
-          30,
-          35,
-          40,
-          45,
-          50
-        ],
-        "baskets": [
-          50,
-          45,
-          40,
-          35,
-          30,
-          25,
-          20,
-          15,
-          10,
-          5
-        ]
-      },
-      "expected": 5
-    },
-    {
-      "input": {
-        "fruits": [
-          100,
-          99,
-          98,
-          97,
-          96,
-          95,
-          94,
-          93,
-          92,
-          91
-        ],
-        "baskets": [
-          91,
-          92,
-          93,
-          94,
-          95,
-          96,
-          97,
-          98,
-          99,
-          100
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          50,
-          40,
-          30,
-          20,
-          10
-        ],
-        "baskets": [
-          10,
-          20,
-          30,
-          40,
-          50
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          999999999,
-          999999998,
-          999999997,
-          999999996,
-          999999995
-        ],
-        "baskets": [
-          1000000000,
-          1000000000,
-          1000000000,
-          1000000000,
-          1000000000
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          5,
-          7,
-          3,
-          8,
-          2,
-          6
-        ],
-        "baskets": [
-          4,
-          5,
-          7,
-          6,
-          8,
-          3
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7
-        ],
-        "baskets": [
-          5,
-          5,
-          5,
-          5,
-          5,
-          10,
-          10,
-          10,
-          10,
-          10
-        ]
-      },
-      "expected": 5
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          2,
-          2,
-          3,
-          3,
-          3,
-          4,
-          4,
-          4,
-          4
-        ],
-        "baskets": [
-          2,
-          2,
-          3,
-          3,
-          3,
-          4,
-          4,
-          4,
-          4,
-          4
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
-        ],
-        "baskets": [
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          1,
-          2,
-          2,
-          3,
-          3,
-          4,
-          4,
-          5,
-          5
-        ],
-        "baskets": [
-          5,
-          4,
-          3,
-          2,
-          1,
-          5,
-          4,
-          3,
-          2,
-          1
-        ]
-      },
-      "expected": 4
-    },
-    {
-      "input": {
-        "fruits": [
-          5,
-          3,
-          8,
-          6,
-          2
-        ],
-        "baskets": [
-          4,
-          7,
-          8,
-          5,
-          1
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50
-        ],
-        "baskets": [
-          5,
-          25,
-          15,
-          40,
-          30
+        "n": 6,
+        "mines": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            3,
+            3
+          ]
         ]
       },
       "expected": 2
     },
     {
       "input": {
-        "fruits": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
-        ],
-        "baskets": [
-          2,
-          4,
-          6,
-          8,
-          10,
-          12,
-          14,
-          16,
-          18,
-          20
+        "n": 1,
+        "mines": [
+          [
+            0,
+            0
+          ]
         ]
       },
       "expected": 0
     },
     {
       "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50,
-          60,
-          70,
-          80,
-          90,
-          100
-        ],
-        "baskets": [
-          10,
-          20,
-          30,
-          40,
-          50,
-          60,
-          70,
-          80,
-          90,
-          100
+        "n": 500,
+        "mines": [
+          [
+            250,
+            250
+          ]
         ]
       },
-      "expected": 0
+      "expected": 250
     },
     {
       "input": {
-        "fruits": [
-          1,
-          1,
-          1,
-          1,
-          10
-        ],
-        "baskets": [
-          10,
-          10,
-          10,
-          10,
-          1
+        "n": 4,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            3,
+            3
+          ]
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "n": 3,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ]
         ]
       },
       "expected": 1
     },
     {
       "input": {
-        "fruits": [
-          5,
-          10,
-          15,
-          20,
-          25
-        ],
-        "baskets": [
-          5,
-          15,
-          25,
-          35,
-          45,
-          55
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50
-        ],
-        "baskets": [
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
-      },
-      "expected": 5
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50
-        ],
-        "baskets": [
-          5,
-          15,
-          25,
-          35,
-          45
+        "n": 3,
+        "mines": [
+          [
+            1,
+            1
+          ]
         ]
       },
       "expected": 1
     },
     {
       "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50,
-          60,
-          70,
-          80,
-          90,
-          100
-        ],
-        "baskets": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
+        "n": 5,
+        "mines": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            3
+          ]
         ]
       },
-      "expected": 9
+      "expected": 1
     },
     {
       "input": {
-        "fruits": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ],
-        "baskets": [
-          15,
-          14,
-          13,
-          12,
-          11,
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
+        "n": 500,
+        "mines": []
+      },
+      "expected": 250
+    },
+    {
+      "input": {
+        "n": 4,
+        "mines": []
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "n": 5,
+        "mines": [
+          [
+            4,
+            2
+          ]
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "n": 3,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ]
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "n": 3,
+        "mines": []
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "n": 6,
+        "mines": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            2
+          ]
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "n": 100,
+        "mines": [
+          [
+            50,
+            50
+          ],
+          [
+            49,
+            49
+          ],
+          [
+            49,
+            51
+          ],
+          [
+            51,
+            49
+          ],
+          [
+            51,
+            51
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            50,
+            49
+          ],
+          [
+            50,
+            51
+          ],
+          [
+            60,
+            60
+          ],
+          [
+            30,
+            30
+          ]
+        ]
+      },
+      "expected": 49
+    },
+    {
+      "input": {
+        "n": 15,
+        "mines": [
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            7,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            14,
+            14
+          ]
         ]
       },
       "expected": 7
     },
     {
       "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50,
-          60
-        ],
-        "baskets": [
-          60,
-          50,
-          40,
-          30,
-          20,
-          10
+        "n": 500,
+        "mines": [
+          [
+            250,
+            250
+          ],
+          [
+            249,
+            249
+          ],
+          [
+            251,
+            251
+          ],
+          [
+            248,
+            248
+          ],
+          [
+            252,
+            252
+          ],
+          [
+            247,
+            247
+          ],
+          [
+            253,
+            253
+          ]
         ]
       },
-      "expected": 3
+      "expected": 247
     },
     {
       "input": {
-        "fruits": [
-          10,
-          20,
-          30,
-          40,
-          50
-        ],
-        "baskets": [
-          100,
-          100,
-          100,
-          100,
-          1
+        "n": 25,
+        "mines": [
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            12,
+            10
+          ],
+          [
+            11,
+            9
+          ],
+          [
+            11,
+            13
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            13,
+            11
+          ]
         ]
       },
-      "expected": 1
+      "expected": 11
     },
     {
       "input": {
-        "fruits": [
-          5,
-          5,
-          5,
-          5,
-          5
-        ],
-        "baskets": [
-          3,
-          3,
-          3,
-          3,
-          3
+        "n": 10,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            0,
+            9
+          ],
+          [
+            9,
+            0
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ]
         ]
       },
-      "expected": 5
+      "expected": 4
     },
     {
       "input": {
-        "fruits": [
-          500,
-          400,
-          300,
-          200,
-          100
-        ],
-        "baskets": [
-          100,
-          200,
-          300,
-          400,
-          500
+        "n": 10,
+        "mines": [
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            4
+          ]
         ]
       },
-      "expected": 0
+      "expected": 4
     },
     {
       "input": {
-        "fruits": [
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10
-        ],
-        "baskets": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
+        "n": 15,
+        "mines": [
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            7,
+            6
+          ],
+          [
+            7,
+            7
+          ]
         ]
       },
-      "expected": 10
+      "expected": 7
     },
     {
       "input": {
-        "fruits": [
-          1,
-          3,
-          5,
-          7,
-          9
-        ],
-        "baskets": [
-          2,
-          4,
-          6,
-          8,
-          10
+        "n": 75,
+        "mines": [
+          [
+            37,
+            37
+          ],
+          [
+            36,
+            36
+          ],
+          [
+            36,
+            38
+          ],
+          [
+            38,
+            36
+          ],
+          [
+            38,
+            38
+          ],
+          [
+            36,
+            37
+          ],
+          [
+            37,
+            36
+          ],
+          [
+            37,
+            38
+          ]
         ]
       },
-      "expected": 0
+      "expected": 36
     },
     {
       "input": {
-        "fruits": [
-          100,
-          200,
-          300,
-          400,
-          500
-        ],
-        "baskets": [
-          150,
-          250,
-          350,
-          450,
-          550
+        "n": 30,
+        "mines": [
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            10,
+            9
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            14,
+            15
+          ],
+          [
+            16,
+            15
+          ],
+          [
+            15,
+            14
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            20,
+            20
+          ],
+          [
+            21,
+            20
+          ],
+          [
+            19,
+            20
+          ],
+          [
+            20,
+            19
+          ],
+          [
+            20,
+            21
+          ]
         ]
       },
-      "expected": 0
+      "expected": 14
     },
     {
       "input": {
-        "fruits": [
-          2,
-          4,
-          6,
-          8,
-          10,
-          12,
-          14,
-          16,
-          18,
-          20
-        ],
-        "baskets": [
-          20,
-          18,
-          16,
-          14,
-          12,
-          10,
-          8,
-          6,
-          4,
-          2
-        ]
-      },
-      "expected": 5
-    },
-    {
-      "input": {
-        "fruits": [
-          999999999,
-          999999998,
-          999999997,
-          999999996
-        ],
-        "baskets": [
-          999999996,
-          999999997,
-          999999998,
-          999999999
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          2,
-          4,
-          6,
-          8,
-          10
-        ],
-        "baskets": [
-          1,
-          3,
-          5,
-          7,
-          9
-        ]
-      },
-      "expected": 1
-    },
-    {
-      "input": {
-        "fruits": [
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10
-        ],
-        "baskets": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
+        "n": 20,
+        "mines": [
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            14
+          ],
+          [
+            14,
+            5
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            10,
+            9
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            8
+          ],
+          [
+            8,
+            10
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            19,
+            19
+          ]
         ]
       },
       "expected": 9
     },
     {
       "input": {
-        "fruits": [
-          9,
-          11,
-          13,
-          15,
-          17
-        ],
-        "baskets": [
-          18,
-          19,
-          20,
-          21,
-          22
+        "n": 500,
+        "mines": [
+          [
+            250,
+            250
+          ],
+          [
+            249,
+            249
+          ],
+          [
+            249,
+            251
+          ],
+          [
+            251,
+            249
+          ],
+          [
+            251,
+            251
+          ],
+          [
+            249,
+            250
+          ],
+          [
+            250,
+            249
+          ],
+          [
+            250,
+            251
+          ],
+          [
+            200,
+            200
+          ],
+          [
+            300,
+            300
+          ]
         ]
       },
-      "expected": 0
+      "expected": 249
     },
     {
       "input": {
-        "fruits": [
-          10,
-          10,
-          10,
-          10,
-          10
-        ],
-        "baskets": [
-          5,
-          5,
-          5,
-          5,
-          5
+        "n": 7,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            0,
+            6
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            6,
+            0
+          ]
         ]
       },
-      "expected": 5
+      "expected": 2
     },
     {
       "input": {
-        "fruits": [
-          1000000000,
-          1000000000,
-          1000000000
-        ],
-        "baskets": [
-          999999999,
-          999999999,
-          999999999
+        "n": 100,
+        "mines": [
+          [
+            50,
+            50
+          ],
+          [
+            49,
+            49
+          ],
+          [
+            51,
+            51
+          ],
+          [
+            48,
+            48
+          ],
+          [
+            52,
+            52
+          ],
+          [
+            47,
+            47
+          ],
+          [
+            53,
+            53
+          ],
+          [
+            46,
+            46
+          ],
+          [
+            54,
+            54
+          ],
+          [
+            45,
+            45
+          ],
+          [
+            55,
+            55
+          ]
+        ]
+      },
+      "expected": 45
+    },
+    {
+      "input": {
+        "n": 500,
+        "mines": [
+          [
+            250,
+            250
+          ],
+          [
+            250,
+            251
+          ],
+          [
+            250,
+            249
+          ],
+          [
+            249,
+            250
+          ],
+          [
+            251,
+            250
+          ]
+        ]
+      },
+      "expected": 249
+    },
+    {
+      "input": {
+        "n": 10,
+        "mines": [
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ]
         ]
       },
       "expected": 3
     },
     {
       "input": {
-        "fruits": [
-          1,
-          2,
-          4,
-          8,
-          16,
-          32,
-          64,
-          128,
-          256,
-          512
-        ],
-        "baskets": [
-          1,
-          2,
-          4,
-          8,
-          16,
-          32,
-          64,
-          128,
-          256,
-          1024
+        "n": 12,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            2,
+            4
+          ]
         ]
       },
-      "expected": 0
+      "expected": 4
     },
     {
       "input": {
-        "fruits": [
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
-        ],
-        "baskets": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          10
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          9,
-          8,
-          7,
-          6,
-          5
-        ],
-        "baskets": [
-          10,
-          9,
-          8,
-          7,
-          6
-        ]
-      },
-      "expected": 0
-    },
-    {
-      "input": {
-        "fruits": [
-          1000000000,
-          1000000000,
-          1000000000
-        ],
-        "baskets": [
-          999999999,
-          999999999,
-          1000000000
-        ]
-      },
-      "expected": 2
-    },
-    {
-      "input": {
-        "fruits": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20
-        ],
-        "baskets": [
-          20,
-          19,
-          18,
-          17,
-          16,
-          15,
-          14,
-          13,
-          12,
-          11,
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
+        "n": 20,
+        "mines": [
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            11,
+            11
+          ]
         ]
       },
       "expected": 10
     },
     {
       "input": {
-        "fruits": [
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10,
-          10
-        ],
-        "baskets": [
-          10,
-          9,
-          8,
-          7,
-          6,
-          5,
-          4,
-          3,
-          2,
-          1
+        "n": 7,
+        "mines": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ]
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "n": 6,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            4,
+            1
+          ],
+          [
+            5,
+            0
+          ]
+        ]
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "n": 25,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            22
+          ],
+          [
+            0,
+            23
+          ],
+          [
+            0,
+            24
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            24
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            24
+          ],
+          [
+            22,
+            0
+          ],
+          [
+            22,
+            24
+          ],
+          [
+            23,
+            0
+          ],
+          [
+            23,
+            24
+          ],
+          [
+            24,
+            0
+          ],
+          [
+            24,
+            1
+          ],
+          [
+            24,
+            2
+          ],
+          [
+            24,
+            22
+          ],
+          [
+            24,
+            23
+          ],
+          [
+            24,
+            24
+          ]
+        ]
+      },
+      "expected": 13
+    },
+    {
+      "input": {
+        "n": 20,
+        "mines": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            18
+          ],
+          [
+            18,
+            1
+          ],
+          [
+            18,
+            18
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            11
+          ]
         ]
       },
       "expected": 9
     },
     {
       "input": {
-        "fruits": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ],
-        "baskets": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
+        "n": 10,
+        "mines": [
+          [
+            5,
+            5
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            5
+          ]
         ]
       },
-      "expected": 0
+      "expected": 4
     },
     {
       "input": {
-        "fruits": [
-          2,
-          3,
-          1,
-          5,
-          4
-        ],
-        "baskets": [
-          5,
-          3,
-          4,
-          2,
-          1
+        "n": 100,
+        "mines": [
+          [
+            10,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            12,
+            10
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            12,
+            12
+          ]
+        ]
+      },
+      "expected": 50
+    },
+    {
+      "input": {
+        "n": 200,
+        "mines": [
+          [
+            100,
+            100
+          ],
+          [
+            100,
+            101
+          ],
+          [
+            101,
+            100
+          ],
+          [
+            99,
+            99
+          ],
+          [
+            101,
+            99
+          ],
+          [
+            99,
+            101
+          ],
+          [
+            98,
+            98
+          ],
+          [
+            102,
+            102
+          ]
+        ]
+      },
+      "expected": 98
+    },
+    {
+      "input": {
+        "n": 10,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            9
+          ]
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "n": 15,
+        "mines": [
+          [
+            7,
+            7
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            9,
+            7
+          ],
+          [
+            9,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            7,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            5
+          ],
+          [
+            8,
+            6
+          ],
+          [
+            8,
+            7
+          ]
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "n": 15,
+        "mines": [
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            5,
+            5
+          ]
+        ]
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "n": 15,
+        "mines": [
+          [
+            7,
+            7
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            9,
+            7
+          ],
+          [
+            9,
+            8
+          ],
+          [
+            9,
+            9
+          ]
+        ]
+      },
+      "expected": 7
+    },
+    {
+      "input": {
+        "n": 10,
+        "mines": [
+          [
+            0,
+            5
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "n": 15,
+        "mines": [
+          [
+            7,
+            7
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            6,
+            9
+          ],
+          [
+            7,
+            6
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            8,
+            6
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            9,
+            6
+          ],
+          [
+            9,
+            7
+          ],
+          [
+            9,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            5,
+            8
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            10
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            8,
+            5
+          ],
+          [
+            8,
+            10
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            10,
+            5
+          ],
+          [
+            10,
+            6
+          ],
+          [
+            10,
+            7
+          ],
+          [
+            10,
+            8
+          ],
+          [
+            10,
+            9
+          ]
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "n": 25,
+        "mines": [
+          [
+            12,
+            12
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            11,
+            13
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            11
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            12,
+            10
+          ],
+          [
+            12,
+            14
+          ],
+          [
+            14,
+            12
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            12,
+            13
+          ]
+        ]
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "n": 10,
+        "mines": [
+          [
+            5,
+            5
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            9,
+            9
+          ]
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "n": 7,
+        "mines": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            3,
+            3
+          ]
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "n": 25,
+        "mines": [
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            19
+          ],
+          [
+            19,
+            5
+          ],
+          [
+            19,
+            19
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            12
+          ]
+        ]
+      },
+      "expected": 12
+    },
+    {
+      "input": {
+        "n": 7,
+        "mines": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            6,
+            2
+          ]
         ]
       },
       "expected": 2
     },
     {
       "input": {
-        "fruits": [
-          50,
-          50,
-          50,
-          50,
-          50
-        ],
-        "baskets": [
-          40,
-          40,
-          60,
-          60,
-          60
+        "n": 8,
+        "mines": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            5,
+            5
+          ]
         ]
       },
       "expected": 2
     },
     {
       "input": {
-        "fruits": [
-          1,
-          3,
-          5,
-          7,
-          9,
-          11
-        ],
-        "baskets": [
-          2,
-          4,
-          6,
-          8,
-          10,
-          12
+        "n": 7,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ]
         ]
       },
-      "expected": 0
+      "expected": 2
     },
     {
       "input": {
-        "fruits": [
-          1000000000,
-          999999999,
-          888888888,
-          777777777,
-          666666666
-        ],
-        "baskets": [
-          666666666,
-          777777777,
-          888888888,
-          999999999,
-          1000000000
+        "n": 10,
+        "mines": [
+          [
+            4,
+            4
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            4,
+            6
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            4
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            6
+          ]
         ]
       },
-      "expected": 0
+      "expected": 4
+    },
+    {
+      "input": {
+        "n": 30,
+        "mines": [
+          [
+            15,
+            15
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "expected": 14
+    },
+    {
+      "input": {
+        "n": 10,
+        "mines": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            8,
+            8
+          ]
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "n": 8,
+        "mines": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            6,
+            1
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            5,
+            5
+          ]
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "n": 300,
+        "mines": [
+          [
+            150,
+            150
+          ],
+          [
+            149,
+            149
+          ],
+          [
+            149,
+            151
+          ],
+          [
+            151,
+            149
+          ],
+          [
+            151,
+            151
+          ],
+          [
+            149,
+            150
+          ],
+          [
+            150,
+            149
+          ],
+          [
+            150,
+            151
+          ],
+          [
+            100,
+            100
+          ],
+          [
+            200,
+            200
+          ]
+        ]
+      },
+      "expected": 149
+    },
+    {
+      "input": {
+        "n": 20,
+        "mines": [
+          [
+            10,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            10,
+            9
+          ],
+          [
+            11,
+            9
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            8,
+            10
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            8,
+            12
+          ],
+          [
+            9,
+            8
+          ],
+          [
+            9,
+            12
+          ],
+          [
+            10,
+            8
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            11,
+            8
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            12,
+            8
+          ],
+          [
+            12,
+            9
+          ],
+          [
+            12,
+            10
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            7,
+            11
+          ],
+          [
+            7,
+            12
+          ],
+          [
+            7,
+            13
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            8,
+            13
+          ],
+          [
+            9,
+            7
+          ],
+          [
+            9,
+            13
+          ],
+          [
+            10,
+            7
+          ],
+          [
+            10,
+            13
+          ],
+          [
+            11,
+            7
+          ],
+          [
+            11,
+            13
+          ],
+          [
+            12,
+            7
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            7
+          ],
+          [
+            13,
+            8
+          ],
+          [
+            13,
+            9
+          ],
+          [
+            13,
+            10
+          ],
+          [
+            13,
+            11
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            13,
+            13
+          ]
+        ]
+      },
+      "expected": 7
+    },
+    {
+      "input": {
+        "n": 20,
+        "mines": [
+          [
+            10,
+            10
+          ],
+          [
+            10,
+            9
+          ],
+          [
+            10,
+            8
+          ],
+          [
+            10,
+            7
+          ],
+          [
+            10,
+            6
+          ],
+          [
+            10,
+            5
+          ],
+          [
+            10,
+            4
+          ],
+          [
+            10,
+            3
+          ],
+          [
+            10,
+            2
+          ],
+          [
+            10,
+            1
+          ],
+          [
+            10,
+            0
+          ]
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "n": 50,
+        "mines": [
+          [
+            25,
+            25
+          ],
+          [
+            25,
+            24
+          ],
+          [
+            25,
+            23
+          ],
+          [
+            25,
+            22
+          ],
+          [
+            25,
+            21
+          ],
+          [
+            25,
+            20
+          ],
+          [
+            25,
+            19
+          ],
+          [
+            25,
+            18
+          ],
+          [
+            25,
+            17
+          ],
+          [
+            25,
+            16
+          ],
+          [
+            25,
+            15
+          ],
+          [
+            25,
+            14
+          ],
+          [
+            25,
+            13
+          ],
+          [
+            25,
+            12
+          ],
+          [
+            25,
+            11
+          ],
+          [
+            25,
+            10
+          ],
+          [
+            25,
+            9
+          ],
+          [
+            25,
+            8
+          ],
+          [
+            25,
+            7
+          ],
+          [
+            25,
+            6
+          ],
+          [
+            25,
+            5
+          ],
+          [
+            25,
+            4
+          ],
+          [
+            25,
+            3
+          ],
+          [
+            25,
+            2
+          ],
+          [
+            25,
+            1
+          ],
+          [
+            25,
+            0
+          ]
+        ]
+      },
+      "expected": 24
+    },
+    {
+      "input": {
+        "n": 100,
+        "mines": [
+          [
+            49,
+            49
+          ],
+          [
+            50,
+            49
+          ],
+          [
+            51,
+            49
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            50,
+            50
+          ],
+          [
+            51,
+            50
+          ],
+          [
+            49,
+            51
+          ],
+          [
+            50,
+            51
+          ],
+          [
+            51,
+            51
+          ],
+          [
+            20,
+            20
+          ],
+          [
+            21,
+            20
+          ],
+          [
+            19,
+            20
+          ],
+          [
+            20,
+            19
+          ],
+          [
+            20,
+            21
+          ]
+        ]
+      },
+      "expected": 49
+    },
+    {
+      "input": {
+        "n": 20,
+        "mines": [
+          [
+            10,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            10,
+            9
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            9,
+            12
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            11,
+            9
+          ]
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "n": 30,
+        "mines": [
+          [
+            15,
+            14
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            14,
+            15
+          ],
+          [
+            14,
+            16
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            16,
+            15
+          ],
+          [
+            16,
+            16
+          ],
+          [
+            15,
+            0
+          ],
+          [
+            15,
+            1
+          ],
+          [
+            15,
+            29
+          ],
+          [
+            14,
+            0
+          ],
+          [
+            14,
+            1
+          ],
+          [
+            14,
+            29
+          ],
+          [
+            16,
+            0
+          ],
+          [
+            16,
+            1
+          ],
+          [
+            16,
+            29
+          ],
+          [
+            0,
+            15
+          ],
+          [
+            1,
+            15
+          ],
+          [
+            29,
+            15
+          ],
+          [
+            0,
+            14
+          ],
+          [
+            0,
+            16
+          ],
+          [
+            29,
+            14
+          ],
+          [
+            29,
+            16
+          ]
+        ]
+      },
+      "expected": 14
+    },
+    {
+      "input": {
+        "n": 50,
+        "mines": [
+          [
+            25,
+            24
+          ],
+          [
+            25,
+            25
+          ],
+          [
+            25,
+            26
+          ],
+          [
+            24,
+            24
+          ],
+          [
+            24,
+            25
+          ],
+          [
+            24,
+            26
+          ],
+          [
+            26,
+            24
+          ],
+          [
+            26,
+            25
+          ],
+          [
+            26,
+            26
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            9,
+            12
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            11,
+            12
+          ]
+        ]
+      },
+      "expected": 24
+    },
+    {
+      "input": {
+        "n": 20,
+        "mines": [
+          [
+            9,
+            9
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            10,
+            9
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            9,
+            8
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            11,
+            9
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            9,
+            7
+          ],
+          [
+            10,
+            10
+          ]
+        ]
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "n": 8,
+        "mines": [
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            3
+          ],
+          [
+            6,
+            4
+          ]
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "n": 300,
+        "mines": [
+          [
+            150,
+            150
+          ],
+          [
+            151,
+            151
+          ],
+          [
+            149,
+            149
+          ],
+          [
+            152,
+            152
+          ],
+          [
+            148,
+            148
+          ]
+        ]
+      },
+      "expected": 148
+    },
+    {
+      "input": {
+        "n": 6,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ]
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "n": 30,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            27
+          ],
+          [
+            0,
+            28
+          ],
+          [
+            0,
+            29
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            29
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            29
+          ],
+          [
+            27,
+            0
+          ],
+          [
+            27,
+            29
+          ],
+          [
+            28,
+            0
+          ],
+          [
+            28,
+            29
+          ],
+          [
+            29,
+            0
+          ],
+          [
+            29,
+            1
+          ],
+          [
+            29,
+            2
+          ],
+          [
+            29,
+            27
+          ],
+          [
+            29,
+            28
+          ],
+          [
+            29,
+            29
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            10,
+            19
+          ],
+          [
+            19,
+            10
+          ],
+          [
+            19,
+            19
+          ]
+        ]
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "n": 10,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            7
+          ],
+          [
+            0,
+            8
+          ],
+          [
+            0,
+            9
+          ]
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "n": 25,
+        "mines": [
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            7,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            15,
+            15
+          ]
+        ]
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "n": 15,
+        "mines": [
+          [
+            7,
+            7
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            7,
+            6
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            9,
+            7
+          ]
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "n": 10,
+        "mines": [
+          [
+            5,
+            5
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            0,
+            9
+          ],
+          [
+            9,
+            0
+          ]
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "n": 20,
+        "mines": [
+          [
+            10,
+            10
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            10,
+            9
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            19,
+            19
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            18,
+            18
+          ]
+        ]
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "n": 15,
+        "mines": [
+          [
+            7,
+            7
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            7,
+            6
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            8,
+            6
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            9,
+            8
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            9,
+            7
+          ]
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "n": 12,
+        "mines": [
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            7,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            11,
+            11
+          ]
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "n": 500,
+        "mines": [
+          [
+            250,
+            250
+          ],
+          [
+            251,
+            250
+          ],
+          [
+            249,
+            250
+          ],
+          [
+            250,
+            251
+          ],
+          [
+            250,
+            249
+          ]
+        ]
+      },
+      "expected": 249
+    },
+    {
+      "input": {
+        "n": 50,
+        "mines": [
+          [
+            25,
+            25
+          ],
+          [
+            24,
+            24
+          ],
+          [
+            24,
+            26
+          ],
+          [
+            26,
+            24
+          ],
+          [
+            26,
+            26
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            10,
+            39
+          ],
+          [
+            39,
+            10
+          ],
+          [
+            39,
+            39
+          ]
+        ]
+      },
+      "expected": 24
+    },
+    {
+      "input": {
+        "n": 500,
+        "mines": [
+          [
+            250,
+            250
+          ],
+          [
+            249,
+            249
+          ],
+          [
+            251,
+            251
+          ],
+          [
+            248,
+            248
+          ],
+          [
+            252,
+            252
+          ],
+          [
+            247,
+            247
+          ],
+          [
+            253,
+            253
+          ],
+          [
+            246,
+            246
+          ],
+          [
+            254,
+            254
+          ],
+          [
+            245,
+            245
+          ],
+          [
+            255,
+            255
+          ]
+        ]
+      },
+      "expected": 245
+    },
+    {
+      "input": {
+        "n": 10,
+        "mines": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            7
+          ],
+          [
+            0,
+            8
+          ],
+          [
+            0,
+            9
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            9
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            4,
+            9
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            6,
+            9
+          ],
+          [
+            7,
+            0
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            8,
+            0
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            9,
+            0
+          ],
+          [
+            9,
+            1
+          ],
+          [
+            9,
+            2
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            9,
+            4
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            9,
+            6
+          ],
+          [
+            9,
+            7
+          ],
+          [
+            9,
+            8
+          ]
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "n": 500,
+        "mines": [
+          [
+            250,
+            250
+          ],
+          [
+            250,
+            251
+          ],
+          [
+            251,
+            250
+          ],
+          [
+            251,
+            251
+          ]
+        ]
+      },
+      "expected": 250
+    },
+    {
+      "input": {
+        "n": 7,
+        "mines": [
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            5,
+            5
+          ]
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "n": 30,
+        "mines": [
+          [
+            10,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            12,
+            10
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            16,
+            15
+          ],
+          [
+            16,
+            16
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            17,
+            16
+          ],
+          [
+            17,
+            17
+          ]
+        ]
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "n": 12,
+        "mines": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            11
+          ]
+        ]
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "n": 10,
+        "mines": [
+          [
+            4,
+            5
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            1
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            4,
+            6
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            4,
+            8
+          ],
+          [
+            4,
+            9
+          ]
+        ]
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "n": 15,
+        "mines": [
+          [
+            7,
+            7
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            9,
+            7
+          ],
+          [
+            9,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            10
+          ],
+          [
+            10,
+            6
+          ],
+          [
+            10,
+            10
+          ]
+        ]
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "n": 400,
+        "mines": [
+          [
+            200,
+            200
+          ],
+          [
+            199,
+            199
+          ],
+          [
+            199,
+            201
+          ],
+          [
+            201,
+            199
+          ],
+          [
+            201,
+            201
+          ],
+          [
+            199,
+            200
+          ],
+          [
+            200,
+            199
+          ],
+          [
+            200,
+            201
+          ],
+          [
+            150,
+            150
+          ],
+          [
+            250,
+            250
+          ]
+        ]
+      },
+      "expected": 199
+    },
+    {
+      "input": {
+        "n": 8,
+        "mines": [
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            3,
+            6
+          ],
+          [
+            4,
+            6
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            6,
+            3
+          ],
+          [
+            6,
+            4
+          ],
+          [
+            6,
+            5
+          ]
+        ]
+      },
+      "expected": 2
     }
   ],
-  "test_case_count": 101,
+  "test_case_count": 91,
   "optimal_complexity": null,
-  "source_task_id": "fruits-into-baskets-iii",
-  "source_question_id": 3479
+  "source_task_id": "largest-plus-sign",
+  "source_question_id": 764
 }

@@ -1,741 +1,2322 @@
 {
   "question_id": "q_0041",
-  "title": "Lexicographically Smallest Beautiful String",
+  "title": "Count All Possible Routes",
   "difficulty": 3,
-  "topic": "Greedy",
+  "topic": "Memoization",
   "topics": [
-    "Greedy",
-    "String"
+    "Memoization",
+    "Array",
+    "Dynamic Programming"
   ],
-  "description_md": "A string is beautiful if:\n\nIt consists of the first k letters of the English lowercase alphabet.\nIt does not contain any substring of length 2 or more which is a palindrome.\n\nYou are given a beautiful string s of length n and a positive integer k.\nReturn the lexicographically smallest string of length n, which is larger than s and is beautiful. If there is no such string, return an empty string.\nA string a is lexicographically larger than a string b (of the same length) if in the first position where a and b differ, a has a character strictly larger than the corresponding character in b.\n\nFor example, \"abcd\" is lexicographically larger than \"abcc\" because the first position they differ is at the fourth character, and d is greater than c.\n\n\u00a0\nExample 1:\n\nInput: s = \"abcz\", k = 26\nOutput: \"abda\"\nExplanation: The string \"abda\" is beautiful and lexicographically larger than the string \"abcz\".\nIt can be proven that there is no string that is lexicographically larger than the string \"abcz\", beautiful, and lexicographically smaller than the string \"abda\".\n\nExample 2:\n\nInput: s = \"dc\", k = 4\nOutput: \"\"\nExplanation: It can be proven that there is no string that is lexicographically larger than the string \"dc\" and is beautiful.\n\n\u00a0\nConstraints:\n\n1 <= n == s.length <= 105\n4 <= k <= 26\ns is a beautiful string.\n\n",
-  "starter_code": "class Solution:\n    def smallestBeautifulString(self, s: str, k: int) -> str:\n        ",
-  "entry_point": "Solution().smallestBeautifulString",
-  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def smallestBeautifulString(self, s: str, k: int) -> str:\n        n = len(s)\n        cs = list(s)\n        for i in range(n - 1, -1, -1):\n            p = ord(cs[i]) - ord('a') + 1\n            for j in range(p, k):\n                c = chr(ord('a') + j)\n                if (i > 0 and cs[i - 1] == c) or (i > 1 and cs[i - 2] == c):\n                    continue\n                cs[i] = c\n                for l in range(i + 1, n):\n                    for m in range(k):\n                        c = chr(ord('a') + m)\n                        if (l > 0 and cs[l - 1] == c) or (l > 1 and cs[l - 2] == c):\n                            continue\n                        cs[l] = c\n                        break\n                return ''.join(cs)\n        return ''\n",
+  "description_md": "You are given an array of distinct positive integers locations where locations[i] represents the position of city i. You are also given integers start, finish and fuel representing the starting city, ending city, and the initial amount of fuel you have, respectively.\nAt each step, if you are at city i, you can pick any city j such that j != i and 0 <= j < locations.length and move to city j. Moving from city i to city j reduces the amount of fuel you have by |locations[i] - locations[j]|. Please notice that |x| denotes the absolute value of x.\nNotice that fuel cannot become negative at any point in time, and that you are allowed to visit any city more than once (including start and finish).\nReturn the count of all possible routes from start to finish. Since the answer may be too large, return it modulo 109 + 7.\n\u00a0\nExample 1:\n\nInput: locations = [2,3,6,8,4], start = 1, finish = 3, fuel = 5\nOutput: 4\nExplanation: The following are all possible routes, each uses 5 units of fuel:\n1 -> 3\n1 -> 2 -> 3\n1 -> 4 -> 3\n1 -> 4 -> 2 -> 3\n\nExample 2:\n\nInput: locations = [4,3,1], start = 1, finish = 0, fuel = 6\nOutput: 5\nExplanation: The following are all possible routes:\n1 -> 0, used fuel = 1\n1 -> 2 -> 0, used fuel = 5\n1 -> 2 -> 1 -> 0, used fuel = 5\n1 -> 0 -> 1 -> 0, used fuel = 3\n1 -> 0 -> 1 -> 0 -> 1 -> 0, used fuel = 5\n\nExample 3:\n\nInput: locations = [5,2,1], start = 0, finish = 2, fuel = 3\nOutput: 0\nExplanation: It is impossible to get from 0 to 2 using only 3 units of fuel since the shortest route needs 4 units of fuel.\n\n\u00a0\nConstraints:\n\n2 <= locations.length <= 100\n1 <= locations[i] <= 109\nAll integers in locations are distinct.\n0 <= start, finish < locations.length\n1 <= fuel <= 200\n\n",
+  "starter_code": "class Solution:\n    def countRoutes(self, locations: List[int], start: int, finish: int, fuel: int) -> int:\n        ",
+  "entry_point": "Solution().countRoutes",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def countRoutes(\n        self, locations: List[int], start: int, finish: int, fuel: int\n    ) -> int:\n        @cache\n        def dfs(i: int, k: int) -> int:\n            if k < abs(locations[i] - locations[finish]):\n                return 0\n            ans = int(i == finish)\n            for j, x in enumerate(locations):\n                if j != i:\n                    ans = (ans + dfs(j, k - abs(locations[i] - x))) % mod\n            return ans\n\n        mod = 10**9 + 7\n        return dfs(start, fuel)\n",
   "test_cases": [
     {
       "input": {
-        "s": "abcd",
-        "k": 5
+        "locations": [
+          4,
+          3,
+          1
+        ],
+        "start": 1,
+        "finish": 0,
+        "fuel": 6
       },
-      "expected": "abce"
+      "expected": 5
     },
     {
       "input": {
-        "s": "aabbcc",
-        "k": 6
+        "locations": [
+          1,
+          10,
+          100,
+          1000,
+          10000
+        ],
+        "start": 0,
+        "finish": 4,
+        "fuel": 5000
       },
-      "expected": "aabbcd"
+      "expected": 0
     },
     {
       "input": {
-        "s": "zyx",
-        "k": 26
+        "locations": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "start": 0,
+        "finish": 4,
+        "fuel": 10
       },
-      "expected": ""
+      "expected": 1208
     },
     {
       "input": {
-        "s": "abcz",
-        "k": 26
+        "locations": [
+          5,
+          2,
+          1
+        ],
+        "start": 0,
+        "finish": 2,
+        "fuel": 3
       },
-      "expected": "abda"
+      "expected": 0
     },
     {
       "input": {
-        "s": "aaa",
-        "k": 4
-      },
-      "expected": "aab"
-    },
-    {
-      "input": {
-        "s": "dc",
-        "k": 4
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "aab",
-        "k": 3
-      },
-      "expected": "aac"
-    },
-    {
-      "input": {
-        "s": "abcd",
-        "k": 4
-      },
-      "expected": "abda"
-    },
-    {
-      "input": {
-        "s": "xyz",
-        "k": 26
-      },
-      "expected": "xza"
-    },
-    {
-      "input": {
-        "s": "zyx",
-        "k": 3
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "aabb",
-        "k": 4
-      },
-      "expected": "aabc"
-    },
-    {
-      "input": {
-        "s": "azzzz",
-        "k": 26
-      },
-      "expected": "bacba"
-    },
-    {
-      "input": {
-        "s": "abcabcabcabc",
-        "k": 3
-      },
-      "expected": "acbacbacbacb"
-    },
-    {
-      "input": {
-        "s": "abcabca",
-        "k": 26
-      },
-      "expected": "abcabcd"
-    },
-    {
-      "input": {
-        "s": "aabababa",
-        "k": 6
-      },
-      "expected": "aabababc"
-    },
-    {
-      "input": {
-        "s": "zzzzz",
-        "k": 26
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "abcabcabcabc",
-        "k": 26
-      },
-      "expected": "abcabcabcabd"
-    },
-    {
-      "input": {
-        "s": "zyxzyxzyxzyx",
-        "k": 26
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "wxyz",
-        "k": 26
-      },
-      "expected": "wxza"
-    },
-    {
-      "input": {
-        "s": "zzzzzzzzzz",
-        "k": 26
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "mnopqrstuvw",
-        "k": 21
-      },
-      "expected": "mnopqrsuabc"
-    },
-    {
-      "input": {
-        "s": "zyxwvutsr",
-        "k": 19
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "abcdefg",
-        "k": 7
-      },
-      "expected": "abcdega"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnop",
-        "k": 26
-      },
-      "expected": "abcdefghijklmnoq"
-    },
-    {
-      "input": {
-        "s": "mnopqr",
-        "k": 18
-      },
-      "expected": "mnopra"
-    },
-    {
-      "input": {
-        "s": "lkjihgf",
-        "k": 12
-      },
-      "expected": "lkjihgi"
-    },
-    {
-      "input": {
-        "s": "abcabc",
-        "k": 3
-      },
-      "expected": "acbacb"
-    },
-    {
-      "input": {
-        "s": "abcdefghij",
-        "k": 10
-      },
-      "expected": "abcdefghja"
-    },
-    {
-      "input": {
-        "s": "aabccba",
-        "k": 15
-      },
-      "expected": "aabccbd"
-    },
-    {
-      "input": {
-        "s": "mnbvcxzlkjhgfdsapoiuytrewq",
-        "k": 26
-      },
-      "expected": "mnbvcxzlkjhgfdsapoiuytrewr"
-    },
-    {
-      "input": {
-        "s": "ababababababab",
-        "k": 3
-      },
-      "expected": "ababababababac"
-    },
-    {
-      "input": {
-        "s": "abcabcabcabcabc",
-        "k": 3
-      },
-      "expected": "acbacbacbacbacb"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuvwxyza",
-        "k": 26
-      },
-      "expected": "abcdefghijklmnopqrstuvwxyzb"
-    },
-    {
-      "input": {
-        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
-        "k": 20
-      },
-      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrstabcabcabcabcab"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuv",
-        "k": 21
-      },
-      "expected": "abcdefghijklmnopqrsuab"
-    },
-    {
-      "input": {
-        "s": "zzzzzz",
-        "k": 4
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
-        "k": 26
-      },
-      "expected": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyzab"
-    },
-    {
-      "input": {
-        "s": "abcdabcd",
-        "k": 4
-      },
-      "expected": "abcdabda"
-    },
-    {
-      "input": {
-        "s": "zzzzzzzzzzzzzzzzzzzzzzzz",
-        "k": 26
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "abcaabcd",
-        "k": 26
-      },
-      "expected": "abcaabce"
-    },
-    {
-      "input": {
-        "s": "mnopqrlmno",
-        "k": 14
-      },
-      "expected": "mnopqrlnab"
-    },
-    {
-      "input": {
-        "s": "abcdcba",
-        "k": 10
-      },
-      "expected": "abcdcbd"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuvwxzz",
-        "k": 26
-      },
-      "expected": "abcdefghijklmnopqrstuvwyab"
-    },
-    {
-      "input": {
-        "s": "abcdefghijk",
-        "k": 12
-      },
-      "expected": "abcdefghijl"
-    },
-    {
-      "input": {
-        "s": "abcdefghijk",
-        "k": 11
-      },
-      "expected": "abcdefghika"
-    },
-    {
-      "input": {
-        "s": "abba",
-        "k": 26
-      },
-      "expected": "abbc"
-    },
-    {
-      "input": {
-        "s": "abababababab",
-        "k": 26
-      },
-      "expected": "abababababac"
-    },
-    {
-      "input": {
-        "s": "aaaabbbbccccdddd",
-        "k": 26
-      },
-      "expected": "aaaabbbbccccddde"
-    },
-    {
-      "input": {
-        "s": "abcabcabc",
-        "k": 3
-      },
-      "expected": "acbacbacb"
-    },
-    {
-      "input": {
-        "s": "abcdcba",
-        "k": 26
-      },
-      "expected": "abcdcbd"
-    },
-    {
-      "input": {
-        "s": "abcdexyz",
-        "k": 26
-      },
-      "expected": "abcdexza"
-    },
-    {
-      "input": {
-        "s": "pqrs",
-        "k": 18
-      },
-      "expected": "prab"
-    },
-    {
-      "input": {
-        "s": "qwertyuiopasdfghjklzxcvbnm",
-        "k": 26
-      },
-      "expected": "qwertyuiopasdfghjklzxcvbno"
-    },
-    {
-      "input": {
-        "s": "xyzabc",
-        "k": 26
-      },
-      "expected": "xyzabd"
-    },
-    {
-      "input": {
-        "s": "abacabadabacaba",
-        "k": 26
-      },
-      "expected": "abacabadabacabc"
-    },
-    {
-      "input": {
-        "s": "aabbccdd",
-        "k": 6
-      },
-      "expected": "aabbccde"
-    },
-    {
-      "input": {
-        "s": "zzzz",
-        "k": 4
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "aabbaabbaabb",
-        "k": 6
-      },
-      "expected": "aabbaabbaabc"
-    },
-    {
-      "input": {
-        "s": "abcde",
-        "k": 5
-      },
-      "expected": "abcea"
-    },
-    {
-      "input": {
-        "s": "mnopqrstuvw",
-        "k": 22
-      },
-      "expected": "mnopqrstvab"
-    },
-    {
-      "input": {
-        "s": "abcdexyzabcd",
-        "k": 26
-      },
-      "expected": "abcdexyzabce"
-    },
-    {
-      "input": {
-        "s": "abacabacabacaba",
-        "k": 3
-      },
-      "expected": "abacabacabacabc"
-    },
-    {
-      "input": {
-        "s": "abacabadabc",
-        "k": 26
-      },
-      "expected": "abacabadabd"
-    },
-    {
-      "input": {
-        "s": "xyzxyzxyzxyz",
-        "k": 26
-      },
-      "expected": "xzabcabcabca"
-    },
-    {
-      "input": {
-        "s": "abcbabcba",
-        "k": 3
-      },
-      "expected": "abcbacbac"
-    },
-    {
-      "input": {
-        "s": "abcdefghij",
-        "k": 26
-      },
-      "expected": "abcdefghik"
-    },
-    {
-      "input": {
-        "s": "abac",
-        "k": 4
-      },
-      "expected": "abad"
-    },
-    {
-      "input": {
-        "s": "abcabcabc",
-        "k": 26
-      },
-      "expected": "abcabcabd"
-    },
-    {
-      "input": {
-        "s": "abcba",
-        "k": 3
-      },
-      "expected": "acbac"
-    },
-    {
-      "input": {
-        "s": "abcdefghi",
-        "k": 10
-      },
-      "expected": "abcdefghj"
-    },
-    {
-      "input": {
-        "s": "aabbaa",
-        "k": 6
-      },
-      "expected": "aabbac"
-    },
-    {
-      "input": {
-        "s": "abcdefghi",
-        "k": 9
-      },
-      "expected": "abcdefgia"
-    },
-    {
-      "input": {
-        "s": "zyxcba",
-        "k": 6
-      },
-      "expected": "zyxcbd"
-    },
-    {
-      "input": {
-        "s": "mnopqrstuvwxyzz",
-        "k": 26
-      },
-      "expected": "mnopqrstuvwxzab"
-    },
-    {
-      "input": {
-        "s": "zzzzzzzzz",
-        "k": 26
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "aabbccddeeffgg",
-        "k": 6
-      },
-      "expected": "aabbccddefabca"
-    },
-    {
-      "input": {
-        "s": "abacabadabacaba",
-        "k": 15
-      },
-      "expected": "abacabadabacabc"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnopqrstuvwxy",
-        "k": 26
-      },
-      "expected": "abcdefghijklmnopqrstuvwxz"
-    },
-    {
-      "input": {
-        "s": "abcdabc",
-        "k": 26
-      },
-      "expected": "abcdabd"
-    },
-    {
-      "input": {
-        "s": "fedcba",
-        "k": 6
-      },
-      "expected": "fedcbd"
-    },
-    {
-      "input": {
-        "s": "aabbccddeeffgg",
-        "k": 10
-      },
-      "expected": "aabbccddeeffgh"
-    },
-    {
-      "input": {
-        "s": "mnopqrstu",
-        "k": 20
-      },
-      "expected": "mnopqrtab"
-    },
-    {
-      "input": {
-        "s": "abcdefg",
-        "k": 8
-      },
-      "expected": "abcdefh"
-    },
-    {
-      "input": {
-        "s": "abababababab",
-        "k": 2
-      },
-      "expected": "baababababab"
-    },
-    {
-      "input": {
-        "s": "abcddcba",
-        "k": 20
-      },
-      "expected": "abcddcbd"
-    },
-    {
-      "input": {
-        "s": "abacaba",
-        "k": 7
-      },
-      "expected": "abacabc"
-    },
-    {
-      "input": {
-        "s": "abacabadabacaba",
-        "k": 3
-      },
-      "expected": "abacabadabacabc"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnop",
-        "k": 20
-      },
-      "expected": "abcdefghijklmnoq"
-    },
-    {
-      "input": {
-        "s": "aabababacababaca",
-        "k": 26
-      },
-      "expected": "aabababacababacb"
-    },
-    {
-      "input": {
-        "s": "zzyyxxwwvvuuttssrrqqppoonnmmllkkjjiihhaaggeeffddccbb",
-        "k": 26
-      },
-      "expected": "zzyyxxwwvvuuttssrrqqppoonnmmllkkjjiihhaaggeeffddccbd"
-    },
-    {
-      "input": {
-        "s": "abacabad",
-        "k": 4
-      },
-      "expected": "abacabca"
-    },
-    {
-      "input": {
-        "s": "acb",
-        "k": 3
-      },
-      "expected": "bac"
-    },
-    {
-      "input": {
-        "s": "zyxzyxzyx",
-        "k": 26
-      },
-      "expected": ""
-    },
-    {
-      "input": {
-        "s": "aabbccddeeff",
-        "k": 26
-      },
-      "expected": "aabbccddeefg"
-    },
-    {
-      "input": {
-        "s": "abcbac",
-        "k": 26
-      },
-      "expected": "abcbad"
-    },
-    {
-      "input": {
-        "s": "abcdefghijklmnop",
-        "k": 16
-      },
-      "expected": "abcdefghijklmnpa"
-    },
-    {
-      "input": {
-        "s": "abcabcabcabc",
-        "k": 6
-      },
-      "expected": "abcabcabcabd"
-    },
-    {
-      "input": {
-        "s": "abacaba",
-        "k": 26
-      },
-      "expected": "abacabc"
-    },
-    {
-      "input": {
-        "s": "abacbacbac",
-        "k": 5
-      },
-      "expected": "abacbacbad"
-    },
-    {
-      "input": {
-        "s": "abcdcba",
-        "k": 5
-      },
-      "expected": "abcdcbd"
-    },
-    {
-      "input": {
-        "s": "abcdefgabcdefg",
-        "k": 26
-      },
-      "expected": "abcdefgabcdefh"
-    },
-    {
-      "input": {
-        "s": "abcdabcdabcd",
-        "k": 4
-      },
-      "expected": "abcdabcdabda"
-    },
-    {
-      "input": {
-        "s": "zyxwvutsrqponmlkjihgfedcba",
-        "k": 26
-      },
-      "expected": "zyxwvutsrqponmlkjihgfedcbd"
+        "locations": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "start": 0,
+        "finish": 3,
+        "fuel": 50
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "locations": [
+          2,
+          3,
+          6,
+          8,
+          4
+        ],
+        "start": 1,
+        "finish": 3,
+        "fuel": 5
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          2,
+          3
+        ],
+        "start": 0,
+        "finish": 2,
+        "fuel": 3
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "start": 0,
+        "finish": 4,
+        "fuel": 100
+      },
+      "expected": 1208
+    },
+    {
+      "input": {
+        "locations": [
+          2,
+          8,
+          14,
+          20,
+          26,
+          32,
+          38,
+          44,
+          50,
+          56,
+          62
+        ],
+        "start": 2,
+        "finish": 9,
+        "fuel": 100
+      },
+      "expected": 549504
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90
+        ],
+        "start": 3,
+        "finish": 8,
+        "fuel": 150
+      },
+      "expected": 461824
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          25,
+          40,
+          55,
+          70,
+          85,
+          100,
+          115,
+          130,
+          145,
+          160,
+          175,
+          190
+        ],
+        "start": 0,
+        "finish": 12,
+        "fuel": 300
+      },
+      "expected": 23453696
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100
+        ],
+        "start": 20,
+        "finish": 0,
+        "fuel": 300
+      },
+      "expected": 984041497
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          25,
+          35,
+          45,
+          55
+        ],
+        "start": 0,
+        "finish": 4,
+        "fuel": 80
+      },
+      "expected": 40
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          15,
+          25,
+          35,
+          45,
+          55,
+          65,
+          75,
+          85,
+          95
+        ],
+        "start": 4,
+        "finish": 0,
+        "fuel": 150
+      },
+      "expected": 179664
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          6,
+          8,
+          9,
+          11,
+          12,
+          14,
+          15,
+          17,
+          18
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 20
+      },
+      "expected": 28672
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45
+        ],
+        "start": 0,
+        "finish": 8,
+        "fuel": 120
+      },
+      "expected": 838699257
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          5,
+          9,
+          12,
+          18,
+          23
+        ],
+        "start": 0,
+        "finish": 5,
+        "fuel": 40
+      },
+      "expected": 464
+    },
+    {
+      "input": {
+        "locations": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          350,
+          400,
+          450,
+          500,
+          550
+        ],
+        "start": 1,
+        "finish": 9,
+        "fuel": 1000
+      },
+      "expected": 78931328
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 100
+      },
+      "expected": 11616768
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "start": 0,
+        "finish": 6,
+        "fuel": 15
+      },
+      "expected": 32
+    },
+    {
+      "input": {
+        "locations": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000,
+          1100,
+          1200,
+          1300,
+          1400,
+          1500,
+          1600,
+          1700,
+          1800,
+          1900,
+          2000
+        ],
+        "start": 15,
+        "finish": 0,
+        "fuel": 2500
+      },
+      "expected": 886790116
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 20
+      },
+      "expected": 256
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150
+        ],
+        "start": 0,
+        "finish": 14,
+        "fuel": 150
+      },
+      "expected": 8192
+    },
+    {
+      "input": {
+        "locations": [
+          3,
+          6,
+          9,
+          12,
+          15,
+          18,
+          21,
+          24,
+          27,
+          30,
+          33,
+          36,
+          39,
+          42,
+          45,
+          48,
+          51,
+          54,
+          57,
+          60
+        ],
+        "start": 0,
+        "finish": 19,
+        "fuel": 150
+      },
+      "expected": 505021546
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          10,
+          100,
+          1000,
+          10000,
+          100000,
+          1000000
+        ],
+        "start": 0,
+        "finish": 6,
+        "fuel": 1000000
+      },
+      "expected": 32
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "start": 0,
+        "finish": 19,
+        "fuel": 1000
+      },
+      "expected": 762710068
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80
+        ],
+        "start": 2,
+        "finish": 5,
+        "fuel": 100
+      },
+      "expected": 1952
+    },
+    {
+      "input": {
+        "locations": [
+          3,
+          7,
+          12,
+          18,
+          23,
+          29,
+          34,
+          39,
+          44
+        ],
+        "start": 1,
+        "finish": 8,
+        "fuel": 100
+      },
+      "expected": 11186944
+    },
+    {
+      "input": {
+        "locations": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 1000
+      },
+      "expected": 256
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "start": 0,
+        "finish": 19,
+        "fuel": 200
+      },
+      "expected": 262144
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60,
+          65,
+          70
+        ],
+        "start": 6,
+        "finish": 11,
+        "fuel": 200
+      },
+      "expected": 460940892
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15
+        ],
+        "start": 7,
+        "finish": 0,
+        "fuel": 15
+      },
+      "expected": 64
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          20,
+          15,
+          40,
+          25,
+          35,
+          10
+        ],
+        "start": 2,
+        "finish": 6,
+        "fuel": 80
+      },
+      "expected": 225320
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "start": 0,
+        "finish": 19,
+        "fuel": 1800
+      },
+      "expected": 387985368
+    },
+    {
+      "input": {
+        "locations": [
+          2,
+          15,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100
+        ],
+        "start": 1,
+        "finish": 17,
+        "fuel": 100
+      },
+      "expected": 524288
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200,
+          210,
+          220,
+          230,
+          240,
+          250,
+          260,
+          270,
+          280,
+          290,
+          300,
+          310,
+          320,
+          330,
+          340,
+          350,
+          360,
+          370,
+          380,
+          390,
+          400,
+          410,
+          420,
+          430,
+          440,
+          450,
+          460,
+          470,
+          480,
+          490,
+          500
+        ],
+        "start": 49,
+        "finish": 0,
+        "fuel": 2000
+      },
+      "expected": 430143451
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100
+        ],
+        "start": 9,
+        "finish": 18,
+        "fuel": 300
+      },
+      "expected": 279596282
+    },
+    {
+      "input": {
+        "locations": [
+          100,
+          200,
+          300,
+          400,
+          500
+        ],
+        "start": 1,
+        "finish": 3,
+        "fuel": 600
+      },
+      "expected": 76
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          5,
+          10,
+          15,
+          20,
+          25,
+          30
+        ],
+        "start": 0,
+        "finish": 6,
+        "fuel": 40
+      },
+      "expected": 224
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 150
+      },
+      "expected": 892249801
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          30,
+          50,
+          70,
+          90,
+          110,
+          130,
+          150,
+          170,
+          190,
+          210,
+          230,
+          250,
+          270,
+          290,
+          310,
+          330,
+          350,
+          370,
+          390,
+          410,
+          430,
+          450,
+          470,
+          490
+        ],
+        "start": 0,
+        "finish": 24,
+        "fuel": 1200
+      },
+      "expected": 765380918
+    },
+    {
+      "input": {
+        "locations": [
+          7,
+          15,
+          22,
+          30,
+          35,
+          40,
+          45
+        ],
+        "start": 1,
+        "finish": 4,
+        "fuel": 70
+      },
+      "expected": 12736
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "start": 10,
+        "finish": 19,
+        "fuel": 150
+      },
+      "expected": 290816
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 25
+      },
+      "expected": 563971037
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          30,
+          50,
+          70,
+          90,
+          110,
+          130,
+          150,
+          170,
+          190,
+          210,
+          230,
+          250,
+          270,
+          290,
+          310,
+          330,
+          350,
+          370,
+          390,
+          410,
+          430,
+          450,
+          470,
+          490
+        ],
+        "start": 0,
+        "finish": 24,
+        "fuel": 1500
+      },
+      "expected": 191567701
+    },
+    {
+      "input": {
+        "locations": [
+          8,
+          16,
+          24,
+          32,
+          40,
+          48,
+          56,
+          64,
+          72,
+          80
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 150
+      },
+      "expected": 1469184
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "start": 1,
+        "finish": 13,
+        "fuel": 40
+      },
+      "expected": 344143577
+    },
+    {
+      "input": {
+        "locations": [
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20,
+          22,
+          24,
+          26,
+          28,
+          30
+        ],
+        "start": 1,
+        "finish": 13,
+        "fuel": 100
+      },
+      "expected": 569120129
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "start": 9,
+        "finish": 10,
+        "fuel": 50
+      },
+      "expected": 43
+    },
+    {
+      "input": {
+        "locations": [
+          2,
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ],
+        "start": 4,
+        "finish": 9,
+        "fuel": 1023
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          5,
+          10,
+          15,
+          20,
+          25,
+          30
+        ],
+        "start": 0,
+        "finish": 6,
+        "fuel": 30
+      },
+      "expected": 32
+    },
+    {
+      "input": {
+        "locations": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 500
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "start": 5,
+        "finish": 9,
+        "fuel": 150
+      },
+      "expected": 179664
+    },
+    {
+      "input": {
+        "locations": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000,
+          1100,
+          1200,
+          1300,
+          1400,
+          1500,
+          1600,
+          1700,
+          1800,
+          1900,
+          2000
+        ],
+        "start": 0,
+        "finish": 19,
+        "fuel": 9900
+      },
+      "expected": 762710068
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "start": 29,
+        "finish": 0,
+        "fuel": 50
+      },
+      "expected": 593376807
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19
+        ],
+        "start": 1,
+        "finish": 8,
+        "fuel": 15
+      },
+      "expected": 64
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          8,
+          12,
+          18,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60
+        ],
+        "start": 11,
+        "finish": 0,
+        "fuel": 100
+      },
+      "expected": 15490048
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110
+        ],
+        "start": 5,
+        "finish": 10,
+        "fuel": 150
+      },
+      "expected": 500736
+    },
+    {
+      "input": {
+        "locations": [
+          1000,
+          1005,
+          1010,
+          1015,
+          1020,
+          1025,
+          1030,
+          1035,
+          1040,
+          1045,
+          1050,
+          1055,
+          1060,
+          1065,
+          1070,
+          1075,
+          1080,
+          1085,
+          1090,
+          1095,
+          1100
+        ],
+        "start": 10,
+        "finish": 20,
+        "fuel": 600
+      },
+      "expected": 512001622
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "start": 0,
+        "finish": 20,
+        "fuel": 300
+      },
+      "expected": 652750206
+    },
+    {
+      "input": {
+        "locations": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800
+        ],
+        "start": 1,
+        "finish": 7,
+        "fuel": 1500
+      },
+      "expected": 116544
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "start": 15,
+        "finish": 0,
+        "fuel": 100
+      },
+      "expected": 802029339
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          25,
+          40,
+          55,
+          70,
+          85,
+          100,
+          115,
+          130,
+          145
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 500
+      },
+      "expected": 216449452
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          5,
+          10,
+          20,
+          30,
+          40
+        ],
+        "start": 0,
+        "finish": 5,
+        "fuel": 60
+      },
+      "expected": 208
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200,
+          210,
+          220,
+          230,
+          240,
+          250,
+          260,
+          270,
+          280,
+          290,
+          300
+        ],
+        "start": 0,
+        "finish": 29,
+        "fuel": 300
+      },
+      "expected": 268435456
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          15,
+          25,
+          35,
+          45,
+          55,
+          65,
+          75,
+          85,
+          95,
+          105,
+          115,
+          125,
+          135,
+          145,
+          155
+        ],
+        "start": 7,
+        "finish": 15,
+        "fuel": 300
+      },
+      "expected": 343225957
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "start": 0,
+        "finish": 20,
+        "fuel": 190
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          2,
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024,
+          2048,
+          4096,
+          8192,
+          16384,
+          32768,
+          65536,
+          131072,
+          262144,
+          524288
+        ],
+        "start": 0,
+        "finish": 19,
+        "fuel": 524288
+      },
+      "expected": 262144
+    },
+    {
+      "input": {
+        "locations": [
+          2,
+          3,
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          29,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61,
+          67,
+          71,
+          73,
+          79,
+          83,
+          89,
+          97
+        ],
+        "start": 10,
+        "finish": 0,
+        "fuel": 150
+      },
+      "expected": 759294305
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          3,
+          6,
+          10,
+          15,
+          21,
+          28,
+          36,
+          45,
+          55,
+          66,
+          78,
+          91,
+          105,
+          120,
+          136,
+          153,
+          171,
+          190,
+          210
+        ],
+        "start": 19,
+        "finish": 0,
+        "fuel": 210
+      },
+      "expected": 262144
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100,
+          105,
+          110,
+          115,
+          120,
+          125,
+          130,
+          135,
+          140,
+          145,
+          150,
+          155,
+          160,
+          165,
+          170,
+          175,
+          180,
+          185,
+          190,
+          195,
+          200
+        ],
+        "start": 0,
+        "finish": 39,
+        "fuel": 500
+      },
+      "expected": 319204339
+    },
+    {
+      "input": {
+        "locations": [
+          3,
+          7,
+          15,
+          31,
+          63,
+          127,
+          255,
+          511,
+          1023,
+          2047,
+          4095,
+          8191,
+          16383,
+          32767,
+          65535,
+          131071,
+          262143,
+          524287,
+          1048575,
+          2097151
+        ],
+        "start": 0,
+        "finish": 19,
+        "fuel": 2097150
+      },
+      "expected": 262144
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19
+        ],
+        "start": 4,
+        "finish": 8,
+        "fuel": 30
+      },
+      "expected": 277680
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140
+        ],
+        "start": 0,
+        "finish": 14,
+        "fuel": 500
+      },
+      "expected": 6482820
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100,
+          105,
+          110,
+          115,
+          120,
+          125,
+          130,
+          135,
+          140,
+          145,
+          150
+        ],
+        "start": 0,
+        "finish": 29,
+        "fuel": 150
+      },
+      "expected": 268435456
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          5,
+          10,
+          15,
+          20,
+          25
+        ],
+        "start": 0,
+        "finish": 5,
+        "fuel": 40
+      },
+      "expected": 112
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          2,
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024,
+          2048,
+          4096,
+          8192,
+          16384,
+          32768,
+          65536,
+          131072,
+          262144,
+          524288
+        ],
+        "start": 0,
+        "finish": 19,
+        "fuel": 524287
+      },
+      "expected": 262144
+    },
+    {
+      "input": {
+        "locations": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600
+        ],
+        "start": 0,
+        "finish": 5,
+        "fuel": 1500
+      },
+      "expected": 149696
+    },
+    {
+      "input": {
+        "locations": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150
+        ],
+        "start": 7,
+        "finish": 14,
+        "fuel": 120
+      },
+      "expected": 5760
+    },
+    {
+      "input": {
+        "locations": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 1500
+      },
+      "expected": 183296
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          5,
+          10,
+          20,
+          50,
+          100,
+          200,
+          500,
+          1000,
+          2000
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 3000
+      },
+      "expected": 149308961
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          15,
+          25,
+          35,
+          45,
+          55,
+          65
+        ],
+        "start": 0,
+        "finish": 6,
+        "fuel": 150
+      },
+      "expected": 71872
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50
+        ],
+        "start": 9,
+        "finish": 0,
+        "fuel": 100
+      },
+      "expected": 11616768
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "start": 0,
+        "finish": 19,
+        "fuel": 18
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "locations": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600
+        ],
+        "start": 5,
+        "finish": 0,
+        "fuel": 1500
+      },
+      "expected": 149696
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60
+        ],
+        "start": 0,
+        "finish": 11,
+        "fuel": 100
+      },
+      "expected": 9483264
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "start": 0,
+        "finish": 6,
+        "fuel": 20
+      },
+      "expected": 1536
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          15,
+          25,
+          35,
+          45,
+          55,
+          65,
+          75,
+          85,
+          95
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 100
+      },
+      "expected": 256
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30
+        ],
+        "start": 0,
+        "finish": 5,
+        "fuel": 50
+      },
+      "expected": 592
+    },
+    {
+      "input": {
+        "locations": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000
+        ],
+        "start": 0,
+        "finish": 9,
+        "fuel": 1800
+      },
+      "expected": 1469184
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "start": 0,
+        "finish": 29,
+        "fuel": 150
+      },
+      "expected": 996660885
+    },
+    {
+      "input": {
+        "locations": [
+          5,
+          15,
+          25,
+          35,
+          45,
+          55,
+          65,
+          75,
+          85,
+          95,
+          105,
+          115,
+          125,
+          135,
+          145,
+          155,
+          165,
+          175,
+          185,
+          195,
+          205,
+          215,
+          225,
+          235,
+          245,
+          255,
+          265,
+          275,
+          285,
+          295
+        ],
+        "start": 29,
+        "finish": 0,
+        "fuel": 1500
+      },
+      "expected": 996660885
+    },
+    {
+      "input": {
+        "locations": [
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20,
+          22,
+          24,
+          26,
+          28,
+          30,
+          32,
+          34,
+          36,
+          38,
+          40
+        ],
+        "start": 10,
+        "finish": 0,
+        "fuel": 50
+      },
+      "expected": 636086244
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "start": 0,
+        "finish": 14,
+        "fuel": 50
+      },
+      "expected": 928900893
+    },
+    {
+      "input": {
+        "locations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "start": 0,
+        "finish": 19,
+        "fuel": 190
+      },
+      "expected": 533148385
+    },
+    {
+      "input": {
+        "locations": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900
+        ],
+        "start": 0,
+        "finish": 8,
+        "fuel": 2000
+      },
+      "expected": 32131968
     }
   ],
-  "test_case_count": 103,
+  "test_case_count": 96,
   "optimal_complexity": null,
-  "source_task_id": "lexicographically-smallest-beautiful-string",
-  "source_question_id": 2663
+  "source_task_id": "count-all-possible-routes",
+  "source_question_id": 1575
 }

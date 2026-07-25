@@ -1,1367 +1,313 @@
 {
   "question_id": "q_0008",
-  "title": "Positions Of Large Groups",
+  "title": "Perfect Number",
   "difficulty": 1,
-  "topic": "String",
+  "topic": "Math",
   "topics": [
-    "String"
+    "Math"
   ],
-  "description_md": "In a string s\u00a0of lowercase letters, these letters form consecutive groups of the same character.\nFor example, a string like s = \"abbxxxxzyy\" has the groups \"a\", \"bb\", \"xxxx\", \"z\", and\u00a0\"yy\".\nA group is identified by an interval\u00a0[start, end], where\u00a0start\u00a0and\u00a0end\u00a0denote the start and end\u00a0indices (inclusive) of the group. In the above example,\u00a0\"xxxx\"\u00a0has the interval\u00a0[3,6].\nA group is considered\u00a0large\u00a0if it has 3 or more characters.\nReturn\u00a0the intervals of every large group sorted in\u00a0increasing order by start index.\n\u00a0\nExample 1:\n\nInput: s = \"abbxxxxzzy\"\nOutput: [[3,6]]\nExplanation: \"xxxx\" is the only large group with start index 3 and end index 6.\n\nExample 2:\n\nInput: s = \"abc\"\nOutput: []\nExplanation: We have groups \"a\", \"b\", and \"c\", none of which are large groups.\n\nExample 3:\n\nInput: s = \"abcdddeeeeaabbbcd\"\nOutput: [[3,5],[6,9],[12,14]]\nExplanation: The large groups are \"ddd\", \"eeee\", and \"bbb\".\n\n\u00a0\nConstraints:\n\n1 <= s.length <= 1000\ns contains lowercase English letters only.\n\n",
-  "starter_code": "class Solution:\n    def largeGroupPositions(self, s: str) -> List[List[int]]:\n        ",
-  "entry_point": "Solution().largeGroupPositions",
-  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def largeGroupPositions(self, s: str) -> List[List[int]]:\n        i, n = 0, len(s)\n        ans = []\n        while i < n:\n            j = i\n            while j < n and s[j] == s[i]:\n                j += 1\n            if j - i >= 3:\n                ans.append([i, j - 1])\n            i = j\n        return ans\n",
+  "description_md": "A perfect number is a positive integer that is equal to the sum of its positive divisors, excluding the number itself. A divisor of an integer x is an integer that can divide x evenly.\nGiven an integer n, return true if n is a perfect number, otherwise return false.\n\u00a0\nExample 1:\n\nInput: num = 28\nOutput: true\nExplanation: 28 = 1 + 2 + 4 + 7 + 14\n1, 2, 4, 7, and 14 are all divisors of 28.\n\nExample 2:\n\nInput: num = 7\nOutput: false\n\n\u00a0\nConstraints:\n\n1 <= num <= 108\n\n",
+  "starter_code": "class Solution:\n    def checkPerfectNumber(self, num: int) -> bool:\n        ",
+  "entry_point": "Solution().checkPerfectNumber",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def checkPerfectNumber(self, num: int) -> bool:\n        if num == 1:\n            return False\n        s, i = 1, 2\n        while i <= num // i:\n            if num % i == 0:\n                s += i\n                if i != num // i:\n                    s += num // i\n            i += 1\n        return s == num\n",
   "test_cases": [
     {
       "input": {
-        "s": "aabbbccccdddd"
+        "num": 8128
       },
-      "expected": [
-        [
-          2,
-          4
-        ],
-        [
-          5,
-          8
-        ],
-        [
-          9,
-          12
-        ]
-      ]
+      "expected": true
     },
     {
       "input": {
-        "s": "aabbbccccddeee"
+        "num": 10
       },
-      "expected": [
-        [
-          2,
-          4
-        ],
-        [
-          5,
-          8
-        ],
-        [
-          11,
-          13
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "abcdefghijk"
+        "num": 100000000
       },
-      "expected": []
+      "expected": false
     },
     {
       "input": {
-        "s": "aabbaa"
+        "num": 28
       },
-      "expected": []
+      "expected": true
     },
     {
       "input": {
-        "s": "aabbccccaaaabbccccaaaabbcccc"
+        "num": 12
       },
-      "expected": [
-        [
-          4,
-          7
-        ],
-        [
-          8,
-          11
-        ],
-        [
-          14,
-          17
-        ],
-        [
-          18,
-          21
-        ],
-        [
-          24,
-          27
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "a"
+        "num": 7
       },
-      "expected": []
+      "expected": false
     },
     {
       "input": {
-        "s": "abbxxxxzzy"
+        "num": 6
       },
-      "expected": [
-        [
-          3,
-          6
-        ]
-      ]
+      "expected": true
     },
     {
       "input": {
-        "s": "zzzzyyyyy"
+        "num": 33550336
       },
-      "expected": [
-        [
-          0,
-          3
-        ],
-        [
-          4,
-          8
-        ]
-      ]
+      "expected": true
     },
     {
       "input": {
-        "s": "aa"
+        "num": 27
       },
-      "expected": []
+      "expected": false
     },
     {
       "input": {
-        "s": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+        "num": 1
       },
-      "expected": [
-        [
-          0,
-          69
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aaa"
+        "num": 100
       },
-      "expected": [
-        [
-          0,
-          2
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "pppppqqqppppppqqqqqqqqq"
+        "num": 496
       },
-      "expected": [
-        [
-          0,
-          4
-        ],
-        [
-          5,
-          7
-        ],
-        [
-          8,
-          13
-        ],
-        [
-          14,
-          22
-        ]
-      ]
+      "expected": true
     },
     {
       "input": {
-        "s": "zzzzzzzzzz"
+        "num": 99999999
       },
-      "expected": [
-        [
-          0,
-          9
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aabbccddeeeeffffgggghhhhiiiijjjjkkkkllllmmmmnnnnooopppqqqrrrsttuuvvvwwwwxxxxyyyyzzzz"
+        "num": 1046527
       },
-      "expected": [
-        [
-          8,
-          11
-        ],
-        [
-          12,
-          15
-        ],
-        [
-          16,
-          19
-        ],
-        [
-          20,
-          23
-        ],
-        [
-          24,
-          27
-        ],
-        [
-          28,
-          31
-        ],
-        [
-          32,
-          35
-        ],
-        [
-          36,
-          39
-        ],
-        [
-          40,
-          43
-        ],
-        [
-          44,
-          47
-        ],
-        [
-          48,
-          50
-        ],
-        [
-          51,
-          53
-        ],
-        [
-          54,
-          56
-        ],
-        [
-          57,
-          59
-        ],
-        [
-          65,
-          67
-        ],
-        [
-          68,
-          71
-        ],
-        [
-          72,
-          75
-        ],
-        [
-          76,
-          79
-        ],
-        [
-          80,
-          83
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "abc"
+        "num": 1234567
       },
-      "expected": []
+      "expected": false
     },
     {
       "input": {
-        "s": "abcd"
+        "num": 99999998
       },
-      "expected": []
+      "expected": false
     },
     {
       "input": {
-        "s": "aabbbccddddeeeee"
+        "num": 10000000
       },
-      "expected": [
-        [
-          2,
-          4
-        ],
-        [
-          7,
-          10
-        ],
-        [
-          11,
-          15
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aaabaaa"
+        "num": 56949850
       },
-      "expected": [
-        [
-          0,
-          2
-        ],
-        [
-          4,
-          6
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "abcdddeeeeaabbbcd"
+        "num": 81284288
       },
-      "expected": [
-        [
-          3,
-          5
-        ],
-        [
-          6,
-          9
-        ],
-        [
-          12,
-          14
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "zzzzz"
+        "num": 37
       },
-      "expected": [
-        [
-          0,
-          4
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aabbccddeee"
+        "num": 82589933
       },
-      "expected": [
-        [
-          8,
-          10
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aaabbbcccddd"
+        "num": 672280688
       },
-      "expected": [
-        [
-          0,
-          2
-        ],
-        [
-          3,
-          5
-        ],
-        [
-          6,
-          8
-        ],
-        [
-          9,
-          11
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aaaaabbbbbcccccc"
+        "num": 2096128
       },
-      "expected": [
-        [
-          0,
-          4
-        ],
-        [
-          5,
-          9
-        ],
-        [
-          10,
-          15
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aabbcccddd"
+        "num": 67891011
       },
-      "expected": [
-        [
-          4,
-          6
-        ],
-        [
-          7,
-          9
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aabbccddeeffgggghhiijjjkkkllmmnnnooopppqqqqrrrrssss"
+        "num": 32766
       },
-      "expected": [
-        [
-          12,
-          15
-        ],
-        [
-          20,
-          22
-        ],
-        [
-          23,
-          25
-        ],
-        [
-          30,
-          32
-        ],
-        [
-          33,
-          35
-        ],
-        [
-          36,
-          38
-        ],
-        [
-          39,
-          42
-        ],
-        [
-          43,
-          46
-        ],
-        [
-          47,
-          50
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "zzzzzzyyyyaaaabbcccc"
+        "num": 496000
       },
-      "expected": [
-        [
-          0,
-          5
-        ],
-        [
-          6,
-          9
-        ],
-        [
-          10,
-          13
-        ],
-        [
-          16,
-          19
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc"
+        "num": 96141120
       },
-      "expected": []
+      "expected": false
     },
     {
       "input": {
-        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzzzzzzzzzz"
+        "num": 11111111
       },
-      "expected": [
-        [
-          50,
-          59
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+        "num": 497
       },
-      "expected": [
-        [
-          0,
-          101
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "xyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyz"
+        "num": 987654321
       },
-      "expected": []
+      "expected": false
     },
     {
       "input": {
-        "s": "aabbccccddeeeffffggggghhhhhiiiiijjjjjjkkkklllllmmmmmnnooooppppqqqqrrrrssssttttuuuuvvvvwwwwxxxyyyyzzzz"
+        "num": 33550337
       },
-      "expected": [
-        [
-          4,
-          7
-        ],
-        [
-          10,
-          12
-        ],
-        [
-          13,
-          16
-        ],
-        [
-          17,
-          21
-        ],
-        [
-          22,
-          26
-        ],
-        [
-          27,
-          31
-        ],
-        [
-          32,
-          37
-        ],
-        [
-          38,
-          41
-        ],
-        [
-          42,
-          46
-        ],
-        [
-          47,
-          51
-        ],
-        [
-          54,
-          57
-        ],
-        [
-          58,
-          61
-        ],
-        [
-          62,
-          65
-        ],
-        [
-          66,
-          69
-        ],
-        [
-          70,
-          73
-        ],
-        [
-          74,
-          77
-        ],
-        [
-          78,
-          81
-        ],
-        [
-          82,
-          85
-        ],
-        [
-          86,
-          89
-        ],
-        [
-          90,
-          92
-        ],
-        [
-          93,
-          96
-        ],
-        [
-          97,
-          100
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "ababababababababababababababababababababababababababababababababababababababababababab"
+        "num": 1048576
       },
-      "expected": []
+      "expected": false
     },
     {
       "input": {
-        "s": "zzzzzyyyyyxxxxwwwwvvvvuuuuttttsrrrqqqpooooonnnnmmmmmlllllkkkkjjjjjiiiihhhhhgggggfffffeeee"
+        "num": 2
       },
-      "expected": [
-        [
-          0,
-          4
-        ],
-        [
-          5,
-          9
-        ],
-        [
-          10,
-          13
-        ],
-        [
-          14,
-          17
-        ],
-        [
-          18,
-          21
-        ],
-        [
-          22,
-          25
-        ],
-        [
-          26,
-          29
-        ],
-        [
-          31,
-          33
-        ],
-        [
-          34,
-          36
-        ],
-        [
-          38,
-          42
-        ],
-        [
-          43,
-          46
-        ],
-        [
-          47,
-          51
-        ],
-        [
-          52,
-          56
-        ],
-        [
-          57,
-          60
-        ],
-        [
-          61,
-          65
-        ],
-        [
-          66,
-          69
-        ],
-        [
-          70,
-          74
-        ],
-        [
-          75,
-          79
-        ],
-        [
-          80,
-          84
-        ],
-        [
-          85,
-          88
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aabcccccaaaaabbbcccc"
+        "num": 495
       },
-      "expected": [
-        [
-          3,
-          7
-        ],
-        [
-          8,
-          12
-        ],
-        [
-          13,
-          15
-        ],
-        [
-          16,
-          19
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "abcdefghijkllllmnopqrstuvwxyz"
+        "num": 2147483647
       },
-      "expected": [
-        [
-          11,
-          14
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "abcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaaaa"
+        "num": 4690
       },
-      "expected": [
-        [
-          51,
-          54
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        "num": 8128000
       },
-      "expected": [
-        [
-          0,
-          84
-        ],
-        [
-          85,
-          166
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aaaaaaabbbbbcccccdddddeeeeeeaaaaaaaaabbbbcccccddeeeeefffff"
+        "num": 100000
       },
-      "expected": [
-        [
-          0,
-          6
-        ],
-        [
-          7,
-          11
-        ],
-        [
-          12,
-          16
-        ],
-        [
-          17,
-          21
-        ],
-        [
-          22,
-          27
-        ],
-        [
-          28,
-          36
-        ],
-        [
-          37,
-          40
-        ],
-        [
-          41,
-          45
-        ],
-        [
-          48,
-          52
-        ],
-        [
-          53,
-          57
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "abccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccd"
+        "num": 1073741823
       },
-      "expected": [
-        [
-          2,
-          65
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "tttttttttttttttttttttttttttttttttttttt"
+        "num": 600851475143
       },
-      "expected": [
-        [
-          0,
-          37
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aabbccddeeeffffggggghhhhhiiiiijjjjjj"
+        "num": 672
       },
-      "expected": [
-        [
-          8,
-          10
-        ],
-        [
-          11,
-          14
-        ],
-        [
-          15,
-          19
-        ],
-        [
-          20,
-          24
-        ],
-        [
-          25,
-          29
-        ],
-        [
-          30,
-          35
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "xyzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+        "num": 50000000
       },
-      "expected": [
-        [
-          2,
-          47
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aabbccccddeeeffffggggghhhhhiiiiijjjjjjkkkklllllmmmmmnnooooppppqqqqrrrrssssttttuuuuvvvvwwwwxxxyyyyzzzzz"
+        "num": 67229820
       },
-      "expected": [
-        [
-          4,
-          7
-        ],
-        [
-          10,
-          12
-        ],
-        [
-          13,
-          16
-        ],
-        [
-          17,
-          21
-        ],
-        [
-          22,
-          26
-        ],
-        [
-          27,
-          31
-        ],
-        [
-          32,
-          37
-        ],
-        [
-          38,
-          41
-        ],
-        [
-          42,
-          46
-        ],
-        [
-          47,
-          51
-        ],
-        [
-          54,
-          57
-        ],
-        [
-          58,
-          61
-        ],
-        [
-          62,
-          65
-        ],
-        [
-          66,
-          69
-        ],
-        [
-          70,
-          73
-        ],
-        [
-          74,
-          77
-        ],
-        [
-          78,
-          81
-        ],
-        [
-          82,
-          85
-        ],
-        [
-          86,
-          89
-        ],
-        [
-          90,
-          92
-        ],
-        [
-          93,
-          96
-        ],
-        [
-          97,
-          101
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "abcdefghiiiiijkllllmmnopqqqrrr"
+        "num": 56456456
       },
-      "expected": [
-        [
-          8,
-          12
-        ],
-        [
-          15,
-          18
-        ],
-        [
-          24,
-          26
-        ],
-        [
-          27,
-          29
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "abcdefghijklmnopqrstuvwwxyzzaaabbbccc"
+        "num": 98304
       },
-      "expected": [
-        [
-          28,
-          30
-        ],
-        [
-          31,
-          33
-        ],
-        [
-          34,
-          36
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "kkkkkklllllmmmmmnnnnnoooooopppppqqqqqqrrrrrssssstttttuuuuuvvvvvwwwwwxxyyyyyzzzzz"
+        "num": 1073741824
       },
-      "expected": [
-        [
-          0,
-          5
-        ],
-        [
-          6,
-          10
-        ],
-        [
-          11,
-          15
-        ],
-        [
-          16,
-          20
-        ],
-        [
-          21,
-          26
-        ],
-        [
-          27,
-          31
-        ],
-        [
-          32,
-          37
-        ],
-        [
-          38,
-          42
-        ],
-        [
-          43,
-          47
-        ],
-        [
-          48,
-          52
-        ],
-        [
-          53,
-          57
-        ],
-        [
-          58,
-          62
-        ],
-        [
-          63,
-          67
-        ],
-        [
-          70,
-          74
-        ],
-        [
-          75,
-          79
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aabbccccddddeeeffffffgggghhhiiiiijjjkkllmmnnnooppqqrrssttuuvvwxxxwwvvuuttssrrqponmlkjihgfedcba"
+        "num": 98765432
       },
-      "expected": [
-        [
-          4,
-          7
-        ],
-        [
-          8,
-          11
-        ],
-        [
-          12,
-          14
-        ],
-        [
-          15,
-          20
-        ],
-        [
-          21,
-          24
-        ],
-        [
-          25,
-          27
-        ],
-        [
-          28,
-          32
-        ],
-        [
-          33,
-          35
-        ],
-        [
-          42,
-          44
-        ],
-        [
-          62,
-          64
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "aaaaabbbbccccdddd"
+        "num": 10000
       },
-      "expected": [
-        [
-          0,
-          4
-        ],
-        [
-          5,
-          8
-        ],
-        [
-          9,
-          12
-        ],
-        [
-          13,
-          16
-        ]
-      ]
+      "expected": false
     },
     {
       "input": {
-        "s": "ppppqqqqrrrsssttttuuuuvvvvwxxx"
+        "num": 119439360
       },
-      "expected": [
-        [
-          0,
-          3
-        ],
-        [
-          4,
-          7
-        ],
-        [
-          8,
-          10
-        ],
-        [
-          11,
-          13
-        ],
-        [
-          14,
-          17
-        ],
-        [
-          18,
-          21
-        ],
-        [
-          22,
-          25
-        ],
-        [
-          27,
-          29
-        ]
-      ]
-    },
-    {
-      "input": {
-        "s": "aaaaaaaaaabbbbbbbbbbbbbbccccccccccccccccccccccccdddddddddddddddddddddddddddddddddddddeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefffffffffffffffggggggggggggggggg"
-      },
-      "expected": [
-        [
-          0,
-          9
-        ],
-        [
-          10,
-          23
-        ],
-        [
-          24,
-          47
-        ],
-        [
-          48,
-          84
-        ],
-        [
-          85,
-          116
-        ],
-        [
-          117,
-          131
-        ],
-        [
-          132,
-          148
-        ]
-      ]
-    },
-    {
-      "input": {
-        "s": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnmmmm"
-      },
-      "expected": [
-        [
-          0,
-          47
-        ],
-        [
-          48,
-          51
-        ]
-      ]
-    },
-    {
-      "input": {
-        "s": "xyzzyxwwwwwzzzzzz"
-      },
-      "expected": [
-        [
-          6,
-          10
-        ],
-        [
-          11,
-          16
-        ]
-      ]
-    },
-    {
-      "input": {
-        "s": "aabbccddeeffggccddeeffggccddeeffggccddeeffggccddeeffgg"
-      },
-      "expected": []
-    },
-    {
-      "input": {
-        "s": "aaabbbcccddddeeefff ggghhhhiiiiijjjjkkkkllllmmmmnnnnooopppqqqqrrrrssttttuuuuvvvvwwwwxxxxxyyyyyzzzzz"
-      },
-      "expected": [
-        [
-          0,
-          2
-        ],
-        [
-          3,
-          5
-        ],
-        [
-          6,
-          8
-        ],
-        [
-          9,
-          12
-        ],
-        [
-          13,
-          15
-        ],
-        [
-          16,
-          18
-        ],
-        [
-          20,
-          22
-        ],
-        [
-          23,
-          26
-        ],
-        [
-          27,
-          31
-        ],
-        [
-          32,
-          35
-        ],
-        [
-          36,
-          39
-        ],
-        [
-          40,
-          43
-        ],
-        [
-          44,
-          47
-        ],
-        [
-          48,
-          51
-        ],
-        [
-          52,
-          54
-        ],
-        [
-          55,
-          57
-        ],
-        [
-          58,
-          61
-        ],
-        [
-          62,
-          65
-        ],
-        [
-          68,
-          71
-        ],
-        [
-          72,
-          75
-        ],
-        [
-          76,
-          79
-        ],
-        [
-          80,
-          83
-        ],
-        [
-          84,
-          88
-        ],
-        [
-          89,
-          93
-        ],
-        [
-          94,
-          98
-        ]
-      ]
+      "expected": false
     }
   ],
-  "test_case_count": 54,
+  "test_case_count": 49,
   "optimal_complexity": null,
-  "source_task_id": "positions-of-large-groups",
-  "source_question_id": 830
+  "source_task_id": "perfect-number",
+  "source_question_id": 507
 }
