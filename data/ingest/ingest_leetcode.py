@@ -214,8 +214,14 @@ def main():
     print(f"Loaded {len(df)} total problems across all splits.")
 
     if args.debug_row is not None:
-        print(json.dumps(df.iloc[args.debug_row].to_dict(), indent=2, default=str))
-        return
+        if args.debug_row is not None:
+            row = df.iloc[args.debug_row]
+            print(json.dumps(row.to_dict(), indent=2, default=str))
+            print("\n--- PARSED ---")
+            print("tags:", parse_tags(row.get("tags")))
+            print("is_single_function_entry:", is_single_function_entry(row))
+            print("test_cases[0]:", parse_test_cases(row)[0] if parse_test_cases(row) else "EMPTY")
+            return
 
     keep = filter_keep_pile(df)
     print(
