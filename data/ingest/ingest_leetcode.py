@@ -137,25 +137,26 @@ def _parse_kwargs(input_str: str) -> dict:
     tree = ast.parse(f"f({input_str})", mode="eval")
     return {kw.arg: ast.literal_eval(kw.value) for kw in tree.body.keywords}
 
+def _parse_expected(output_str: str):
+    """Most `output` values are valid Python literals (numbers, lists,
+    None), but string-returning problems store a bare, unquoted word
+    (e.g. `leetcode` instead of `'leetcode'`). Fall back to treating it
+    as a raw string when literal_eval can't parse it as-is."""
+    try:
+        return ast.literal_eval(output_str)
+    except (ValueError, SyntaxError):
+        return output_str
+
 
 def parse_test_cases(row) -> list:
-    """Normalize input_output into [{"input": {...}, "expected": ...}, ...].
-
-    After `.to_pandas()`, `input_output` comes through as a numpy array of
-    dicts (not the JSON string we originally assumed) — each dict has
-    'input' and 'output' as string values that still need their own parse
-    pass. Kept a string-fallback path too, in case a different split or a
-    future dataset version serializes it differently.
-    """
     raw = row.get("input_output")
     if raw is None:
         return []
 
-    if hasattr(raw, "tolist"):  # numpy array -> list of dicts
+    if hasattr(raw, "tolist"):
         raw = raw.tolist()
 
     if isinstance(raw, str):
-        # Fallback: numpy-print style string, missing commas between entries.
         fixed = re.sub(r"}\s*\n\s*{", "}, {", raw)
         try:
             raw = ast.literal_eval(fixed)
@@ -167,13 +168,21 @@ def parse_test_cases(row) -> list:
 
     cases = []
     for item in raw:
+        output_str = item.get("output", "")
+        # Some rows capture an execution error from a broken auto-generated
+        # case (e.g. mismatched indices) instead of a real expected value.
+        # There's no sound way to test against "should raise this exact
+        # error string" — skip these.
+        if isinstance(output_str, str) and output_str.startswith("Error:"):
+            continue
         try:
             args = _parse_kwargs(item.get("input", ""))
-            expected = ast.literal_eval(item.get("output", ""))
+            expected = _parse_expected(output_str)
         except (ValueError, SyntaxError, AttributeError):
             continue
         cases.append({"input": args, "expected": expected})
     return cases
+
 
 def parse_tags(tags_raw) -> list:
     """Normalize the dataset's `tags` field into a clean list of strings.
@@ -230,6 +239,7 @@ def main():
         help="Print the raw dict for this row index of the RAW (pre-filter) "
         "dataframe and exit. Use this first to check real field shapes.",
     )
+    parser.add_argument("--debug-task-id", type=str, default=None)
     args = parser.parse_args()
 
     print("Loading newfacade/LeetCodeDataset from Hugging Face...")
@@ -237,15 +247,24 @@ def main():
     print(f"Loaded {len(df)} total problems across all splits.")
 
     if args.debug_row is not None:
-        if args.debug_row is not None:
-            row = df.iloc[args.debug_row]
-            print(json.dumps(row.to_dict(), indent=2, default=str))
-            print("\n--- PARSED ---")
-            print("tags:", parse_tags(row.get("tags")))
-            print("is_single_function_entry:", is_single_function_entry(row))
-            print("test_cases[0]:", parse_test_cases(row)[0] if parse_test_cases(row) else "EMPTY")
+        row = df.iloc[args.debug_row]
+        print(json.dumps(row.to_dict(), indent=2, default=str))
+        print("\n--- PARSED ---")
+        print("tags:", parse_tags(row.get("tags")))
+        print("is_single_function_entry:", is_single_function_entry(row))
+        print("test_cases[0]:", parse_test_cases(row)[0] if parse_test_cases(row) else "EMPTY")
+        return
+    elif args.debug_task_id is not None:
+        matches = df[df["task_id"] == args.debug_task_id]
+        if matches.empty:
+            print(f"No row found with task_id={args.debug_task_id!r}", file=sys.stderr)
             return
-
+        row = matches.iloc[0]
+        print("input_output (raw):")
+        print(row.get("input_output"))
+        print("\nparsed test_cases:", parse_test_cases(row))
+        print("has_usable_tests:", has_usable_tests(row))
+        return
     keep = filter_keep_pile(df)
     print(
         f"Keep-pile after filtering: {len(keep)} problems "

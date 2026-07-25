@@ -23,6 +23,23 @@ REQUIRED_FIELDS = {
 
 VALID_DIFFICULTIES = {0, 1, 2, 3}
 
+def _starter_code_parses(code: str) -> bool:
+    """starter_code is intentionally left with an empty function body for
+    students to fill in — append a synthetic pass at one indent level
+    deeper than the last line, just to catch genuine syntax errors
+    (mismatched brackets etc.) without penalizing the expected empty body."""
+    stripped = (code or "").rstrip()
+    if not stripped:
+        return False
+    last_line = stripped.splitlines()[-1]
+    indent = len(last_line) - len(last_line.lstrip(" "))
+    candidate = stripped + "\n" + " " * (indent + 4) + "pass\n"
+    try:
+        ast.parse(candidate)
+        return True
+    except SyntaxError:
+        return False
+
 
 def validate_file(path: Path) -> list:
     """Return a list of error strings; empty list means the file is clean."""
@@ -43,10 +60,8 @@ def validate_file(path: Path) -> list:
         errors.append(f"{path.name}: empty entry_point")
 
     starter = data.get("starter_code", "")
-    try:
-        ast.parse(starter)
-    except SyntaxError as e:
-        errors.append(f"{path.name}: starter_code does not parse ({e})")
+    if not _starter_code_parses(starter):
+        errors.append(f"{path.name}: starter_code does not parse")
 
     solution = data.get("reference_solution", "")
     try:
