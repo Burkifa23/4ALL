@@ -1,0 +1,749 @@
+{
+  "question_id": "q_0047",
+  "title": "Find The Number Of Possible Ways For An Event",
+  "difficulty": 3,
+  "topic": "Math",
+  "topics": [
+    "Math",
+    "Dynamic Programming",
+    "Combinatorics"
+  ],
+  "description_md": "You are given three integers n, x, and y.\nAn event is being held for n performers. When a performer arrives, they are assigned to one of the x stages. All performers assigned to the same stage will perform together as a band, though some stages might remain empty.\nAfter all performances are completed, the jury will award each band a score in the range [1, y].\nReturn the total number of possible ways the event can take place.\nSince the answer may be very large, return it modulo 109 + 7.\nNote that two events are considered to have been held differently if either of the following conditions is satisfied:\n\nAny performer is assigned a different stage.\nAny band is awarded a different score.\n\n\u00a0\nExample 1:\n\nInput: n = 1, x = 2, y = 3\nOutput: 6\nExplanation:\n\nThere are 2 ways to assign a stage to the performer.\nThe jury can award a score of either 1, 2, or 3 to the only band.\n\n\nExample 2:\n\nInput: n = 5, x = 2, y = 1\nOutput: 32\nExplanation:\n\nEach performer will be assigned either stage 1 or stage 2.\nAll bands will be awarded a score of 1.\n\n\nExample 3:\n\nInput: n = 3, x = 3, y = 4\nOutput: 684\n\n\u00a0\nConstraints:\n\n1 <= n, x, y <= 1000\n\n",
+  "starter_code": "class Solution:\n    def numberOfWays(self, n: int, x: int, y: int) -> int:\n        ",
+  "entry_point": "Solution().numberOfWays",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def numberOfWays(self, n: int, x: int, y: int) -> int:\n        mod = 10**9 + 7\n        f = [[0] * (x + 1) for _ in range(n + 1)]\n        f[0][0] = 1\n        for i in range(1, n + 1):\n            for j in range(1, x + 1):\n                f[i][j] = (f[i - 1][j] * j + f[i - 1][j - 1] * (x - (j - 1))) % mod\n        ans, p = 0, 1\n        for j in range(1, x + 1):\n            p = p * y % mod\n            ans = (ans + f[n][j] * p) % mod\n        return ans\n",
+  "test_cases": [
+    {
+      "input": {
+        "n": 500,
+        "x": 250,
+        "y": 250
+      },
+      "expected": 604049962
+    },
+    {
+      "input": {
+        "n": 6,
+        "x": 6,
+        "y": 6
+      },
+      "expected": 150265836
+    },
+    {
+      "input": {
+        "n": 4,
+        "x": 2,
+        "y": 4
+      },
+      "expected": 232
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 5,
+        "y": 20
+      },
+      "expected": 955685646
+    },
+    {
+      "input": {
+        "n": 100,
+        "x": 10,
+        "y": 10
+      },
+      "expected": 757713628
+    },
+    {
+      "input": {
+        "n": 1,
+        "x": 2,
+        "y": 3
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "n": 1000,
+        "x": 1000,
+        "y": 1000
+      },
+      "expected": 295964505
+    },
+    {
+      "input": {
+        "n": 5,
+        "x": 2,
+        "y": 1
+      },
+      "expected": 32
+    },
+    {
+      "input": {
+        "n": 1,
+        "x": 1,
+        "y": 1
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "n": 7,
+        "x": 4,
+        "y": 3
+      },
+      "expected": 882264
+    },
+    {
+      "input": {
+        "n": 10,
+        "x": 10,
+        "y": 1
+      },
+      "expected": 999999937
+    },
+    {
+      "input": {
+        "n": 7,
+        "x": 1,
+        "y": 10
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "n": 2,
+        "x": 3,
+        "y": 2
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "n": 100,
+        "x": 10,
+        "y": 100
+      },
+      "expected": 273493465
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 500,
+        "y": 1
+      },
+      "expected": 742761597
+    },
+    {
+      "input": {
+        "n": 10,
+        "x": 5,
+        "y": 5
+      },
+      "expected": 574980399
+    },
+    {
+      "input": {
+        "n": 10,
+        "x": 5,
+        "y": 10
+      },
+      "expected": 786818193
+    },
+    {
+      "input": {
+        "n": 2,
+        "x": 2,
+        "y": 2
+      },
+      "expected": 12
+    },
+    {
+      "input": {
+        "n": 3,
+        "x": 3,
+        "y": 4
+      },
+      "expected": 684
+    },
+    {
+      "input": {
+        "n": 2,
+        "x": 4,
+        "y": 3
+      },
+      "expected": 120
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 20,
+        "y": 30
+      },
+      "expected": 969962044
+    },
+    {
+      "input": {
+        "n": 7,
+        "x": 3,
+        "y": 2
+      },
+      "expected": 15966
+    },
+    {
+      "input": {
+        "n": 1000,
+        "x": 100,
+        "y": 100
+      },
+      "expected": 31082313
+    },
+    {
+      "input": {
+        "n": 999,
+        "x": 1000,
+        "y": 999
+      },
+      "expected": 529470001
+    },
+    {
+      "input": {
+        "n": 300,
+        "x": 100,
+        "y": 200
+      },
+      "expected": 920174716
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 700,
+        "y": 300
+      },
+      "expected": 848923924
+    },
+    {
+      "input": {
+        "n": 2,
+        "x": 2,
+        "y": 1000
+      },
+      "expected": 2002000
+    },
+    {
+      "input": {
+        "n": 100,
+        "x": 100,
+        "y": 100
+      },
+      "expected": 169878723
+    },
+    {
+      "input": {
+        "n": 1000,
+        "x": 10,
+        "y": 100
+      },
+      "expected": 639122056
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 500,
+        "y": 10
+      },
+      "expected": 945662039
+    },
+    {
+      "input": {
+        "n": 600,
+        "x": 300,
+        "y": 300
+      },
+      "expected": 952131693
+    },
+    {
+      "input": {
+        "n": 800,
+        "x": 25,
+        "y": 25
+      },
+      "expected": 241877807
+    },
+    {
+      "input": {
+        "n": 750,
+        "x": 25,
+        "y": 35
+      },
+      "expected": 837224424
+    },
+    {
+      "input": {
+        "n": 100,
+        "x": 50,
+        "y": 50
+      },
+      "expected": 54657599
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 500,
+        "y": 500
+      },
+      "expected": 295516381
+    },
+    {
+      "input": {
+        "n": 250,
+        "x": 5,
+        "y": 200
+      },
+      "expected": 919377263
+    },
+    {
+      "input": {
+        "n": 999,
+        "x": 999,
+        "y": 999
+      },
+      "expected": 490429319
+    },
+    {
+      "input": {
+        "n": 999,
+        "x": 1000,
+        "y": 1000
+      },
+      "expected": 78742301
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 1000,
+        "y": 1000
+      },
+      "expected": 736888411
+    },
+    {
+      "input": {
+        "n": 1000,
+        "x": 10,
+        "y": 10
+      },
+      "expected": 187897528
+    },
+    {
+      "input": {
+        "n": 999,
+        "x": 999,
+        "y": 1
+      },
+      "expected": 760074701
+    },
+    {
+      "input": {
+        "n": 400,
+        "x": 400,
+        "y": 2
+      },
+      "expected": 877938741
+    },
+    {
+      "input": {
+        "n": 100,
+        "x": 100,
+        "y": 1
+      },
+      "expected": 424090053
+    },
+    {
+      "input": {
+        "n": 750,
+        "x": 30,
+        "y": 40
+      },
+      "expected": 725279144
+    },
+    {
+      "input": {
+        "n": 300,
+        "x": 200,
+        "y": 150
+      },
+      "expected": 446039088
+    },
+    {
+      "input": {
+        "n": 1000,
+        "x": 1,
+        "y": 1000
+      },
+      "expected": 1000
+    },
+    {
+      "input": {
+        "n": 600,
+        "x": 50,
+        "y": 100
+      },
+      "expected": 201548400
+    },
+    {
+      "input": {
+        "n": 750,
+        "x": 500,
+        "y": 250
+      },
+      "expected": 201743686
+    },
+    {
+      "input": {
+        "n": 20,
+        "x": 10,
+        "y": 10
+      },
+      "expected": 250624124
+    },
+    {
+      "input": {
+        "n": 750,
+        "x": 250,
+        "y": 350
+      },
+      "expected": 298617350
+    },
+    {
+      "input": {
+        "n": 800,
+        "x": 2,
+        "y": 3
+      },
+      "expected": 105983888
+    },
+    {
+      "input": {
+        "n": 450,
+        "x": 150,
+        "y": 200
+      },
+      "expected": 836208120
+    },
+    {
+      "input": {
+        "n": 999,
+        "x": 999,
+        "y": 1000
+      },
+      "expected": 759466025
+    },
+    {
+      "input": {
+        "n": 1000,
+        "x": 500,
+        "y": 500
+      },
+      "expected": 754687589
+    },
+    {
+      "input": {
+        "n": 600,
+        "x": 3,
+        "y": 500
+      },
+      "expected": 507224996
+    },
+    {
+      "input": {
+        "n": 250,
+        "x": 250,
+        "y": 250
+      },
+      "expected": 37703966
+    },
+    {
+      "input": {
+        "n": 200,
+        "x": 1000,
+        "y": 1
+      },
+      "expected": 500816181
+    },
+    {
+      "input": {
+        "n": 200,
+        "x": 100,
+        "y": 1
+      },
+      "expected": 794576212
+    },
+    {
+      "input": {
+        "n": 10,
+        "x": 1,
+        "y": 1000
+      },
+      "expected": 1000
+    },
+    {
+      "input": {
+        "n": 400,
+        "x": 40,
+        "y": 40
+      },
+      "expected": 130346951
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 3,
+        "y": 5
+      },
+      "expected": 954723270
+    },
+    {
+      "input": {
+        "n": 1000,
+        "x": 50,
+        "y": 50
+      },
+      "expected": 429860379
+    },
+    {
+      "input": {
+        "n": 300,
+        "x": 2,
+        "y": 100
+      },
+      "expected": 507547660
+    },
+    {
+      "input": {
+        "n": 600,
+        "x": 300,
+        "y": 400
+      },
+      "expected": 520792267
+    },
+    {
+      "input": {
+        "n": 1,
+        "x": 1000,
+        "y": 1000
+      },
+      "expected": 1000000
+    },
+    {
+      "input": {
+        "n": 750,
+        "x": 250,
+        "y": 500
+      },
+      "expected": 534179249
+    },
+    {
+      "input": {
+        "n": 10,
+        "x": 50,
+        "y": 100
+      },
+      "expected": 512711582
+    },
+    {
+      "input": {
+        "n": 10,
+        "x": 100,
+        "y": 50
+      },
+      "expected": 634873075
+    },
+    {
+      "input": {
+        "n": 50,
+        "x": 5,
+        "y": 10
+      },
+      "expected": 182572441
+    },
+    {
+      "input": {
+        "n": 750,
+        "x": 200,
+        "y": 300
+      },
+      "expected": 719876888
+    },
+    {
+      "input": {
+        "n": 550,
+        "x": 100,
+        "y": 100
+      },
+      "expected": 128555335
+    },
+    {
+      "input": {
+        "n": 50,
+        "x": 10,
+        "y": 20
+      },
+      "expected": 139021947
+    },
+    {
+      "input": {
+        "n": 1000,
+        "x": 200,
+        "y": 200
+      },
+      "expected": 985949432
+    },
+    {
+      "input": {
+        "n": 800,
+        "x": 200,
+        "y": 200
+      },
+      "expected": 116750119
+    },
+    {
+      "input": {
+        "n": 50,
+        "x": 10,
+        "y": 5
+      },
+      "expected": 722025534
+    },
+    {
+      "input": {
+        "n": 800,
+        "x": 800,
+        "y": 2
+      },
+      "expected": 34432269
+    },
+    {
+      "input": {
+        "n": 999,
+        "x": 1,
+        "y": 999
+      },
+      "expected": 999
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 10,
+        "y": 100
+      },
+      "expected": 266610171
+    },
+    {
+      "input": {
+        "n": 1000,
+        "x": 1000,
+        "y": 1
+      },
+      "expected": 524700271
+    },
+    {
+      "input": {
+        "n": 800,
+        "x": 250,
+        "y": 250
+      },
+      "expected": 375598308
+    },
+    {
+      "input": {
+        "n": 200,
+        "x": 300,
+        "y": 100
+      },
+      "expected": 159926237
+    },
+    {
+      "input": {
+        "n": 700,
+        "x": 7,
+        "y": 7
+      },
+      "expected": 275200648
+    },
+    {
+      "input": {
+        "n": 999,
+        "x": 500,
+        "y": 500
+      },
+      "expected": 547290861
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 50,
+        "y": 50
+      },
+      "expected": 25088782
+    },
+    {
+      "input": {
+        "n": 900,
+        "x": 50,
+        "y": 50
+      },
+      "expected": 414449887
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 300,
+        "y": 700
+      },
+      "expected": 800306839
+    },
+    {
+      "input": {
+        "n": 2,
+        "x": 1000,
+        "y": 2
+      },
+      "expected": 3998000
+    },
+    {
+      "input": {
+        "n": 300,
+        "x": 1,
+        "y": 1000
+      },
+      "expected": 1000
+    },
+    {
+      "input": {
+        "n": 600,
+        "x": 100,
+        "y": 100
+      },
+      "expected": 172044181
+    },
+    {
+      "input": {
+        "n": 1000,
+        "x": 2,
+        "y": 2
+      },
+      "expected": 753692822
+    },
+    {
+      "input": {
+        "n": 500,
+        "x": 1,
+        "y": 1000
+      },
+      "expected": 1000
+    }
+  ],
+  "test_case_count": 91,
+  "optimal_complexity": null,
+  "source_task_id": "find-the-number-of-possible-ways-for-an-event",
+  "source_question_id": 3317
+}

@@ -1,0 +1,770 @@
+{
+  "question_id": "q_0012",
+  "title": "Valid Anagram",
+  "difficulty": 1,
+  "topic": "Hash Table",
+  "topics": [
+    "Hash Table",
+    "String",
+    "Sorting"
+  ],
+  "description_md": "Given two strings s and t, return true if t is an anagram of s, and false otherwise.\n\u00a0\nExample 1:\n\nInput: s = \"anagram\", t = \"nagaram\"\nOutput: true\n\nExample 2:\n\nInput: s = \"rat\", t = \"car\"\nOutput: false\n\n\u00a0\nConstraints:\n\n1 <= s.length, t.length <= 5 * 104\ns and t consist of lowercase English letters.\n\n\u00a0\nFollow up: What if the inputs contain Unicode characters? How would you adapt your solution to such a case?\n",
+  "starter_code": "class Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        ",
+  "entry_point": "Solution().isAnagram",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        if len(s) != len(t):\n            return False\n        cnt = Counter(s)\n        for c in t:\n            cnt[c] -= 1\n            if cnt[c] < 0:\n                return False\n        return True\n",
+  "test_cases": [
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxyz",
+        "t": "zyxwvutsrqponmlkjihgfedcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "abcde",
+        "t": "edcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "abc",
+        "t": "abcd"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "apple",
+        "t": "pale"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "hello",
+        "t": "bello"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "aacc",
+        "t": "ccac"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "abc",
+        "t": "def"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "abc",
+        "t": "cba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "abcd",
+        "t": "abce"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "anagram",
+        "t": "nagaram"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "rat",
+        "t": "car"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "a",
+        "t": "a"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "ab",
+        "t": "ba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "listen",
+        "t": "silent"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "abcd",
+        "t": "dcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "triangle",
+        "t": "integral"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aabbcc",
+        "t": "abcabc"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "",
+        "t": ""
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "ababababababababab",
+        "t": "bababababababababa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "hello world",
+        "t": "worldhello"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "theeyes",
+        "t": "theysee"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "repeatedcharactershere",
+        "t": "repeatedcharactershere"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "ababababab",
+        "t": "bababababa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "t": "zzxxyywwvvuuttssrrqqppoonnmmllkkjjiihhggffeeddccbbaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "the quick brown fox",
+        "t": "xof nworb kciuq eht"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "astronomer",
+        "t": "moonstarer"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "thisisananagram",
+        "t": "isanagramthis"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "spaces should be ignored",
+        "t": "should be ignored spaces"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aabbcc",
+        "t": "ccbbaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "special!@#$%^&*()characters",
+        "t": "characters)!@#$%^&*()special"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "aaaabbbbccccddddeeeeffffgggghhhhiiiijjjjkkkkllllmmmmnnnnooooppppqqqqrrrrssssttttuuuuvvvvwwwwxxxxyyyyzzzz",
+        "t": "zzzzyyyxxxwwwwvvvvuuuuttttssssrrrrqqqqppppooooonnnnmmmmllllkkkkjjjjiiiigggghhhhffffffeeeeeeeeddccccbbbbaaaa"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "anagram",
+        "t": "nagarams"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "dormitory",
+        "t": "dirtyroom"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "1234567890",
+        "t": "0987654321"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "anananana",
+        "t": "naanaanna"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "",
+        "t": "a"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "thisisanagramtest",
+        "t": "agamnartisiesttst"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "hello world",
+        "t": "world hello"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "a gentleman",
+        "t": "elegant man"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "t": "zzyyxxwwvvuuttrrssqqppoonnmmllkkjjiihhggffeeddccbbaa"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aabbcc",
+        "t": "aabbc"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "school master",
+        "t": "the classroom"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "thisisaverylongstringthatwearetesting",
+        "t": "averylongstringthatwearetestingthisis"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "thequickbrownfoxjumpsoverthelazydog",
+        "t": "godzylathedelvropmusfixnworbquickthe"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "thisisananagram",
+        "t": "isananagramthis"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "funeral",
+        "t": "real fun"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "unitedstates",
+        "t": "adtenisestatesu"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "mississippi",
+        "t": "mississipi"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "elevenplus",
+        "t": "twelvestop"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "a",
+        "t": "b"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "anagramanagramanagram",
+        "t": "nagaramnagaramnagaram"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aabbccdd",
+        "t": "ddbbaacc"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aquickbrownfoxjumpsoverthelazydog",
+        "t": "quickbrownfoxjumpsoverthelazydoga"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "abcdeabced",
+        "t": "abcedabcde"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aquickbrownfoxjumpsoverthelazydog",
+        "t": "thelazydogjumpsoveraquickbrownfox"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "pythonprogramming",
+        "t": "nohtypgnimmargorp"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "forty five",
+        "t": "over fifty"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "a!@#b$%^c&*()",
+        "t": "c&*()b$%^a!@#"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aquickbrownfoxjumpsoverthelazydog",
+        "t": "quickbrownfoxjumpsoverthelazygod"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "noon",
+        "t": "noon"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "anagrammatic",
+        "t": "icnagarammat"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "t": "zyxwvutsrqponmlkjihgfedcba"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "abacabadabacaba",
+        "t": "bacabacabacaba"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "t": "zzyyxxwwvvuuttssrrqqppoonnmmllkkjjiihhggeeffddeebbaa"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "the quick brown fox jumps over the lazy dog",
+        "t": "dog lazy the over jumps fox brown quick the"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "conversation",
+        "t": "voices rant on"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "eleven plus two",
+        "t": "twelve plus one"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "the eyes",
+        "t": "they see"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "conversation",
+        "t": "voicesranton"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "t": "zzyyxxwwvvuuttssrrqqppoonnmmllkkjjiihhggeeffddccbbbaa"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "anagramanagram",
+        "t": "nagaramnagaram"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "this is a test",
+        "t": "test a is this"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "night",
+        "t": "thing"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aaabbbccc",
+        "t": "bbbaaacc"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "samecharacters",
+        "t": "charactersames"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "t": "zzyxwvuttsrqponmlkjihgfeddcbaabbccddeeffgghhiijjkkllmmnnooppqqrrss"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "mississippi",
+        "t": "ssmissippii"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "abcabcabcabcabcabc",
+        "t": "abcabcabcabcabcabc"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "xxyyzz",
+        "t": "zzxxyy"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "thequickbrownfoxjumpsoverthelazydog",
+        "t": "thequickbrownfoxjumpsoverthelazygod"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "elevenpluszwo",
+        "t": "twelvezillion"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "notanagramhere",
+        "t": "anagramherenot"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "uniqueanagram",
+        "t": "nagramuniqueanagram"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "fluster",
+        "t": "restful"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "dormitory",
+        "t": "dirty room"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "aaaaaa",
+        "t": "aaaaa"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "punishments",
+        "t": "ninepunishment"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "thirty",
+        "t": "typhrirt"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "racecar",
+        "t": "carrace"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "ab",
+        "t": "aabb"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "a",
+        "t": ""
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "qwertyuiopasdfghjklzxcvbnm",
+        "t": "mnbvcxzlkjhgfdsapoiuytrewq"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "abacax",
+        "t": "aacxab"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
+        "t": "zyxwvutsrqponmlkjihgfedcbazyxwvutsrqponmlkjihgfedcba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "questionnaire",
+        "t": "reinquirequest"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "anagramatically",
+        "t": "gramaticallyanagram"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "uniquecharacters",
+        "t": "uniquecharactersx"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "abcdabcdabcd",
+        "t": "dcbaabcdabcd"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "adobe",
+        "t": "abode"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "t": "zzzyyxwwvvuuttssrrqqppoonnmlkkjjiihhggffeeeeddccbaab"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "clint eastwood",
+        "t": "old west action"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "abcabcabcabc",
+        "t": "cbacbacbacba"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "schoolmaster",
+        "t": "theclassroom"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "embarrassing",
+        "t": "backgroundsere"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "racecar",
+        "t": "racecar"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "s": "nematocysts",
+        "t": "cytoplasmnets"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "s": "aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz",
+        "t": "zzyyxxwwvvuuttsrqponmlkjihgfedcbazyxwvutsrqponmlkjihgfedcbaa"
+      },
+      "expected": false
+    }
+  ],
+  "test_case_count": 107,
+  "optimal_complexity": null,
+  "source_task_id": "valid-anagram",
+  "source_question_id": 242
+}

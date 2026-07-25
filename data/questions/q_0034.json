@@ -1,0 +1,972 @@
+{
+  "question_id": "q_0034",
+  "title": "Move Pieces To Obtain A String",
+  "difficulty": 2,
+  "topic": "Two Pointers",
+  "topics": [
+    "Two Pointers",
+    "String"
+  ],
+  "description_md": "You are given two strings start and target, both of length n. Each string consists only of the characters 'L', 'R', and '_' where:\n\nThe characters 'L' and 'R' represent pieces, where a piece 'L' can move to the left only if there is a blank space directly to its left, and a piece 'R' can move to the right only if there is a blank space directly to its right.\nThe character '_' represents a blank space that can be occupied by any of the 'L' or 'R' pieces.\n\nReturn true if it is possible to obtain the string target by moving the pieces of the string start any number of times. Otherwise, return false.\n\u00a0\nExample 1:\n\nInput: start = \"_L__R__R_\", target = \"L______RR\"\nOutput: true\nExplanation: We can obtain the string target from start by doing the following moves:\n- Move the first piece one step to the left, start becomes equal to \"L___R__R_\".\n- Move the last piece one step to the right, start becomes equal to \"L___R___R\".\n- Move the second piece three steps to the right, start becomes equal to \"L______RR\".\nSince it is possible to get the string target from start, we return true.\n\nExample 2:\n\nInput: start = \"R_L_\", target = \"__LR\"\nOutput: false\nExplanation: The 'R' piece in the string start can move one step to the right to obtain \"_RL_\".\nAfter that, no pieces can move anymore, so it is impossible to obtain the string target from start.\n\nExample 3:\n\nInput: start = \"_R\", target = \"R_\"\nOutput: false\nExplanation: The piece in the string start can move only to the right, so it is impossible to obtain the string target from start.\n\u00a0\nConstraints:\n\nn == start.length == target.length\n1 <= n <= 105\nstart and target consist of the characters 'L', 'R', and '_'.\n\n",
+  "starter_code": "class Solution:\n    def canChange(self, start: str, target: str) -> bool:\n        ",
+  "entry_point": "Solution().canChange",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def canChange(self, start: str, target: str) -> bool:\n        a = [(v, i) for i, v in enumerate(start) if v != '_']\n        b = [(v, i) for i, v in enumerate(target) if v != '_']\n        if len(a) != len(b):\n            return False\n        for (c, i), (d, j) in zip(a, b):\n            if c != d:\n                return False\n            if c == 'L' and i < j:\n                return False\n            if c == 'R' and i > j:\n                return False\n        return True\n",
+  "test_cases": [
+    {
+      "input": {
+        "start": "_R",
+        "target": "R_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "___",
+        "target": "___"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "LR",
+        "target": "LR"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "_LL_R",
+        "target": "LL__R"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "____",
+        "target": "____"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "L_R",
+        "target": "_LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R__L",
+        "target": "L__R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_L_R",
+        "target": "LL_R_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_R",
+        "target": "_RR"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "_L__R__R_",
+        "target": "L______RR"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "L___R",
+        "target": "_L__R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "LL_R",
+        "target": "R_L_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "__L___",
+        "target": "L_____"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "LRRL",
+        "target": "LRRL"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "RL",
+        "target": "LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R__L",
+        "target": "__LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "LRLR",
+        "target": "LRLR"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "LL_RR",
+        "target": "L_RLR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_L",
+        "target": "LL_"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "RLRL",
+        "target": "LRLR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R",
+        "target": "L___R"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "R___L",
+        "target": "L___R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_",
+        "target": "__LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_LRL",
+        "target": "RLR_L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "RRLL____",
+        "target": "____RRLL"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R__L__R",
+        "target": "__LR___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R___L___L___R___R",
+        "target": "_______LL___RR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "LR___LR___LR____",
+        "target": "_L__L___R___R___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R_L__",
+        "target": "L______LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "____L___R___",
+        "target": "L___________R"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "R_____L_______",
+        "target": "_________LR____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_R_R_R_R",
+        "target": "RRRRR_____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R____L_____",
+        "target": "_____R____L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R______L",
+        "target": "_____LR_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R___L__R_L",
+        "target": "_____LR__L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L______R______L",
+        "target": "_______LR______"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_L___R_R",
+        "target": "__LR___LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R__L___L_",
+        "target": "___LR___L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L____R____L___",
+        "target": "________LR____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R____R",
+        "target": "_LR_____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R__L_____R",
+        "target": "_______LR___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_R_R_R_",
+        "target": "____RRRR"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "R_L_R_L_R",
+        "target": "_L__L__RR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R__LR_R__",
+        "target": "__LR___R_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "___L_R___L___R___",
+        "target": "L_____L____R____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "LR_L_R_L_R",
+        "target": "L_R_L_R_L_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R_L_R",
+        "target": "_L__L_R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R__L___R_L",
+        "target": "____LR__RL"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "RRR_______LLL",
+        "target": "________RRRLLL"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "__LR__R",
+        "target": "____LRR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R___L",
+        "target": "____L__LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R__L_R__L",
+        "target": "_______L___LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R__L___L_R",
+        "target": "___LL______R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L_R__L_R",
+        "target": "L______LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_L_L_L_L",
+        "target": "_____LLLL"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "____L_R_L____",
+        "target": "_________LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L_R__L__R",
+        "target": "__LR____R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_R_L_R_L",
+        "target": "_LR_L_L_R_L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L_R_L_R",
+        "target": "L___L___R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_R_L___",
+        "target": "__LR____L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_R_L_R",
+        "target": "___R_L_RL"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_R_L_R",
+        "target": "_LR_L__RR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R___L___R___L",
+        "target": "_____R___L___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R___L___R___L___",
+        "target": "_____R____L____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "LR_LRL__",
+        "target": "LRL_L___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R____L",
+        "target": "______LR_L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R___R___R___L___L___",
+        "target": "_______RRR____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_R____L____R",
+        "target": "____L___R_R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_____R__L",
+        "target": "L_________RL"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R___L___R___L___",
+        "target": "__________LRLRL"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "____R_L_R___",
+        "target": "R_L_____R_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "___L__R___",
+        "target": "L_______R__"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "R____L____R",
+        "target": "____R___L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "LR__LR__LR___",
+        "target": "L___R___L___RRR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L____R____",
+        "target": "____LR____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "RRR___LLL",
+        "target": "___LLLRRR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R_L___R",
+        "target": "L___L_R__"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R___R___R___R___L",
+        "target": "___L_____RRR___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R_L_R_L_R",
+        "target": "LL______RRR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L__R_L_R",
+        "target": "L_____RLR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_R__L",
+        "target": "_R___L_RL"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R___R___L___R___L",
+        "target": "_____RR____L___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_R_L_R_L_R___",
+        "target": "_L_R_L_R_L_R____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R___L___R",
+        "target": "__LR___R_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "______L_R",
+        "target": "L______R_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R__L_L___R",
+        "target": "___LR____R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R___L___R___R___L___",
+        "target": "_____R____R____L___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L_L_L_L",
+        "target": "LLLL____"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "_L_R_L_R_",
+        "target": "L_____R_R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R_L_R_L_R",
+        "target": "_LR_L_R_L_R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R_L_R_L_R",
+        "target": "_L_L_L_RLR_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R___R___L",
+        "target": "_____L___RR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_______L",
+        "target": "________LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_____R_L____",
+        "target": "________L_R__"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_R___L_R___",
+        "target": "_L_R_L___R____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L_R__L__R",
+        "target": "____L___LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L_R__L___R",
+        "target": "L_____R____R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_R___L",
+        "target": "_LR______"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R_L___R",
+        "target": "L___LR___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_R_L_R",
+        "target": "_LR_L_R_L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "LRLR_LRL",
+        "target": "LRLR_LRL"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "R_____L__",
+        "target": "_____LR__"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_R_L",
+        "target": "__LR__L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L_R_L_R_L",
+        "target": "LR_L_R_L_R_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_____R___L",
+        "target": "________LRL"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L____R_____",
+        "target": "L_____R_____"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "R__R__L",
+        "target": "_____RR_L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "___LR___R",
+        "target": "L_____RR_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L___R_L_R",
+        "target": "L_____RR__"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R__L_R",
+        "target": "LL______RR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "______",
+        "target": "______"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "R_L_R___L_R",
+        "target": "_L_R_L___RR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_L_L__L___",
+        "target": "_L_L___L___L_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R________L",
+        "target": "________LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L___L_R",
+        "target": "__LR__L_R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R___________L",
+        "target": "____________LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R___L",
+        "target": "__L___R_L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R___R__L",
+        "target": "____L___R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_______L_L_R_R",
+        "target": "L______L___R_R"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "start": "RRRLLL___",
+        "target": "___RRRLLL"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L__R__L___R____",
+        "target": "L___L__R__R____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R___R___R___L",
+        "target": "___L_____RR___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R__L___",
+        "target": "_L_____RL__"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R___L___R",
+        "target": "L___L___R___R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "____L___R__",
+        "target": "L_____R____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R__L_R",
+        "target": "_LR__LR_"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L___LR__L____",
+        "target": "__LR__LR__L____"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R___R",
+        "target": "___L____R"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L___R___L_R",
+        "target": "L_____RL___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "__L_R__R_L",
+        "target": "L_____R__L"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L___R__L",
+        "target": "L_____R__"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "L_R___R___L___",
+        "target": "___L_____R___"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L_R_L_R_R",
+        "target": "L______RRR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_L___R_L_R",
+        "target": "L______LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "_R_L_R_L____",
+        "target": "____LR____LR"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "start": "R_L__R",
+        "target": "__LR__"
+      },
+      "expected": false
+    }
+  ],
+  "test_case_count": 136,
+  "optimal_complexity": null,
+  "source_task_id": "move-pieces-to-obtain-a-string",
+  "source_question_id": 2337
+}

@@ -1,0 +1,585 @@
+{
+  "question_id": "q_0017",
+  "title": "Roman To Integer",
+  "difficulty": 1,
+  "topic": "Hash Table",
+  "topics": [
+    "Hash Table",
+    "Math",
+    "String"
+  ],
+  "description_md": "Roman numerals are represented by seven different symbols:\u00a0I, V, X, L, C, D and M.\n\nSymbol       Value\nI             1\nV             5\nX             10\nL             50\nC             100\nD             500\nM             1000\nFor example,\u00a02 is written as II\u00a0in Roman numeral, just two ones added together. 12 is written as\u00a0XII, which is simply X + II. The number 27 is written as XXVII, which is XX + V + II.\nRoman numerals are usually written largest to smallest from left to right. However, the numeral for four is not IIII. Instead, the number four is written as IV. Because the one is before the five we subtract it making four. The same principle applies to the number nine, which is written as IX. There are six instances where subtraction is used:\n\nI can be placed before V (5) and X (10) to make 4 and 9.\u00a0\nX can be placed before L (50) and C (100) to make 40 and 90.\u00a0\nC can be placed before D (500) and M (1000) to make 400 and 900.\n\nGiven a roman numeral, convert it to an integer.\n\u00a0\nExample 1:\n\nInput: s = \"III\"\nOutput: 3\nExplanation: III = 3.\n\nExample 2:\n\nInput: s = \"LVIII\"\nOutput: 58\nExplanation: L = 50, V= 5, III = 3.\n\nExample 3:\n\nInput: s = \"MCMXCIV\"\nOutput: 1994\nExplanation: M = 1000, CM = 900, XC = 90 and IV = 4.\n\n\u00a0\nConstraints:\n\n1 <= s.length <= 15\ns contains only\u00a0the characters ('I', 'V', 'X', 'L', 'C', 'D', 'M').\nIt is guaranteed\u00a0that s is a valid roman numeral in the range [1, 3999].\n\n",
+  "starter_code": "class Solution:\n    def romanToInt(self, s: str) -> int:\n        ",
+  "entry_point": "Solution().romanToInt",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def romanToInt(self, s: str) -> int:\n        d = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}\n        return sum((-1 if d[a] < d[b] else 1) * d[a] for a, b in pairwise(s)) + d[s[-1]]\n",
+  "test_cases": [
+    {
+      "input": {
+        "s": "XCIX"
+      },
+      "expected": 99
+    },
+    {
+      "input": {
+        "s": "MMCMXCIX"
+      },
+      "expected": 2999
+    },
+    {
+      "input": {
+        "s": "MMMCMXCIX"
+      },
+      "expected": 3999
+    },
+    {
+      "input": {
+        "s": "DCXXI"
+      },
+      "expected": 621
+    },
+    {
+      "input": {
+        "s": "XC"
+      },
+      "expected": 90
+    },
+    {
+      "input": {
+        "s": "VIII"
+      },
+      "expected": 8
+    },
+    {
+      "input": {
+        "s": "XV"
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "s": "XXVII"
+      },
+      "expected": 27
+    },
+    {
+      "input": {
+        "s": "IX"
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "s": "DCCLXXIX"
+      },
+      "expected": 779
+    },
+    {
+      "input": {
+        "s": "XX"
+      },
+      "expected": 20
+    },
+    {
+      "input": {
+        "s": "CDXLIV"
+      },
+      "expected": 444
+    },
+    {
+      "input": {
+        "s": "LVIII"
+      },
+      "expected": 58
+    },
+    {
+      "input": {
+        "s": "CM"
+      },
+      "expected": 900
+    },
+    {
+      "input": {
+        "s": "D"
+      },
+      "expected": 500
+    },
+    {
+      "input": {
+        "s": "X"
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "s": "IV"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "s": "XXV"
+      },
+      "expected": 25
+    },
+    {
+      "input": {
+        "s": "XXX"
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "s": "XL"
+      },
+      "expected": 40
+    },
+    {
+      "input": {
+        "s": "MMMDCCCLXXXVIII"
+      },
+      "expected": 3888
+    },
+    {
+      "input": {
+        "s": "XXXIX"
+      },
+      "expected": 39
+    },
+    {
+      "input": {
+        "s": "XLIV"
+      },
+      "expected": 44
+    },
+    {
+      "input": {
+        "s": "CCCXCIX"
+      },
+      "expected": 399
+    },
+    {
+      "input": {
+        "s": "CD"
+      },
+      "expected": 400
+    },
+    {
+      "input": {
+        "s": "LXX"
+      },
+      "expected": 70
+    },
+    {
+      "input": {
+        "s": "CCC"
+      },
+      "expected": 300
+    },
+    {
+      "input": {
+        "s": "MMM"
+      },
+      "expected": 3000
+    },
+    {
+      "input": {
+        "s": "MCMXCIV"
+      },
+      "expected": 1994
+    },
+    {
+      "input": {
+        "s": "III"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "s": "MDCCCLXXIV"
+      },
+      "expected": 1874
+    },
+    {
+      "input": {
+        "s": "CMXCIX"
+      },
+      "expected": 999
+    },
+    {
+      "input": {
+        "s": "MMCDXCIX"
+      },
+      "expected": 2499
+    },
+    {
+      "input": {
+        "s": "M"
+      },
+      "expected": 1000
+    },
+    {
+      "input": {
+        "s": "CCXLVI"
+      },
+      "expected": 246
+    },
+    {
+      "input": {
+        "s": "CC"
+      },
+      "expected": 200
+    },
+    {
+      "input": {
+        "s": "DCCLXXIV"
+      },
+      "expected": 774
+    },
+    {
+      "input": {
+        "s": "MCCCLXXXIX"
+      },
+      "expected": 1389
+    },
+    {
+      "input": {
+        "s": "CMLXXXVII"
+      },
+      "expected": 987
+    },
+    {
+      "input": {
+        "s": "XCIV"
+      },
+      "expected": 94
+    },
+    {
+      "input": {
+        "s": "MDCCLXXVI"
+      },
+      "expected": 1776
+    },
+    {
+      "input": {
+        "s": "DCCLXXVI"
+      },
+      "expected": 776
+    },
+    {
+      "input": {
+        "s": "CMXLVII"
+      },
+      "expected": 947
+    },
+    {
+      "input": {
+        "s": "MMMCMLXXIV"
+      },
+      "expected": 3974
+    },
+    {
+      "input": {
+        "s": "MDCCCLXXI"
+      },
+      "expected": 1871
+    },
+    {
+      "input": {
+        "s": "MMMDCCCLXXVII"
+      },
+      "expected": 3877
+    },
+    {
+      "input": {
+        "s": "MMMCMXCXCIX"
+      },
+      "expected": 4089
+    },
+    {
+      "input": {
+        "s": "MMMLXXVIII"
+      },
+      "expected": 3078
+    },
+    {
+      "input": {
+        "s": "CCCLXXIV"
+      },
+      "expected": 374
+    },
+    {
+      "input": {
+        "s": "MCMXLIV"
+      },
+      "expected": 1944
+    },
+    {
+      "input": {
+        "s": "MMCDLXXI"
+      },
+      "expected": 2471
+    },
+    {
+      "input": {
+        "s": "DCCCLXXXVIII"
+      },
+      "expected": 888
+    },
+    {
+      "input": {
+        "s": "MMDCCCLXXIV"
+      },
+      "expected": 2874
+    },
+    {
+      "input": {
+        "s": "MMCDXLIV"
+      },
+      "expected": 2444
+    },
+    {
+      "input": {
+        "s": "MMDCCCLXXVII"
+      },
+      "expected": 2877
+    },
+    {
+      "input": {
+        "s": "MMMDCCCXCIX"
+      },
+      "expected": 3899
+    },
+    {
+      "input": {
+        "s": "LXXXIX"
+      },
+      "expected": 89
+    },
+    {
+      "input": {
+        "s": "DCCCLXXVIII"
+      },
+      "expected": 878
+    },
+    {
+      "input": {
+        "s": "MMXXIII"
+      },
+      "expected": 2023
+    },
+    {
+      "input": {
+        "s": "LXXXVII"
+      },
+      "expected": 87
+    },
+    {
+      "input": {
+        "s": "MMMCMXCXC"
+      },
+      "expected": 4080
+    },
+    {
+      "input": {
+        "s": "DCCCXC"
+      },
+      "expected": 890
+    },
+    {
+      "input": {
+        "s": "MMCMCCXCIX"
+      },
+      "expected": 3199
+    },
+    {
+      "input": {
+        "s": "MMMDCCCLXXX"
+      },
+      "expected": 3880
+    },
+    {
+      "input": {
+        "s": "MDCCCCLXXV"
+      },
+      "expected": 1975
+    },
+    {
+      "input": {
+        "s": "MCMXCMLXXIX"
+      },
+      "expected": 2869
+    },
+    {
+      "input": {
+        "s": "MMMDCCCLXXIX"
+      },
+      "expected": 3879
+    },
+    {
+      "input": {
+        "s": "CDXC"
+      },
+      "expected": 490
+    },
+    {
+      "input": {
+        "s": "MCMLXXI"
+      },
+      "expected": 1971
+    },
+    {
+      "input": {
+        "s": "MCMLIV"
+      },
+      "expected": 1954
+    },
+    {
+      "input": {
+        "s": "MMDCCCXCIX"
+      },
+      "expected": 2899
+    },
+    {
+      "input": {
+        "s": "CCXCIX"
+      },
+      "expected": 299
+    },
+    {
+      "input": {
+        "s": "MMMCMXCCLXXVIII"
+      },
+      "expected": 4168
+    },
+    {
+      "input": {
+        "s": "CDXCIX"
+      },
+      "expected": 499
+    },
+    {
+      "input": {
+        "s": "MMMCMLXXIX"
+      },
+      "expected": 3979
+    },
+    {
+      "input": {
+        "s": "DCCLXXVIII"
+      },
+      "expected": 778
+    },
+    {
+      "input": {
+        "s": "MDCCCLXXVIII"
+      },
+      "expected": 1878
+    },
+    {
+      "input": {
+        "s": "MMDCCCLXXXVIII"
+      },
+      "expected": 2888
+    },
+    {
+      "input": {
+        "s": "MCMXLVII"
+      },
+      "expected": 1947
+    },
+    {
+      "input": {
+        "s": "DCXXVIII"
+      },
+      "expected": 628
+    },
+    {
+      "input": {
+        "s": "CCXLVIII"
+      },
+      "expected": 248
+    },
+    {
+      "input": {
+        "s": "MMMCDXLIV"
+      },
+      "expected": 3444
+    },
+    {
+      "input": {
+        "s": "DCCCXCIX"
+      },
+      "expected": 899
+    },
+    {
+      "input": {
+        "s": "DCCCXCIV"
+      },
+      "expected": 894
+    },
+    {
+      "input": {
+        "s": "DCCCLXXIV"
+      },
+      "expected": 874
+    },
+    {
+      "input": {
+        "s": "MCMLXXIII"
+      },
+      "expected": 1973
+    },
+    {
+      "input": {
+        "s": "MMMCDXCIX"
+      },
+      "expected": 3499
+    },
+    {
+      "input": {
+        "s": "MMCDLXXVIII"
+      },
+      "expected": 2478
+    },
+    {
+      "input": {
+        "s": "LVIV"
+      },
+      "expected": 59
+    },
+    {
+      "input": {
+        "s": "MMCDXXI"
+      },
+      "expected": 2421
+    },
+    {
+      "input": {
+        "s": "MDCCCLXXVII"
+      },
+      "expected": 1877
+    },
+    {
+      "input": {
+        "s": "LXXXIV"
+      },
+      "expected": 84
+    },
+    {
+      "input": {
+        "s": "CMXLIV"
+      },
+      "expected": 944
+    },
+    {
+      "input": {
+        "s": "MCMLXXXIV"
+      },
+      "expected": 1984
+    }
+  ],
+  "test_case_count": 94,
+  "optimal_complexity": null,
+  "source_task_id": "roman-to-integer",
+  "source_question_id": 13
+}

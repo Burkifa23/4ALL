@@ -1,0 +1,770 @@
+{
+  "question_id": "q_0043",
+  "title": "Strobogrammatic Number Iii",
+  "difficulty": 3,
+  "topic": "Recursion",
+  "topics": [
+    "Recursion",
+    "Array",
+    "String"
+  ],
+  "description_md": "Given two strings low and high that represent two integers low and high where low <= high, return the number of strobogrammatic numbers in the range [low, high].\nA strobogrammatic number is a number that looks the same when rotated 180 degrees (looked at upside down).\n\u00a0\nExample 1:\nInput: low = \"50\", high = \"100\"\nOutput: 3\nExample 2:\nInput: low = \"0\", high = \"0\"\nOutput: 1\n\n\u00a0\nConstraints:\n\n1 <= low.length, high.length <= 15\nlow and high consist of only digits.\nlow <= high\nlow and high do not contain any leading zeros except for zero itself.\n\n",
+  "starter_code": "class Solution:\n    def strobogrammaticInRange(self, low: str, high: str) -> int:\n        ",
+  "entry_point": "Solution().strobogrammaticInRange",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def strobogrammaticInRange(self, low: str, high: str) -> int:\n        def dfs(u):\n            if u == 0:\n                return ['']\n            if u == 1:\n                return ['0', '1', '8']\n            ans = []\n            for v in dfs(u - 2):\n                for l, r in ('11', '88', '69', '96'):\n                    ans.append(l + v + r)\n                if u != n:\n                    ans.append('0' + v + '0')\n            return ans\n\n        a, b = len(low), len(high)\n        low, high = int(low), int(high)\n        ans = 0\n        for n in range(a, b + 1):\n            for s in dfs(n):\n                if low <= int(s) <= high:\n                    ans += 1\n        return ans\n",
+  "test_cases": [
+    {
+      "input": {
+        "low": "1",
+        "high": "10"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "low": "1000000000",
+        "high": "9999999999"
+      },
+      "expected": 2500
+    },
+    {
+      "input": {
+        "low": "0",
+        "high": "150"
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "low": "100",
+        "high": "200"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "low": "500",
+        "high": "1000"
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "low": "69",
+        "high": "96"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "low": "88",
+        "high": "88"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "1111",
+        "high": "2222"
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "low": "0",
+        "high": "0"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "10000",
+        "high": "90000"
+      },
+      "expected": 45
+    },
+    {
+      "input": {
+        "low": "50",
+        "high": "100"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "low": "100000000",
+        "high": "100000001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "696969696969696969",
+        "high": "696969696969696969"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "1000000000",
+        "high": "1111111111"
+      },
+      "expected": 157
+    },
+    {
+      "input": {
+        "low": "555555555555555",
+        "high": "666666666666666"
+      },
+      "expected": 23438
+    },
+    {
+      "input": {
+        "low": "99999",
+        "high": "100000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "696969",
+        "high": "969696"
+      },
+      "expected": 43
+    },
+    {
+      "input": {
+        "low": "10000000000",
+        "high": "10000000001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "180",
+        "high": "180"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "868",
+        "high": "868"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "6",
+        "high": "9"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "1000000000000",
+        "high": "9999999999999"
+      },
+      "expected": 37500
+    },
+    {
+      "input": {
+        "low": "1",
+        "high": "2147483647"
+      },
+      "expected": 3123
+    },
+    {
+      "input": {
+        "low": "888888888888888",
+        "high": "888888888888888"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "10000000000000000",
+        "high": "10000000000000000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "9876543210",
+        "high": "9876543210"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "110011",
+        "high": "880088"
+      },
+      "expected": 61
+    },
+    {
+      "input": {
+        "low": "100100100",
+        "high": "111111111"
+      },
+      "expected": 92
+    },
+    {
+      "input": {
+        "low": "100000000000000",
+        "high": "999999999999999"
+      },
+      "expected": 187500
+    },
+    {
+      "input": {
+        "low": "11111111111111",
+        "high": "22222222222222"
+      },
+      "expected": 11719
+    },
+    {
+      "input": {
+        "low": "111111111111111",
+        "high": "999999999999999"
+      },
+      "expected": 175781
+    },
+    {
+      "input": {
+        "low": "100000",
+        "high": "999999"
+      },
+      "expected": 100
+    },
+    {
+      "input": {
+        "low": "1001",
+        "high": "1000000000"
+      },
+      "expected": 2480
+    },
+    {
+      "input": {
+        "low": "6969696969696969",
+        "high": "9696969696969696"
+      },
+      "expected": 130209
+    },
+    {
+      "input": {
+        "low": "12321",
+        "high": "98789"
+      },
+      "expected": 50
+    },
+    {
+      "input": {
+        "low": "0",
+        "high": "999999999999999"
+      },
+      "expected": 312499
+    },
+    {
+      "input": {
+        "low": "0",
+        "high": "1000000000"
+      },
+      "expected": 2499
+    },
+    {
+      "input": {
+        "low": "10000000",
+        "high": "10000001"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "123456789012345",
+        "high": "987654321098765"
+      },
+      "expected": 155625
+    },
+    {
+      "input": {
+        "low": "1",
+        "high": "1"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "111111111",
+        "high": "999999999"
+      },
+      "expected": 1406
+    },
+    {
+      "input": {
+        "low": "111",
+        "high": "999999"
+      },
+      "expected": 191
+    },
+    {
+      "input": {
+        "low": "888888888",
+        "high": "999999999"
+      },
+      "expected": 469
+    },
+    {
+      "input": {
+        "low": "100000000000001",
+        "high": "100000000000002"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "100000000000000000",
+        "high": "200000000000000000"
+      },
+      "expected": 390625
+    },
+    {
+      "input": {
+        "low": "0",
+        "high": "1000000"
+      },
+      "expected": 199
+    },
+    {
+      "input": {
+        "low": "1000000000000000",
+        "high": "9000000000000000"
+      },
+      "expected": 234375
+    },
+    {
+      "input": {
+        "low": "101",
+        "high": "1001"
+      },
+      "expected": 13
+    },
+    {
+      "input": {
+        "low": "110011",
+        "high": "988989"
+      },
+      "expected": 89
+    },
+    {
+      "input": {
+        "low": "200000000000000",
+        "high": "300000000000000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "100000000000000",
+        "high": "199999999999999"
+      },
+      "expected": 46875
+    },
+    {
+      "input": {
+        "low": "999999999",
+        "high": "1000000000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "1000000",
+        "high": "9999999"
+      },
+      "expected": 300
+    },
+    {
+      "input": {
+        "low": "1",
+        "high": "2000000000"
+      },
+      "expected": 3123
+    },
+    {
+      "input": {
+        "low": "696969696969696",
+        "high": "969696969696969"
+      },
+      "expected": 78125
+    },
+    {
+      "input": {
+        "low": "111",
+        "high": "111"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "12345678987654321",
+        "high": "98765432123456789"
+      },
+      "expected": 778125
+    },
+    {
+      "input": {
+        "low": "100000000000000",
+        "high": "180000000000000"
+      },
+      "expected": 28125
+    },
+    {
+      "input": {
+        "low": "101010101010101",
+        "high": "110011001100110"
+      },
+      "expected": 7513
+    },
+    {
+      "input": {
+        "low": "110011",
+        "high": "980089"
+      },
+      "expected": 86
+    },
+    {
+      "input": {
+        "low": "69",
+        "high": "969696969696969"
+      },
+      "expected": 292964
+    },
+    {
+      "input": {
+        "low": "111",
+        "high": "999"
+      },
+      "expected": 11
+    },
+    {
+      "input": {
+        "low": "8888888888888888",
+        "high": "8888888888888888"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "10000000000000000",
+        "high": "20000000000000000"
+      },
+      "expected": 234375
+    },
+    {
+      "input": {
+        "low": "10000000000000000",
+        "high": "99999999999999999"
+      },
+      "expected": 937500
+    },
+    {
+      "input": {
+        "low": "1000000000000000",
+        "high": "1000000000000000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "1000000000000",
+        "high": "2000000000000"
+      },
+      "expected": 9375
+    },
+    {
+      "input": {
+        "low": "1",
+        "high": "999999999999999"
+      },
+      "expected": 312498
+    },
+    {
+      "input": {
+        "low": "110011001",
+        "high": "980089008"
+      },
+      "expected": 1276
+    },
+    {
+      "input": {
+        "low": "1000",
+        "high": "9999"
+      },
+      "expected": 20
+    },
+    {
+      "input": {
+        "low": "1000000000",
+        "high": "1800000000"
+      },
+      "expected": 375
+    },
+    {
+      "input": {
+        "low": "11",
+        "high": "88"
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "low": "1000000000000000000",
+        "high": "999999999999999999"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "1000000000",
+        "high": "2000000000"
+      },
+      "expected": 625
+    },
+    {
+      "input": {
+        "low": "123456789",
+        "high": "987654321"
+      },
+      "expected": 1245
+    },
+    {
+      "input": {
+        "low": "111111111111111",
+        "high": "222222222222222"
+      },
+      "expected": 35156
+    },
+    {
+      "input": {
+        "low": "10000000000",
+        "high": "10000000000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "2000000000",
+        "high": "3000000000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "11000000000000011",
+        "high": "98000000000000899"
+      },
+      "expected": 796876
+    },
+    {
+      "input": {
+        "low": "69000069",
+        "high": "96000096"
+      },
+      "expected": 201
+    },
+    {
+      "input": {
+        "low": "100000000",
+        "high": "1000000000"
+      },
+      "expected": 1500
+    },
+    {
+      "input": {
+        "low": "10000000000",
+        "high": "11000000001"
+      },
+      "expected": 375
+    },
+    {
+      "input": {
+        "low": "555555555",
+        "high": "666666666"
+      },
+      "expected": 188
+    },
+    {
+      "input": {
+        "low": "1000000000",
+        "high": "9000000000"
+      },
+      "expected": 1875
+    },
+    {
+      "input": {
+        "low": "123456789012345",
+        "high": "123456789012345"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "100000000",
+        "high": "200000000"
+      },
+      "expected": 375
+    },
+    {
+      "input": {
+        "low": "888888888888888",
+        "high": "999999999999999"
+      },
+      "expected": 58594
+    },
+    {
+      "input": {
+        "low": "1111",
+        "high": "1111"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "1234567890",
+        "high": "12345678900"
+      },
+      "expected": 3000
+    },
+    {
+      "input": {
+        "low": "1000000000000",
+        "high": "1000000000000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "1111",
+        "high": "8888"
+      },
+      "expected": 13
+    },
+    {
+      "input": {
+        "low": "18000000000000001",
+        "high": "68000000000000089"
+      },
+      "expected": 234376
+    },
+    {
+      "input": {
+        "low": "696969696969",
+        "high": "969696969696"
+      },
+      "expected": 5209
+    },
+    {
+      "input": {
+        "low": "111111111",
+        "high": "888888888"
+      },
+      "expected": 938
+    },
+    {
+      "input": {
+        "low": "8888",
+        "high": "888888"
+      },
+      "expected": 136
+    },
+    {
+      "input": {
+        "low": "110011",
+        "high": "111111"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "low": "100000",
+        "high": "200000"
+      },
+      "expected": 25
+    },
+    {
+      "input": {
+        "low": "200000000000000",
+        "high": "210000000000000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "8000000000",
+        "high": "8999999999"
+      },
+      "expected": 625
+    },
+    {
+      "input": {
+        "low": "8888888888",
+        "high": "8888888888"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "0",
+        "high": "1"
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "low": "100",
+        "high": "999"
+      },
+      "expected": 12
+    },
+    {
+      "input": {
+        "low": "100000000000",
+        "high": "999999999999"
+      },
+      "expected": 12500
+    },
+    {
+      "input": {
+        "low": "10000000000000001",
+        "high": "10000000000000009"
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "low": "9876543210",
+        "high": "10987654321"
+      },
+      "expected": 529
+    },
+    {
+      "input": {
+        "low": "200000000",
+        "high": "200000000"
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "low": "690069",
+        "high": "690069"
+      },
+      "expected": 1
+    }
+  ],
+  "test_case_count": 107,
+  "optimal_complexity": null,
+  "source_task_id": "strobogrammatic-number-iii",
+  "source_question_id": 248
+}

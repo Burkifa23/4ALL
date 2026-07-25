@@ -1,0 +1,241 @@
+{
+  "question_id": "q_0042",
+  "title": "Number Of Ways To Paint N 3 Grid",
+  "difficulty": 3,
+  "topic": "Dynamic Programming",
+  "topics": [
+    "Dynamic Programming"
+  ],
+  "description_md": "You have a grid of size n x 3 and you want to paint each cell of the grid with exactly one of the three colors: Red, Yellow, or Green while making sure that no two adjacent cells have the same color (i.e., no two cells that share vertical or horizontal sides have the same color).\nGiven n the number of rows of the grid, return the number of ways you can paint this grid. As the answer may grow large, the answer must be computed modulo 109 + 7.\n\u00a0\nExample 1:\n\n\nInput: n = 1\nOutput: 12\nExplanation: There are 12 possible way to paint the grid as shown.\n\nExample 2:\n\nInput: n = 5000\nOutput: 30228214\n\n\u00a0\nConstraints:\n\nn == grid.length\n1 <= n <= 5000\n\n",
+  "starter_code": "class Solution:\n    def numOfWays(self, n: int) -> int:\n        ",
+  "entry_point": "Solution().numOfWays",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def numOfWays(self, n: int) -> int:\n        mod = 10**9 + 7\n        f0 = f1 = 6\n        for _ in range(n - 1):\n            g0 = (3 * f0 + 2 * f1) % mod\n            g1 = (2 * f0 + 2 * f1) % mod\n            f0, f1 = g0, g1\n        return (f0 + f1) % mod\n",
+  "test_cases": [
+    {
+      "input": {
+        "n": 3
+      },
+      "expected": 246
+    },
+    {
+      "input": {
+        "n": 1000
+      },
+      "expected": 650420578
+    },
+    {
+      "input": {
+        "n": 100
+      },
+      "expected": 905790447
+    },
+    {
+      "input": {
+        "n": 2500
+      },
+      "expected": 80958521
+    },
+    {
+      "input": {
+        "n": 4
+      },
+      "expected": 1122
+    },
+    {
+      "input": {
+        "n": 4999
+      },
+      "expected": 134620719
+    },
+    {
+      "input": {
+        "n": 5000
+      },
+      "expected": 30228214
+    },
+    {
+      "input": {
+        "n": 2
+      },
+      "expected": 54
+    },
+    {
+      "input": {
+        "n": 1
+      },
+      "expected": 12
+    },
+    {
+      "input": {
+        "n": 500
+      },
+      "expected": 350959293
+    },
+    {
+      "input": {
+        "n": 50
+      },
+      "expected": 151149117
+    },
+    {
+      "input": {
+        "n": 10
+      },
+      "expected": 10107954
+    },
+    {
+      "input": {
+        "n": 5
+      },
+      "expected": 5118
+    },
+    {
+      "input": {
+        "n": 4000
+      },
+      "expected": 685933196
+    },
+    {
+      "input": {
+        "n": 12
+      },
+      "expected": 210323922
+    },
+    {
+      "input": {
+        "n": 2000
+      },
+      "expected": 897054912
+    },
+    {
+      "input": {
+        "n": 3750
+      },
+      "expected": 477003884
+    },
+    {
+      "input": {
+        "n": 3500
+      },
+      "expected": 28484708
+    },
+    {
+      "input": {
+        "n": 3000
+      },
+      "expected": 313837042
+    },
+    {
+      "input": {
+        "n": 30
+      },
+      "expected": 462032897
+    },
+    {
+      "input": {
+        "n": 16
+      },
+      "expected": 62485141
+    },
+    {
+      "input": {
+        "n": 10000
+      },
+      "expected": 779575021
+    },
+    {
+      "input": {
+        "n": 8
+      },
+      "expected": 485778
+    },
+    {
+      "input": {
+        "n": 250
+      },
+      "expected": 601916395
+    },
+    {
+      "input": {
+        "n": 999
+      },
+      "expected": 672393158
+    },
+    {
+      "input": {
+        "n": 32
+      },
+      "expected": 554911778
+    },
+    {
+      "input": {
+        "n": 20
+      },
+      "expected": 690883140
+    },
+    {
+      "input": {
+        "n": 11
+      },
+      "expected": 46107966
+    },
+    {
+      "input": {
+        "n": 15
+      },
+      "expected": 963045241
+    },
+    {
+      "input": {
+        "n": 200
+      },
+      "expected": 693684710
+    },
+    {
+      "input": {
+        "n": 1234
+      },
+      "expected": 18988659
+    },
+    {
+      "input": {
+        "n": 750
+      },
+      "expected": 493513580
+    },
+    {
+      "input": {
+        "n": 4500
+      },
+      "expected": 471193061
+    },
+    {
+      "input": {
+        "n": 6
+      },
+      "expected": 23346
+    },
+    {
+      "input": {
+        "n": 7
+      },
+      "expected": 106494
+    },
+    {
+      "input": {
+        "n": 25
+      },
+      "expected": 676744457
+    },
+    {
+      "input": {
+        "n": 1500
+      },
+      "expected": 814277332
+    }
+  ],
+  "test_case_count": 37,
+  "optimal_complexity": null,
+  "source_task_id": "number-of-ways-to-paint-n-3-grid",
+  "source_question_id": 1411
+}

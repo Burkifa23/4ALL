@@ -1,0 +1,380 @@
+{
+  "question_id": "q_0020",
+  "title": "Count Of Matches In Tournament",
+  "difficulty": 1,
+  "topic": "Math",
+  "topics": [
+    "Math",
+    "Simulation"
+  ],
+  "description_md": "You are given an integer n, the number of teams in a tournament that has strange rules:\n\nIf the current number of teams is even, each team gets paired with another team. A total of n / 2 matches are played, and n / 2 teams advance to the next round.\nIf the current number of teams is odd, one team randomly advances in the tournament, and the rest gets paired. A total of (n - 1) / 2 matches are played, and (n - 1) / 2 + 1 teams advance to the next round.\n\nReturn the number of matches played in the tournament until a winner is decided.\n\u00a0\nExample 1:\n\nInput: n = 7\nOutput: 6\nExplanation: Details of the tournament: \n- 1st Round: Teams = 7, Matches = 3, and 4 teams advance.\n- 2nd Round: Teams = 4, Matches = 2, and 2 teams advance.\n- 3rd Round: Teams = 2, Matches = 1, and 1 team is declared the winner.\nTotal number of matches = 3 + 2 + 1 = 6.\n\nExample 2:\n\nInput: n = 14\nOutput: 13\nExplanation: Details of the tournament:\n- 1st Round: Teams = 14, Matches = 7, and 7 teams advance.\n- 2nd Round: Teams = 7, Matches = 3, and 4 teams advance.\n- 3rd Round: Teams = 4, Matches = 2, and 2 teams advance.\n- 4th Round: Teams = 2, Matches = 1, and 1 team is declared the winner.\nTotal number of matches = 7 + 3 + 2 + 1 = 13.\n\n\u00a0\nConstraints:\n\n1 <= n <= 200\n\n",
+  "starter_code": "class Solution:\n    def numberOfMatches(self, n: int) -> int:\n        ",
+  "entry_point": "Solution().numberOfMatches",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def numberOfMatches(self, n: int) -> int:\n        return n - 1\n",
+  "test_cases": [
+    {
+      "input": {
+        "n": 3
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "n": 100
+      },
+      "expected": 99
+    },
+    {
+      "input": {
+        "n": 14
+      },
+      "expected": 13
+    },
+    {
+      "input": {
+        "n": 200
+      },
+      "expected": 199
+    },
+    {
+      "input": {
+        "n": 17
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "n": 2
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "n": 199
+      },
+      "expected": 198
+    },
+    {
+      "input": {
+        "n": 1
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "n": 7
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "n": 13
+      },
+      "expected": 12
+    },
+    {
+      "input": {
+        "n": 97
+      },
+      "expected": 96
+    },
+    {
+      "input": {
+        "n": 63
+      },
+      "expected": 62
+    },
+    {
+      "input": {
+        "n": 29
+      },
+      "expected": 28
+    },
+    {
+      "input": {
+        "n": 45
+      },
+      "expected": 44
+    },
+    {
+      "input": {
+        "n": 135
+      },
+      "expected": 134
+    },
+    {
+      "input": {
+        "n": 183
+      },
+      "expected": 182
+    },
+    {
+      "input": {
+        "n": 49
+      },
+      "expected": 48
+    },
+    {
+      "input": {
+        "n": 130
+      },
+      "expected": 129
+    },
+    {
+      "input": {
+        "n": 163
+      },
+      "expected": 162
+    },
+    {
+      "input": {
+        "n": 111
+      },
+      "expected": 110
+    },
+    {
+      "input": {
+        "n": 10
+      },
+      "expected": 9
+    },
+    {
+      "input": {
+        "n": 197
+      },
+      "expected": 196
+    },
+    {
+      "input": {
+        "n": 50
+      },
+      "expected": 49
+    },
+    {
+      "input": {
+        "n": 157
+      },
+      "expected": 156
+    },
+    {
+      "input": {
+        "n": 5
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "n": 123
+      },
+      "expected": 122
+    },
+    {
+      "input": {
+        "n": 59
+      },
+      "expected": 58
+    },
+    {
+      "input": {
+        "n": 87
+      },
+      "expected": 86
+    },
+    {
+      "input": {
+        "n": 173
+      },
+      "expected": 172
+    },
+    {
+      "input": {
+        "n": 4
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "n": 99
+      },
+      "expected": 98
+    },
+    {
+      "input": {
+        "n": 16
+      },
+      "expected": 15
+    },
+    {
+      "input": {
+        "n": 177
+      },
+      "expected": 176
+    },
+    {
+      "input": {
+        "n": 64
+      },
+      "expected": 63
+    },
+    {
+      "input": {
+        "n": 33
+      },
+      "expected": 32
+    },
+    {
+      "input": {
+        "n": 143
+      },
+      "expected": 142
+    },
+    {
+      "input": {
+        "n": 98
+      },
+      "expected": 97
+    },
+    {
+      "input": {
+        "n": 73
+      },
+      "expected": 72
+    },
+    {
+      "input": {
+        "n": 133
+      },
+      "expected": 132
+    },
+    {
+      "input": {
+        "n": 175
+      },
+      "expected": 174
+    },
+    {
+      "input": {
+        "n": 128
+      },
+      "expected": 127
+    },
+    {
+      "input": {
+        "n": 101
+      },
+      "expected": 100
+    },
+    {
+      "input": {
+        "n": 181
+      },
+      "expected": 180
+    },
+    {
+      "input": {
+        "n": 8
+      },
+      "expected": 7
+    },
+    {
+      "input": {
+        "n": 131
+      },
+      "expected": 130
+    },
+    {
+      "input": {
+        "n": 27
+      },
+      "expected": 26
+    },
+    {
+      "input": {
+        "n": 169
+      },
+      "expected": 168
+    },
+    {
+      "input": {
+        "n": 32
+      },
+      "expected": 31
+    },
+    {
+      "input": {
+        "n": 149
+      },
+      "expected": 148
+    },
+    {
+      "input": {
+        "n": 127
+      },
+      "expected": 126
+    },
+    {
+      "input": {
+        "n": 81
+      },
+      "expected": 80
+    },
+    {
+      "input": {
+        "n": 150
+      },
+      "expected": 149
+    },
+    {
+      "input": {
+        "n": 151
+      },
+      "expected": 150
+    },
+    {
+      "input": {
+        "n": 198
+      },
+      "expected": 197
+    },
+    {
+      "input": {
+        "n": 11
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "n": 15
+      },
+      "expected": 14
+    },
+    {
+      "input": {
+        "n": 189
+      },
+      "expected": 188
+    },
+    {
+      "input": {
+        "n": 85
+      },
+      "expected": 84
+    },
+    {
+      "input": {
+        "n": 31
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "n": 25
+      },
+      "expected": 24
+    }
+  ],
+  "test_case_count": 60,
+  "optimal_complexity": null,
+  "source_task_id": "count-of-matches-in-tournament",
+  "source_question_id": 1688
+}

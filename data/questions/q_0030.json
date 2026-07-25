@@ -1,0 +1,1689 @@
+{
+  "question_id": "q_0030",
+  "title": "Cutting Ribbons",
+  "difficulty": 2,
+  "topic": "Array",
+  "topics": [
+    "Array",
+    "Binary Search"
+  ],
+  "description_md": "You are given an integer array ribbons, where ribbons[i] represents the length of the ith ribbon, and an integer k. You may cut any of the ribbons into any number of segments of positive integer lengths, or perform no cuts at all.\n\nFor example, if you have a ribbon of length 4, you can:\n\n\t\nKeep the ribbon of length 4,\nCut it into one ribbon of length 3 and one ribbon of length 1,\nCut it into two ribbons of length 2,\nCut it into one ribbon of length 2 and two ribbons of length 1, or\nCut it into four ribbons of length 1.\n\n\n\nYour task is to determine the maximum length of ribbon, x, that allows you to cut at least k ribbons, each of length x. You can discard any leftover ribbon from the cuts. If it is impossible to cut k ribbons of the same length, return 0.\n\u00a0\nExample 1:\n\nInput: ribbons = [9,7,5], k = 3\nOutput: 5\nExplanation:\n- Cut the first ribbon to two ribbons, one of length 5 and one of length 4.\n- Cut the second ribbon to two ribbons, one of length 5 and one of length 2.\n- Keep the third ribbon as it is.\nNow you have 3 ribbons of length 5.\nExample 2:\n\nInput: ribbons = [7,5,9], k = 4\nOutput: 4\nExplanation:\n- Cut the first ribbon to two ribbons, one of length 4 and one of length 3.\n- Cut the second ribbon to two ribbons, one of length 4 and one of length 1.\n- Cut the third ribbon to three ribbons, two of length 4 and one of length 1.\nNow you have 4 ribbons of length 4.\n\nExample 3:\n\nInput: ribbons = [5,7,9], k = 22\nOutput: 0\nExplanation: You cannot obtain k ribbons of the same positive integer length.\n\n\u00a0\nConstraints:\n\n1 <= ribbons.length <= 105\n1 <= ribbons[i] <= 105\n1 <= k <= 109\n\n",
+  "starter_code": "class Solution:\n    def maxLength(self, ribbons: List[int], k: int) -> int:\n        ",
+  "entry_point": "Solution().maxLength",
+  "reference_solution": "import random\nimport functools\nimport collections\nimport string\nimport math\nimport datetime\n\nfrom typing import *\nfrom functools import *\nfrom collections import *\nfrom itertools import *\nfrom heapq import *\nfrom bisect import *\nfrom string import *\nfrom operator import *\nfrom math import *\n\ninf = float('inf')\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef list_node(values: list):\n    if not values:\n        return None\n    head = ListNode(values[0])\n    p = head\n    for val in values[1:]:\n        node = ListNode(val)\n        p.next = node\n        p = node\n    return head\n\ndef is_same_list(p1, p2):\n    if p1 is None and p2 is None:\n        return True\n    if not p1 or not p2:\n        return False\n    return p1.val == p2.val and is_same_list(p1.next, p2.next)\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef tree_node(values: list):\n    if not values:\n        return None\n    root = TreeNode(values[0])\n    i = 1\n    queue = deque()\n    queue.append(root)\n    while queue:\n        node = queue.popleft()\n        if i < len(values) and values[i] is not None:\n            node.left = TreeNode(values[i])\n            queue.append(node.left)\n        i += 1\n        if i < len(values) and values[i] is not None:\n            node.right = TreeNode(values[i])\n            queue.append(node.right)\n        i += 1\n    return root\n\ndef is_same_tree(p, q):\n    if not p and not q:\n        return True\n    elif not p or not q:\n        return False\n    elif p.val != q.val:\n        return False\n    else:\n        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)\nclass Solution:\n    def maxLength(self, ribbons: List[int], k: int) -> int:\n        left, right = 0, max(ribbons)\n        while left < right:\n            mid = (left + right + 1) >> 1\n            cnt = sum(x // mid for x in ribbons)\n            if cnt >= k:\n                left = mid\n            else:\n                right = mid - 1\n        return left\n",
+  "test_cases": [
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 15
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 10
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "ribbons": [
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "k": 5
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "k": 1
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "k": 15
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          100000,
+          100000,
+          100000
+        ],
+        "k": 100000
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          10,
+          10,
+          10
+        ],
+        "k": 8
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          100000,
+          100000,
+          100000
+        ],
+        "k": 3
+      },
+      "expected": 100000
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          3,
+          5,
+          7,
+          9
+        ],
+        "k": 9
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "k": 1
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "ribbons": [
+          100000
+        ],
+        "k": 1
+      },
+      "expected": 100000
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 55
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          20,
+          30
+        ],
+        "k": 5
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          10,
+          10
+        ],
+        "k": 5
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "k": 10
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "k": 5
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "ribbons": [
+          9,
+          7,
+          5
+        ],
+        "k": 3
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50
+        ],
+        "k": 10
+      },
+      "expected": 50
+    },
+    {
+      "input": {
+        "ribbons": [
+          5,
+          7,
+          9
+        ],
+        "k": 22
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          10,
+          10,
+          10
+        ],
+        "k": 5
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "k": 10
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          7,
+          5,
+          9
+        ],
+        "k": 4
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 3
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "k": 10
+      },
+      "expected": 12
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "k": 5
+      },
+      "expected": 20
+    },
+    {
+      "input": {
+        "ribbons": [
+          1
+        ],
+        "k": 1
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 5
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          100000,
+          100000,
+          100000,
+          100000
+        ],
+        "k": 100000
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "ribbons": [
+          15,
+          15,
+          15,
+          15,
+          15
+        ],
+        "k": 6
+      },
+      "expected": 7
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 1
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50
+        ],
+        "k": 1000
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 20
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          100000,
+          100000,
+          100000,
+          100000,
+          100000
+        ],
+        "k": 500000
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100
+        ],
+        "k": 20
+      },
+      "expected": 35
+    },
+    {
+      "input": {
+        "ribbons": [
+          1000,
+          500,
+          250,
+          125,
+          62,
+          31,
+          15,
+          7,
+          3,
+          1
+        ],
+        "k": 20
+      },
+      "expected": 83
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          2,
+          3,
+          3,
+          3,
+          4,
+          4,
+          4,
+          4,
+          5,
+          5,
+          5,
+          5,
+          5,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ],
+        "k": 20
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "ribbons": [
+          12345,
+          12345,
+          12345,
+          12345,
+          12345
+        ],
+        "k": 25000
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 20
+      },
+      "expected": 22
+    },
+    {
+      "input": {
+        "ribbons": [
+          33,
+          33,
+          33,
+          33,
+          33
+        ],
+        "k": 10
+      },
+      "expected": 16
+    },
+    {
+      "input": {
+        "ribbons": [
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50
+        ],
+        "k": 100
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "ribbons": [
+          1000,
+          1000,
+          1000,
+          1000,
+          1000
+        ],
+        "k": 1
+      },
+      "expected": 1000
+    },
+    {
+      "input": {
+        "ribbons": [
+          10000,
+          20000,
+          30000,
+          40000,
+          50000
+        ],
+        "k": 100
+      },
+      "expected": 1470
+    },
+    {
+      "input": {
+        "ribbons": [
+          10000,
+          10000,
+          10000,
+          10000,
+          10000
+        ],
+        "k": 10000
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50
+        ],
+        "k": 20
+      },
+      "expected": 50
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 5
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 20
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "ribbons": [
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50
+        ],
+        "k": 50
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "k": 100
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          9,
+          7,
+          5,
+          3,
+          1
+        ],
+        "k": 5
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "ribbons": [
+          100000,
+          50000,
+          25000,
+          12500,
+          6250
+        ],
+        "k": 15
+      },
+      "expected": 12500
+    },
+    {
+      "input": {
+        "ribbons": [
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000
+        ],
+        "k": 50
+      },
+      "expected": 200
+    },
+    {
+      "input": {
+        "ribbons": [
+          10000,
+          10000,
+          10000,
+          10000,
+          10000,
+          10000,
+          10000,
+          10000,
+          10000,
+          10000
+        ],
+        "k": 100000
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 5
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 50
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 100
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "k": 30
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          100000,
+          100000,
+          100000,
+          100000,
+          100000
+        ],
+        "k": 100000
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          500,
+          400,
+          300,
+          200,
+          100
+        ],
+        "k": 15
+      },
+      "expected": 100
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 30
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000
+        ],
+        "k": 999
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 25
+      },
+      "expected": 20
+    },
+    {
+      "input": {
+        "ribbons": [
+          100000,
+          100000,
+          100000,
+          100000,
+          100000
+        ],
+        "k": 1000000
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "k": 5
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "ribbons": [
+          99999,
+          99999,
+          99999,
+          99999,
+          99999
+        ],
+        "k": 250000
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 5
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 21
+      },
+      "expected": 0
+    },
+    {
+      "input": {
+        "ribbons": [
+          30,
+          20,
+          10,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 25
+      },
+      "expected": 20
+    },
+    {
+      "input": {
+        "ribbons": [
+          100,
+          200,
+          300,
+          400,
+          500
+        ],
+        "k": 10
+      },
+      "expected": 125
+    },
+    {
+      "input": {
+        "ribbons": [
+          99999,
+          99998,
+          99997,
+          99996,
+          99995
+        ],
+        "k": 10
+      },
+      "expected": 49997
+    },
+    {
+      "input": {
+        "ribbons": [
+          99999,
+          99998,
+          99997,
+          99996,
+          99995
+        ],
+        "k": 499975
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 10
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 10
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100
+        ],
+        "k": 25
+      },
+      "expected": 30
+    },
+    {
+      "input": {
+        "ribbons": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ],
+        "k": 100
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 10
+      },
+      "expected": 40
+    },
+    {
+      "input": {
+        "ribbons": [
+          99999,
+          99999,
+          99999,
+          99999,
+          99999
+        ],
+        "k": 100000
+      },
+      "expected": 4
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "k": 9
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "ribbons": [
+          1000,
+          2000,
+          3000,
+          4000,
+          5000,
+          6000,
+          7000,
+          8000,
+          9000,
+          10000
+        ],
+        "k": 35
+      },
+      "expected": 1400
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "k": 12
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "ribbons": [
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "k": 15
+      },
+      "expected": 2
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "k": 10
+      },
+      "expected": 10
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 55
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          10,
+          100,
+          1000,
+          10000
+        ],
+        "k": 1000
+      },
+      "expected": 11
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 15
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "ribbons": [
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50
+        ],
+        "k": 100
+      },
+      "expected": 5
+    },
+    {
+      "input": {
+        "ribbons": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 45
+      },
+      "expected": 11
+    },
+    {
+      "input": {
+        "ribbons": [
+          1000,
+          2000,
+          3000,
+          4000,
+          5000
+        ],
+        "k": 100
+      },
+      "expected": 147
+    },
+    {
+      "input": {
+        "ribbons": [
+          100000,
+          50000,
+          25000,
+          12500,
+          6250,
+          3125,
+          1562,
+          781,
+          390,
+          195
+        ],
+        "k": 20
+      },
+      "expected": 8333
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "k": 25
+      },
+      "expected": 6
+    },
+    {
+      "input": {
+        "ribbons": [
+          30,
+          20,
+          10,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 20
+      },
+      "expected": 22
+    },
+    {
+      "input": {
+        "ribbons": [
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000
+        ],
+        "k": 1
+      },
+      "expected": 100000
+    },
+    {
+      "input": {
+        "ribbons": [
+          99999,
+          99998,
+          99997,
+          99996,
+          99995,
+          99994,
+          99993,
+          99992,
+          99991,
+          99990
+        ],
+        "k": 50
+      },
+      "expected": 19998
+    },
+    {
+      "input": {
+        "ribbons": [
+          1000,
+          1000,
+          1000,
+          1000,
+          1000
+        ],
+        "k": 100
+      },
+      "expected": 50
+    },
+    {
+      "input": {
+        "ribbons": [
+          1000,
+          2000,
+          3000,
+          4000,
+          5000,
+          6000,
+          7000,
+          8000,
+          9000,
+          10000
+        ],
+        "k": 30
+      },
+      "expected": 1600
+    },
+    {
+      "input": {
+        "ribbons": [
+          15,
+          25,
+          35,
+          45,
+          55,
+          65,
+          75,
+          85,
+          95
+        ],
+        "k": 20
+      },
+      "expected": 21
+    },
+    {
+      "input": {
+        "ribbons": [
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000
+        ],
+        "k": 1000000
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000
+        ],
+        "k": 50
+      },
+      "expected": 100
+    },
+    {
+      "input": {
+        "ribbons": [
+          100,
+          200,
+          300,
+          400,
+          500
+        ],
+        "k": 15
+      },
+      "expected": 100
+    },
+    {
+      "input": {
+        "ribbons": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 10
+      },
+      "expected": 1
+    },
+    {
+      "input": {
+        "ribbons": [
+          99999,
+          99998,
+          99997,
+          99996,
+          99995
+        ],
+        "k": 5
+      },
+      "expected": 99995
+    }
+  ],
+  "test_case_count": 100,
+  "optimal_complexity": null,
+  "source_task_id": "cutting-ribbons",
+  "source_question_id": 1891
+}
