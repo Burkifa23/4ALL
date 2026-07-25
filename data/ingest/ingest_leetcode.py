@@ -67,10 +67,27 @@ def is_single_function_entry(row) -> bool:
     return len(method_defs) <= 1
 
 
+def _starter_code_parses(code: str) -> bool:
+    """starter_code is intentionally left with an empty function body for
+    students to fill in, so it will almost never parse standalone. Append
+    a synthetic `pass` at one indent level deeper than the last line, just
+    to check for real syntax errors (mismatched brackets etc.) without
+    penalizing the expected empty body."""
+    stripped = code.rstrip()
+    if not stripped:
+        return False
+    last_line = stripped.splitlines()[-1]
+    indent = len(last_line) - len(last_line.lstrip(" "))
+    candidate = stripped + "\n" + " " * (indent + 4) + "pass\n"
+    return has_parseable_code(candidate)
+
+
 def has_usable_tests(row) -> bool:
     io = row.get("input_output")
-    has_io = io is not None and io not in ("", "null")
-    starter_ok = has_parseable_code(row.get("starter_code") or "")
+    if hasattr(io, "tolist"):
+        io = io.tolist()
+    has_io = io is not None and io not in ("", "null", [])
+    starter_ok = _starter_code_parses(row.get("starter_code") or "")
     completion_ok = has_parseable_code(
         (row.get("prompt") or "") + (row.get("completion") or "")
     )
@@ -125,33 +142,36 @@ def _parse_kwargs(input_str: str) -> dict:
 def parse_test_cases(row) -> list:
     """Normalize input_output into [{"input": {...}, "expected": ...}, ...].
 
-    Real rows come through as a numpy-print of a list of dicts, e.g.
-    "[{'input': 'nums = [3,3], target = 6', 'output': '[0, 1]'}\n {...}]"
-    — missing commas between entries, and both `input` and `output` are
-    themselves strings that need a second parse pass.
+    After `.to_pandas()`, `input_output` comes through as a numpy array of
+    dicts (not the JSON string we originally assumed) — each dict has
+    'input' and 'output' as string values that still need their own parse
+    pass. Kept a string-fallback path too, in case a different split or a
+    future dataset version serializes it differently.
     """
     raw = row.get("input_output")
-    if not raw:
+    if raw is None:
         return []
 
-    # numpy's print puts a newline+space between dict entries instead of a
-    # comma — patch that so the whole thing is valid Python list syntax.
-    fixed = re.sub(r"}\s*\n\s*{", "}, {", raw)
+    if hasattr(raw, "tolist"):  # numpy array -> list of dicts
+        raw = raw.tolist()
 
-    try:
-        parsed = ast.literal_eval(fixed)
-    except (ValueError, SyntaxError):
-        return []
+    if isinstance(raw, str):
+        # Fallback: numpy-print style string, missing commas between entries.
+        fixed = re.sub(r"}\s*\n\s*{", "}, {", raw)
+        try:
+            raw = ast.literal_eval(fixed)
+        except (ValueError, SyntaxError):
+            return []
 
-    if not isinstance(parsed, list):
+    if not isinstance(raw, (list, tuple)):
         return []
 
     cases = []
-    for item in parsed:
+    for item in raw:
         try:
             args = _parse_kwargs(item.get("input", ""))
             expected = ast.literal_eval(item.get("output", ""))
-        except (ValueError, SyntaxError):
+        except (ValueError, SyntaxError, AttributeError):
             continue
         cases.append({"input": args, "expected": expected})
     return cases
@@ -159,16 +179,20 @@ def parse_test_cases(row) -> list:
 def parse_tags(tags_raw) -> list:
     """Normalize the dataset's `tags` field into a clean list of strings.
 
-    Real rows come through as a numpy-print string like
-    "['Array' 'Hash Table']" — note the missing comma, which means this is
-    NOT valid Python list syntax and ast.literal_eval() would silently
-    mangle it. Pull quoted substrings out with regex instead.
+    After `.to_pandas()`, a HF Sequence(string) column comes through as a
+    numpy array, not a Python list or string — so a plain truthiness check
+    (`if not tags_raw`) is ambiguous and raises on multi-element arrays.
+    Handle array-like, plain list, and string forms defensively.
     """
-    if not tags_raw:
+    if tags_raw is None:
         return []
-    if isinstance(tags_raw, list):
-        return tags_raw
-    return re.findall(r"'([^']*)'", tags_raw)
+    if hasattr(tags_raw, "tolist"):  # numpy array / pandas Series
+        return list(tags_raw.tolist())
+    if isinstance(tags_raw, (list, tuple)):
+        return list(tags_raw)
+    if isinstance(tags_raw, str):
+        return re.findall(r"'([^']*)'", tags_raw)
+    return []
 
 
 def to_question_record(row, idx: int) -> dict:
