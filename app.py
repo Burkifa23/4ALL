@@ -43,11 +43,11 @@ code, submitted = render_editor(question)
 # Submit button
 
 if submitted:
-    sandbox_result = run_submission(code, question["id"])
+    sandbox_result = run_submission(code, question["question_id"])
 
     st.session_state["sandbox_result"] = sandbox_result
     add_attempt(
-        question_id=question["id"],
+        question_id=question["question_id"],
         result=sandbox_result.status,
         tests_passed=sandbox_result.tests_passed,
         tests_total=sandbox_result.tests_total,
