@@ -1,84 +1,151 @@
 # Dataset Notes — newfacade/LeetCodeDataset
 
-*Written Day 1/2 (combined), Jul 21 2026. Based on the dataset's GitHub README
-(https://github.com/newfacade/LeetCodeDataset) and HF dataset card
-(https://huggingface.co/datasets/newfacade/LeetCodeDataset). Row-level claims
-below need a `.iloc[0]` sanity check once you load it locally — flag anything
-that doesn't match.*
+*Written Day 1/2, Jul 21 2026. Updated Jul 25 2026 after full local
+ingestion, validation, and reference-solution verification against
+2,869 real rows. All "TBD"/guessed items from the original draft are
+now resolved — see "Findings from the live run" below for what actually
+turned out to be true vs. assumed.*
 
 ## How are test cases actually stored?
 
 Two parallel representations, per row:
-- `input_output` — structured test-case data (exact inner shape TBD, verify
-  locally — likely `{"inputs": [...], "outputs": [...]}` in APPS/human-eval-style
-  datasets, but confirm before trusting the ingest script's parser).
+- `input_output` — structured test-case data.
 - `test` — an executable Python function that checks a candidate solution
   against the cases itself.
 
-This means we don't have to build a test harness from scratch — we can lean on
-`test` directly, or normalize `input_output` into our own uniform shape and run
-cases ourselves for full control over `failed_case_summary` formatting. **Decision:
-normalize `input_output` into our own `{"input":..., "expected":...}` list** so
-the sandbox's child runner has one consistent shape to iterate over, regardless
-of how any single row's `test` function is written. Keep `test` around
-unused/ignored for now — don't depend on `exec`-ing dataset-provided code deep
-inside your runner without reviewing it first.
+**Decision (confirmed correct):** normalize `input_output` into our own
+`{"input": {...}, "expected": ...}` list so the sandbox's child runner has
+one consistent shape to iterate over. `test` is kept around unused —
+don't `exec` dataset-provided code deep inside the runner without review.
+
+**What we actually found**, once loaded via `.to_pandas()`:
+- `input_output` is a **numpy array of dicts**, not a JSON string and not
+  a plain Python list. Each dict has `'input'` and `'output'` as string
+  values that need their own parse pass (e.g.
+  `{'input': 'nums = [3,3], target = 6', 'output': '[0, 1]'}`).
+- The array itself has no commas between dict entries when printed
+  (numpy's repr style), which is a display quirk, not a shape you need
+  to string-patch — accessing the real array via `.tolist()` sidesteps
+  it entirely.
+- Each `input` string parses cleanly as keyword arguments (`nums = [3,3],
+  target = 6`) via `ast.parse(f"f({input_str})", mode="eval")` and
+  reading the resulting AST's keywords — safer than `eval()`.
+- Each `output` string is usually a valid Python literal (`'[0, 1]'`,
+  `'None'`), **but not always** — see "Known gotchas" below.
 
 ## What fields exist?
 
-Full field list (from the dataset's own docs, human-eval format):
+Confirmed against real rows (matches original doc-based list, no
+surprises here):
 
 | Field | Meaning |
 |---|---|
-| `task_id` | slug, e.g. `maximize-the-beauty-of-the-garden` |
+| `task_id` | slug, e.g. `two-sum` |
 | `question_id` | numeric LeetCode ID |
 | `difficulty` | `Easy` / `Medium` / `Hard` |
-| `tags` | list, e.g. `['Array', 'Hash Table']` — this is our `topic`/`topics` source |
+| `tags` | our `topic`/`topics` source — see gotcha below on its real type |
 | `problem_description` | full text incl. examples & constraints |
-| `starter_code` | the stub students complete |
-| `estimated_date` | release date (used for train/test split, not needed by us) |
+| `starter_code` | the stub students complete — **intentionally incomplete**, see gotcha |
+| `estimated_date` | release date, unused |
 | `prompt` | prefix (imports, helper classes like `ListNode`/`TreeNode`) |
 | `completion` | canonical solution body (no prompt) |
-| `entry_point` | function name used for evaluation |
-| `test` | callable checker |
-| `input_output` | test case data |
-| `query` / `response` | combined prompt+description / full solution — used for LLM training, not directly needed by us |
+| `entry_point` | e.g. `"Solution().twoSum"` — an expression, not a bare name; needs `eval()` against the exec'd namespace |
+| `test` | callable checker, unused |
+| `input_output` | test case data — see shape notes above |
+| `query` / `response` | LLM-training fields, unused |
 
-Reference solutions exist (`prompt` + `completion`). This is your gauntlet's
-foundation: every selected question's canonical solution must pass its own
-tests through the real sandbox pipeline.
+Reference solutions (`prompt` + `completion`) were spot-checked: all 50
+sampled questions' reference solutions execute and pass their own
+`test_cases`, verified via `verify_solutions.py`.
 
 ## Simple single-function vs. weird (class-based/multi-function)?
 
-Not yet measured locally (needs the actual `.iloc` pass), but structurally:
-some LeetCode problems are class-based (e.g. design problems like `LRUCache`,
-`MedianFinder`) rather than single free functions. **Filter rule**: reject any
-row whose `starter_code` contains a top-level `class` definition — keep-pile is
-single-function-entry-point problems only, which matches `entry_point` being a
-plain function name for the rows we want.
+**Original filter rule was wrong.** The first draft rejected any row
+whose `starter_code` contained a `class` definition — but nearly every
+LeetCode row wraps its solution in a standard `class Solution:` block,
+so that rule would have rejected almost the entire dataset. **Corrected
+rule:** count method definitions inside the starter code; only reject
+rows where the class defines **more than one** method (the real signal
+for multi-method design problems like `LRUCache`).
 
-## Keep-pile size estimate
+## Keep-pile size and exclusion criteria (post-filtering, confirmed)
 
-Total pool: 2,869 problems (train 2,641 + test 228, v0.3.1). Even a conservative
-discard rate (say, half rejected as class-based/malformed/too-sparse-on-tests)
-still leaves >1,000 usable problems — comfortably above the 30–50 target and
-the escalation trigger (<50) in the role guide. **No escalation needed** based
-on documented structure; revisit if the local run shows otherwise.
+Total pool: 2,869 problems. **After all filters: 2,599 kept, 270
+discarded.** Well above the 30–50 target — no escalation needed.
+
+A row is dropped if any of these hold:
+
+| Check | What it catches | Rows excluded |
+|---|---|---|
+| Multi-method class detection | Design problems (`LRUCache`, etc.) | (included in totals below) |
+| `has_usable_tests` | No usable `input_output`, unparseable code | ~19 in first pass |
+| `uses_tree_or_list_structure` | Needs `TreeNode`/`ListNode` object-graph reconstruction our flat schema can't represent | ~171 |
+| `uses_external_library` | Reference solution imports non-stdlib packages (e.g. `sortedcontainers`) the sandbox won't have | ~80 |
+
+(Exact per-filter breakdown wasn't logged separately per run — if this
+matters later, worth adding a per-filter count to the script's stderr
+output rather than only the final combined number.)
 
 ## Difficulty/topic split target
 
-Aiming for 20 Easy / 20 Medium / 10 Hard (50 total, upper end of the 30–50
-range — safer to have surplus than come up short), with a target of ≥4 distinct
-topics for Person 3's features. `tags` gives us plenty of topic variety to pull
-from across 2,869 problems.
+20 Easy / 20 Medium / 10 Hard (50 total), ≥4 distinct topics for Person
+3's features. **Confirmed working** on the final run — topic-coverage
+warning cleared once the coverage check itself was fixed (see gotcha
+below).
 
-## Open questions to resolve on first local run
+## Known gotchas (resolved during live debugging — don't relitigate these)
 
-1. Confirm the actual inner shape of `input_output` (dict with `inputs`/`outputs`
-   lists? something else?) — the ingest script's `parse_test_cases()` guesses
-   this; fix it against real data.
-2. Confirm `tags` is a Python list after `.to_pandas()` (vs. a stringified list)
-   — affects `to_question_record()`.
-3. Spot-check 3–5 rows by hand: does `prompt + completion` actually execute
-   cleanly and pass its own `input_output` cases?
-   
+- **`tags` and `input_output` are numpy arrays after `.to_pandas()`**,
+  not strings or Python lists. Any `if not x` or `x in (...)` on them
+  raises `ValueError: truth value of an array...`. Fix: check
+  `hasattr(x, "tolist")` and convert before any truthiness/membership
+  check.
+- **String-returning problems store an unquoted bare word** as `output`
+  (e.g. `leetcode`, not `'leetcode'`). `ast.literal_eval` fails on this;
+  falls back to treating it as a raw string in `_parse_expected`.
+- **Some `input_output` entries capture an execution error or timeout**
+  instead of a real answer (`"Error: list index out of range"`,
+  `"Execution timed out"`) — these come from broken auto-generated test
+  cases in the source dataset. Filtered out entirely in
+  `parse_test_cases`; there's no sound way to grade against "should
+  raise this exact error."
+- **Return-type ambiguity**: `ast.literal_eval` can't tell "the answer is
+  the string `'0'`" from "the answer is the integer `0`", and can't
+  parse JSON-style lowercase `true`/`false` at all. Resolved by reading
+  the function's `->` return-type hint from `starter_code`
+  (`_return_type_hint`) and branching in `_parse_expected` accordingly.
+- **`starter_code` is intentionally incomplete** (empty function body —
+  that's the point of a template). Checking it with a bare `ast.parse()`
+  fails almost universally; both the ingest script and the validator
+  append a synthetic `pass` at one indent level deeper before checking
+  for genuine syntax errors.
+- **The topic-coverage check originally read raw `tags` values directly**
+  (`isinstance(tags, list)`), which is never true for a numpy array — it
+  silently always reported 0 topics regardless of the actual sample.
+  Fixed by routing through the same `parse_tags()` helper used
+  everywhere else.
+
+## Follow-up work (not in v1)
+
+- **Tree/linked-list support**: would recover a meaningful chunk of the
+  270 currently-excluded rows. Needs an `arg_types` field in the schema
+  (e.g. `{"root": "TreeNode"}`) so the sandbox runner can invoke
+  `tree_node()`/`list_node()` conversion helpers before calling the
+  candidate, and a structural comparison (not `==`) on output.
+- **Third-party import allowlist**: currently stdlib-only
+  (`_ALLOWED_IMPORTS`); revisit if the sandbox environment later ships
+  more packages by default.
+- Consider logging a per-filter exclusion count (not just the combined
+  total) so future re-runs can see which filter is doing the most
+  rejecting if the source dataset changes.
+
+## Verification performed before this data was committed
+
+1. `python ingest_leetcode.py --out ../questions` — clean run, no
+   warnings, 2599/2869 kept, 50 files written.
+2. `python validates_questions.py --dir ../questions` — 0 errors across
+   all 50 files (schema-level: required fields, difficulty range,
+   parseable code, non-empty test cases, unique IDs).
+3. `python verify_solutions.py --dir ../questions` — 0 failures; every
+   reference solution actually executes and passes its own test cases
+   (correctness-level, not just shape-level).
