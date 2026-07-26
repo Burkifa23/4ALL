@@ -1,13 +1,15 @@
 import json
 from evaluator.client import make_client, complete
 from evaluator.prompts import GRADER_PROMPT_V1_SYSTEM, GRADER_PROMPT_V1_USER_TEMPLATE
+from evaluator.parsing import parse_evaluation, strip_fences
 from evaluator.testing.golden_set.golden_set import GOLDEN_SET
 
 
 def evaluate_complexity(code: str, question: dict, byom_config: dict):
     client = make_client(byom_config)
+    provider = byom_config.get("provider")
+    model = byom_config.get("model", "gemma2")
 
-    # pick two golden-set examples as Few-Shot demonstrations
     example_1 = GOLDEN_SET[0]
     example_2 = GOLDEN_SET[1]
 
@@ -38,11 +40,24 @@ def evaluate_complexity(code: str, question: dict, byom_config: dict):
 
     raw_text = complete(
         client=client,
-        model=byom_config.get("model", "gemma2"),
+        model=model,
         system=GRADER_PROMPT_V1_SYSTEM,
         user=user_prompt,
         temperature=0.2,
         timeout=90.0,
     )
 
-    return raw_text  # parsing.py will clean this up tomorrow (Day 5)
+    try:
+        json.loads(strip_fences(raw_text))
+    except json.JSONDecodeError:
+        raw_text = complete(
+            client=client,
+            model=model,
+            system=GRADER_PROMPT_V1_SYSTEM,
+            user=user_prompt
+            + "\n\nYour last response was not valid JSON. Respond with ONLY the JSON object.",
+            temperature=0.2,
+            timeout=90.0,
+        )
+
+    return parse_evaluation(raw_text, provider)
