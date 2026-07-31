@@ -3,7 +3,7 @@
 
 ## Team Members
 
-- Person 1 – Sandbox
+- Chuong – Sandbox
 - Person 2 – LLM Evaluator
 - Person 3 – Recommender
 - Person 4 – Frontend & Integration
