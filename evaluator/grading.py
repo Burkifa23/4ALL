@@ -57,7 +57,7 @@ def evaluate_complexity(code: str, question: dict, byom_config: dict):
             user=user_prompt
             + "\n\nYour last response was not valid JSON. Respond with ONLY the JSON object.",
             temperature=0.2,
-            timeout=90.0,
+            timeout=150.0,
         )
 
     return parse_evaluation(raw_text, provider)
