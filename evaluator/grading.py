@@ -68,7 +68,7 @@ Now evaluate this code:
         system=GRADER_PROMPT_V2_SYSTEM,
         user=user_prompt,
         temperature=0.2,
-        timeout=90.0,
+        timeout=150.0,
     )
 
     try:

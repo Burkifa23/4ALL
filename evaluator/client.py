@@ -31,7 +31,7 @@ def complete(
     system: str,
     user: str,
     temperature: float = 0.2,
-    timeout: float = 30.0,
+    timeout: float = 120.0,
 ) -> str:
     try:
         response = client.chat.completions.create(
