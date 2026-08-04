@@ -3,3 +3,4 @@ python-dotenv
 openai
 pandas
 scikit-learn
+matplotlib
