@@ -1,0 +1,122 @@
+[
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N^2)",
+    "efficiency_score": 1,
+    "style_score": 4,
+    "raw_feedback": "Brute force nested loop, correct and readable, but not optimal.",
+    "golden_id": "two_sum_brute"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N log N)",
+    "efficiency_score": 4,
+    "style_score": 4,
+    "raw_feedback": "Efficient use of sorting for O(N log N) time complexity, well-structured code.",
+    "golden_id": "two_sum_decent"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 5,
+    "raw_feedback": "Optimal hashmap approach, clean and idiomatic.",
+    "golden_id": "two_sum_optimal"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 3,
+    "style_score": 2,
+    "raw_feedback": "While loop iterates until all pairs are removed, but string replacements can be inefficient.",
+    "golden_id": "valid_parens_brute"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 4,
+    "raw_feedback": "Efficient use of a stack for parenthesis validation, well-structured and readable.",
+    "golden_id": "valid_parens_decent"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 4,
+    "raw_feedback": "Efficient use of a stack for validation, well-structured and readable.",
+    "golden_id": "valid_parens_optimal"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N^2)",
+    "efficiency_score": 1,
+    "style_score": 3,
+    "raw_feedback": "String concatenation within a loop leads to quadratic time complexity.",
+    "golden_id": "reverse_string_brute"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 4,
+    "raw_feedback": "Efficient in-place reversal using two pointers, good variable names.",
+    "golden_id": "reverse_string_decent"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 5,
+    "raw_feedback": "Python slicing provides an elegant and efficient solution.",
+    "golden_id": "reverse_string_optimal"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N^2)",
+    "efficiency_score": 1,
+    "style_score": 2,
+    "raw_feedback": "Nested loops lead to quadratic complexity; variable name 'max_val' is acceptable but could be more descriptive.",
+    "golden_id": "find_max_brute"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 3,
+    "style_score": 4,
+    "raw_feedback": "Linear time complexity achieved, code is clear and well-structured.",
+    "golden_id": "find_max_decent"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 5,
+    "raw_feedback": "Utilizes Python's built-in `max` function for optimal efficiency and clear style.",
+    "golden_id": "find_max_optimal"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N^2)",
+    "efficiency_score": 1,
+    "style_score": 3,
+    "raw_feedback": "Nested loops for duplicate checking, readable but inefficient.",
+    "golden_id": "check_duplicates_brute"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N log N)",
+    "efficiency_score": 3,
+    "style_score": 4,
+    "raw_feedback": "Sorting introduces O(N log N) complexity, but the loop itself is linear.",
+    "golden_id": "check_duplicates_decent"
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 4,
+    "raw_feedback": "Efficient use of sets to check for duplicates, good style.",
+    "golden_id": "check_duplicates_optimal"
+  }
+]
