@@ -81,6 +81,21 @@ def _starter_code_parses(code: str) -> bool:
     candidate = stripped + "\n" + " " * (indent + 4) + "pass\n"
     return has_parseable_code(candidate)
 
+def _finalize_starter_code(starter_code: str) -> str:
+    """Make starter_code independently valid, runnable Python — the
+    frontend renders this string alone, without the dataset's `prompt`
+    boilerplate, so it needs its own typing imports and a real (not
+    just internally-checked) function body."""
+    stripped = (starter_code or "").rstrip()
+    if not stripped:
+        return stripped
+
+    last_line = stripped.splitlines()[-1]
+    indent = len(last_line) - len(last_line.lstrip(" "))
+    body = stripped + "\n" + " " * (indent + 4) + "pass\n"
+
+    return "from typing import *\n\n" + body
+
 
 def has_usable_tests(row) -> bool:
     io = row.get("input_output")
