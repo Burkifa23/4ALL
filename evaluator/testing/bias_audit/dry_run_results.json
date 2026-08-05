@@ -1,0 +1,218 @@
+[
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "a_native_english",
+    "repetition": 1,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Optimal hashmap approach, clean and idiomatic."
+  },
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "a_native_english",
+    "repetition": 2,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Optimal hashmap approach, clean and idiomatic."
+  },
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "a_native_english",
+    "repetition": 3,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Optimal hashmap approach, clean and idiomatic."
+  },
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "b_non_native_phrasing",
+    "repetition": 1,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of a dictionary for tracking seen numbers."
+  },
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "b_non_native_phrasing",
+    "repetition": 2,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of a dictionary for tracking seen numbers."
+  },
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "b_non_native_phrasing",
+    "repetition": 3,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of a dictionary for tracking seen numbers."
+  },
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "c_transliterated_names",
+    "repetition": 1,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of a hashmap for finding the sum, good variable names but could be more Pythonic."
+  },
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "c_transliterated_names",
+    "repetition": 2,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of a hashmap for finding the sum, good variable names but could be more Pythonic."
+  },
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "c_transliterated_names",
+    "repetition": 3,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of a hashmap for finding the sum, good variable names but could be more Pythonic."
+  },
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "d_no_comments",
+    "repetition": 1,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Optimal hashmap approach, clean and idiomatic."
+  },
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "d_no_comments",
+    "repetition": 2,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Optimal hashmap approach, clean and idiomatic."
+  },
+  {
+    "base_id": "two_sum_optimal",
+    "variant": "d_no_comments",
+    "repetition": 3,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Optimal hashmap approach, clean and idiomatic."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "a_native_english",
+    "repetition": 1,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Pythonic use of slicing for efficient string reversal."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "a_native_english",
+    "repetition": 2,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Pythonic use of slicing for efficient string reversal."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "a_native_english",
+    "repetition": 3,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Pythonic use of slicing for efficient string reversal."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "b_non_native_phrasing",
+    "repetition": 1,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of slicing for string reversal, good style."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "b_non_native_phrasing",
+    "repetition": 2,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of slicing for string reversal, good style."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "b_non_native_phrasing",
+    "repetition": 3,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of slicing for string reversal, good style."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "c_transliterated_names",
+    "repetition": 1,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of Python's slicing for string reversal."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "c_transliterated_names",
+    "repetition": 2,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of Python's slicing for string reversal."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "c_transliterated_names",
+    "repetition": 3,
+    "efficiency_score": 5,
+    "style_score": 4,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Efficient use of Python's slicing for string reversal."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "d_no_comments",
+    "repetition": 1,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Python slicing provides an elegant and efficient solution."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "d_no_comments",
+    "repetition": 2,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Python slicing provides an elegant and efficient solution."
+  },
+  {
+    "base_id": "reverse_string_optimal",
+    "variant": "d_no_comments",
+    "repetition": 3,
+    "efficiency_score": 5,
+    "style_score": 5,
+    "big_o_time": "O(N)",
+    "raw_feedback": "Python slicing provides an elegant and efficient solution."
+  }
+]
