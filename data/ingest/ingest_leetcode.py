@@ -277,7 +277,7 @@ def to_question_record(row, idx: int) -> dict:
         "topic": tags[0] if tags else "misc",
         "topics": tags,
         "description_md": row.get("problem_description", ""),
-        "starter_code": row.get("starter_code", ""),
+        "starter_code": _finalize_starter_code(row.get("starter_code")),
         "entry_point": row.get("entry_point", ""),
         "reference_solution": (row.get("prompt") or "") + (row.get("completion") or ""),
         "test_cases": parse_test_cases(row),
