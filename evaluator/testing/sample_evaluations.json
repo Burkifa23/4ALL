@@ -1,0 +1,107 @@
+[
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N^2)",
+    "efficiency_score": 1,
+    "style_score": 4,
+    "raw_feedback": "Brute force nested loop, correct and readable, but not optimal."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N log N)",
+    "efficiency_score": 4,
+    "style_score": 4,
+    "raw_feedback": "Efficient use of sorting for a two-pointer approach, well-structured."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 5,
+    "raw_feedback": "Optimal hashmap approach, clean and idiomatic."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 3,
+    "style_score": 2,
+    "raw_feedback": "While loop iterates until all matching pairs are removed, but string replacements can be inefficient."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 4,
+    "raw_feedback": "Correctly uses a stack for efficient validation of parentheses."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 4,
+    "raw_feedback": "Efficient use of a stack for validation, clear and well-structured."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N^2)",
+    "efficiency_score": 1,
+    "style_score": 3,
+    "raw_feedback": "String concatenation within a loop leads to quadratic time complexity."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 4,
+    "raw_feedback": "Efficient in-place reversal using two pointers, well-structured."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 5,
+    "raw_feedback": "Python's slicing notation provides an elegant and efficient solution."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N^2)",
+    "efficiency_score": 1,
+    "style_score": 2,
+    "raw_feedback": "Nested loops lead to quadratic complexity; variable naming could be improved."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 3,
+    "style_score": 4,
+    "raw_feedback": "Linear time complexity achieved, code is readable but could benefit from more descriptive variable names."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 5,
+    "raw_feedback": "Utilizes Python's built-in `max` function for optimal efficiency and clear style."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N^2)",
+    "efficiency_score": 1,
+    "style_score": 3,
+    "raw_feedback": "Nested loops for checking duplicates, readable but inefficient."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N log N)",
+    "efficiency_score": 3,
+    "style_score": 4,
+    "raw_feedback": "Sorting introduces O(N log N) complexity, but the loop itself is linear."
+  },
+  {
+    "provider": "ollama",
+    "big_o_time": "O(N)",
+    "efficiency_score": 5,
+    "style_score": 5,
+    "raw_feedback": "Efficient use of sets for duplicate detection."
+  }
+]

@@ -1,12 +1,20 @@
 from evaluator.client import make_client, complete
 from evaluator.prompts import HINT_PROMPT_V1_SYSTEM, HINT_PROMPT_V1_USER_TEMPLATE
 
+MAX_DESCRIPTION_CHARS = 1000
+
+
+def truncate_description(description: str) -> str:
+    if len(description) > MAX_DESCRIPTION_CHARS:
+        return description[:MAX_DESCRIPTION_CHARS] + "... [truncated]"
+    return description
+
 
 def get_hint(code: str, question: dict, failed_case_summary: str, byom_config: dict):
     client = make_client(byom_config)
 
     user_prompt = HINT_PROMPT_V1_USER_TEMPLATE.format(
-        question_description=question.get("description", ""),
+        question_description=truncate_description(question.get("description_md", "")),
         code=code,
         failed_case_summary=failed_case_summary,
     )
@@ -17,6 +25,7 @@ def get_hint(code: str, question: dict, failed_case_summary: str, byom_config: d
         system=HINT_PROMPT_V1_SYSTEM,
         user=user_prompt,
         temperature=0.2,
+        timeout=150.0,
     )
 
     return {
