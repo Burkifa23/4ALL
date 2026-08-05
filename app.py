@@ -3,7 +3,7 @@ import streamlit as st
 
 from ui.editor import render_editor
 from ui.results import show_result
-from sandbox.stub import run_submission
+from sandbox.runner import run_submission
 
 from evaluator.stub import get_hint, evaluate_complexity
 from ui.question_loader import load_questions

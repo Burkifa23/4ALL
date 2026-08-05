@@ -22,15 +22,21 @@ REQUIRED_FIELDS = {
 }
 
 VALID_DIFFICULTIES = {0, 1, 2, 3}
-
 def _starter_code_parses(code: str) -> bool:
-    """starter_code is intentionally left with an empty function body for
-    students to fill in — append a synthetic pass at one indent level
-    deeper than the last line, just to catch genuine syntax errors
-    (mismatched brackets etc.) without penalizing the expected empty body."""
     stripped = (code or "").rstrip()
     if not stripped:
         return False
+
+    # Already complete and valid on its own (e.g. finalized starter_code
+    # from the ingestion pipeline) — no synthetic pass needed.
+    try:
+        ast.parse(stripped)
+        return True
+    except SyntaxError:
+        pass
+
+    # Fallback for genuinely incomplete templates (empty function body,
+    # the original LeetCode-style starter code).
     last_line = stripped.splitlines()[-1]
     indent = len(last_line) - len(last_line.lstrip(" "))
     candidate = stripped + "\n" + " " * (indent + 4) + "pass\n"
