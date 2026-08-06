@@ -1,11 +1,5 @@
 # Dataset Notes — newfacade/LeetCodeDataset
 
-*Written Day 1/2, Jul 21 2026. Updated Jul 25 2026 after full local
-ingestion, validation, and reference-solution verification against
-2,869 real rows. All "TBD"/guessed items from the original draft are
-now resolved — see "Findings from the live run" below for what actually
-turned out to be true vs. assumed.*
-
 ## How are test cases actually stored?
 
 Two parallel representations, per row:

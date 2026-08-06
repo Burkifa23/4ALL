@@ -45,7 +45,7 @@ and produces a `SandboxResult` (defined in `contracts/types.py`).
   correctly. Run with `python test_security_manual.py` from `sandbox/`.
 - `sandbox/debug_manual.py` — calls `run_submission()` directly,
   bypassing Streamlit entirely, and prints the full `SandboxResult`.
-  Much faster than clicking through the UI when debugging — use this
+  Much faster than clicking through the UI when debugging; use this
   first if something looks wrong end-to-end.
 
 ## Known limitation: stale Streamlit process
