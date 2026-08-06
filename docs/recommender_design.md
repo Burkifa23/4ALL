@@ -246,20 +246,38 @@ Figures: `docs/report/figures/` — `decision_tree.png`, `feature_importance.png
   dataset. Logging failures are swallowed — a full disk must not end someone's
   assessment.
 
-## 7. Integration status (for Person 4)
+## 7. Integration (live)
 
-`recommender.assemble_features(history, question)` is the runtime entry point:
-pure, no streamlit, no `session_state`. It is the same function the tests and
-the simulator agree with, so calling it is what guarantees parity.
+The model drives the app. `app.py` calls
+`assemble_features(st.session_state.history, question)` then
+`recommend_next(vector, exclude=st.session_state.served)`, and the
+"Next Question" button serves whatever comes back.
 
-One gap remains on the app side: `ui/history.py::add_attempt` records only
-`(question_id, result, tests_passed, tests_total)`. Until it also records the
-`LLMEvaluation` scores per attempt, `assemble_features` will fall back to
-cold-start values for the four score features. It handles both shapes, so the
-app works before and after that change — it just gets a sharper signal after.
+Four changes made it work:
 
-`tests/test_recommender.py::test_assemble_features_canned_history` is the
-parity artifact: one canned history asserted field by field.
+- **`ui/history.py::add_attempt` now records the attempt's `LLMEvaluation`**
+  (`efficiency_score`, `style_score`), the source of four model features.
+  Failures stay unscored — only passing submissions get graded — which is
+  exactly what `assemble_features` expects.
+- **`app.py` grades before recording, and records before assembling.** The
+  feature definitions assume history already contains the attempt being judged.
+- **Navigation moved from list position to `question_id`**, since the
+  recommender returns an id and folder order means nothing to it. Advancing
+  clears `sandbox_result` / `hint` / `evaluation` so the previous question's
+  output can't leak onto the next one.
+- **`ui/sidebar.py` now stores the contract provider value** (`"ollama"` /
+  `"openai"`) rather than the display label. `evaluator/client.py:22` raises
+  `ValueError` on anything else — harmless against the stub, a crash the moment
+  the real client lands. It also carries the `RECOMMENDER_MODE` baseline
+  toggle and shows the live decision and confidence, so the routing is visible
+  rather than mysterious.
+
+Two parity artifacts guard this:
+`tests/test_recommender.py::test_assemble_features_canned_history` (one canned
+history asserted field by field) and `tests/test_app_integration.py`, which
+runs the real `app.py` headlessly via streamlit's `AppTest` and asserts both
+behavioural acceptance tests — ace an Easy question and the next is Medium;
+fail repeatedly and difficulty holds.
 
 ## 8. Limitations
 

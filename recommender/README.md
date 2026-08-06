@@ -24,6 +24,12 @@ classification report, and the test script exercises labeling, encoding,
 feature assembly and the runtime guardrails. Everything is seeded — running
 `train` twice produces an identical model.
 
+The app-level acceptance tests run the real `app.py` headlessly:
+
+```bash
+python tests/test_app_integration.py
+```
+
 Report figures and the ML-vs-rules comparison table:
 
 ```bash
@@ -35,11 +41,13 @@ first) and the deps in `requirements.txt`.
 
 ## Using it from the app
 
+Already wired in `app.py`:
+
 ```python
 from recommender import assemble_features, recommend_next
 
 vector = assemble_features(st.session_state.history, question)
-rec = recommend_next(vector, exclude=served_question_ids)
+rec = recommend_next(vector, exclude=st.session_state.served)
 
 rec.next_question_id  # str
 rec.decision          # "reinforce" | "level_up"
@@ -50,10 +58,15 @@ rec.confidence        # float 0-1
 same function training and the tests agree with. Calling it is what guarantees
 runtime features match training features.
 
+**Call order matters.** Record the attempt (including its `LLMEvaluation`)
+before assembling features: every feature is defined as including the attempt
+just judged. Grade first, then `add_attempt(..., evaluation=evaluation)`, then
+`assemble_features`.
+
 History entries need `question_id` and `result` (`"passed"` counts as a pass).
-Add `efficiency_score` and `style_score` from the attempt's `LLMEvaluation`
-when one was run; without them the four score features fall back to cold-start
-values and the model still works, just with a weaker signal.
+`efficiency_score` and `style_score` come from the attempt's `LLMEvaluation`;
+failures carry `None` for both, since only passing submissions get graded, and
+the four score features then fall back to cold-start values.
 
 Set `RECOMMENDER_MODE=baseline` to force the non-ML rules path — for A/B demos
 or as a live fallback. With no trained model on disk the engine falls back to
