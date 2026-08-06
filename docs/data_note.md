@@ -10,16 +10,16 @@ Reproducible: delete `data/questions/`, rerun the ingest script with the same
 |---|---|---|
 | `question_id` | `str` | Our internal ID, e.g. `"q_0001"`. Stable across regenerations for a given seed. |
 | `title` | `str` | Human-readable title, e.g. `"Two Sum"`. |
-| `difficulty` | `int` | `1` = Easy, `2` = Medium, `3` = Hard. (Person 3: encode as ordinal, not one-hot, since it's genuinely ordered.) |
+| `difficulty` | `int` | `1` = Easy, `2` = Medium, `3` = Hard.  |
 | `topic` | `str` | Primary tag, e.g. `"Array"`. First entry of `topics`. |
 | `topics` | `list[str]` | All tags from the source dataset, e.g. `["Array", "Hash Table"]`. |
 | `description_md` | `str` | Full problem description, markdown-renderable, incl. examples/constraints. |
 | `starter_code` | `str` | The stub shown to the student in the editor. |
 | `entry_point` | `str` | Function name the sandbox calls to run the student's submission. |
 | `reference_solution` | `str` | A known-correct solution (prompt + completion). Used only for the gauntlet (validating the dataset itself) — never shown to students. |
-| `test_cases` | `list[{"input": ..., "expected": ...}]` | Normalized test cases. `input`/`expected` shapes vary by problem (positional args vs. dict — confirm convention with Person 4 when wiring the child runner). |
+| `test_cases` | `list[{"input": ..., "expected": ...}]` | Normalized test cases. `input`/`expected` shapes vary by problem (positional args vs. dict |
 | `test_case_count` | `int` | `len(test_cases)`. Report this honestly in the final numbers — don't imply "100+" if the real count is lower for a given question. |
-| `optimal_complexity` | `str \| null` | e.g. `"O(N)"`. Null until the manual labeling pass (Person 2's request, Day 4 of Week 10). |
+| `optimal_complexity` | `str \| null` | e.g. `"O(N)"`. Null until the manual labeling pass. |
 | `source_task_id` | `str` | Original LeetCode slug, for traceability back to the source dataset. |
 | `source_question_id` | `int` | Original LeetCode numeric ID. |
 
