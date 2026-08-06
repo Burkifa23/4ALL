@@ -18,7 +18,7 @@ python -m recommender.train
 python tests/test_recommender.py
 ```
 
-`simulate` writes `data/synthetic/logs_v1.csv` (2,519 rows, 200 students),
+`simulate` writes `data/synthetic/logs_v1.csv` (2,460 rows, 200 students),
 `train` writes `recommender/models/decision_tree_v1.joblib` and prints the
 classification report, and the test script exercises labeling, encoding,
 feature assembly and the runtime guardrails. Everything is seeded — running
@@ -86,11 +86,11 @@ the same path rather than raising.
 
 ## Model card — `decision_tree_v1.joblib`
 
-- Trained on `data/synthetic/logs_v1.csv` (2,519 rows / 200 students, seed 42)
+- Trained on `data/synthetic/logs_v1.csv` (2,460 rows / 200 students, seed 42)
 - `DecisionTreeClassifier(max_depth=3, min_samples_leaf=20, class_weight="balanced", random_state=42)`
-- Held out 50 whole students (`GroupShuffleSplit`, 667 decisions)
-- accuracy 0.963 · macro-F1 0.962 · level_up recall 0.997 · reinforce recall 0.937
-- Rules baseline on the same split: accuracy 0.822 · macro-F1 0.817
+- Held out 50 whole students (`GroupShuffleSplit`, 631 decisions)
+- accuracy 0.997 · macro-F1 0.997 · level_up recall 1.000 · reinforce recall 0.994
+- Rules baseline on the same split: accuracy 0.767 · macro-F1 0.765
 - The bundle stores `feature_names`; `engine.py` refuses to serve if they no
   longer match `features.FEATURE_NAMES`, so a feature change fails loudly
   instead of predicting on misaligned columns.

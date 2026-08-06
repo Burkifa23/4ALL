@@ -39,6 +39,7 @@ def _row_to_vector(r):
         question_difficulty=r.question_difficulty,
         question_topic=r.question_topic,
         attempts_on_question=r.attempts_on_question,
+        last_attempt_passed=r.last_attempt_passed,
         user_pass_rate=r.user_pass_rate,
         avg_efficiency_score=r.avg_efficiency_score,
         avg_style_score=r.avg_style_score,

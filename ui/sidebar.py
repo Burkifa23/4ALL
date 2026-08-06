@@ -47,8 +47,14 @@ def show_recommendation():
 
     st.sidebar.subheader("Recommender")
 
+    retrying = recommendation.next_question_id == st.session_state.get(
+        "current_question_id"
+    )
+
     if recommendation.decision == "level_up":
         st.sidebar.success("Level up - next question is harder")
+    elif retrying:
+        st.sidebar.info("Reinforce - try this question again")
     else:
         st.sidebar.info("Reinforce - staying at this difficulty")
 
@@ -65,19 +71,18 @@ def show_history():
     st.sidebar.subheader("Session History")
 
     if "history" in st.session_state:
-        for item in st.session_state.history:
+        # Keep these lines flush left. Markdown turns any line indented four or
+        # more spaces into a code block, which is what made history rows render
+        # inside stray fences.
+        for i, item in enumerate(st.session_state.history, 1):
             scores = ""
 
             if item.get("efficiency_score") is not None:
                 scores = (
-                    f"\n\nEfficiency: {item['efficiency_score']} / "
-                    f"Style: {item['style_score']}"
+                    f" - efficiency {item['efficiency_score']}"
+                    f" / style {item['style_score']}"
                 )
 
             st.sidebar.write(
-                f"""
-                Question: {item["question_id"]}
-
-                Result: {item["result"]}{scores}
-                """
+                f"{i}. **{item['question_id']}** - {item['result']}{scores}"
             )

@@ -54,6 +54,12 @@ class FeatureVector:
 
     attempts_on_question: int
 
+    # Whether the submission just judged passed. This is the single strongest
+    # signal for the decision — without it the model has to guess the outcome
+    # from attempt counts, which is exactly how it once levelled students up
+    # for failing.
+    last_attempt_passed: bool
+
     user_pass_rate: float  # 0.0-1.0 over the whole session
 
     avg_efficiency_score: float

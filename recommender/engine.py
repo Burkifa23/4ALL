@@ -26,6 +26,12 @@ MODEL_PATH = Path("recommender/models/decision_tree_v1.joblib")
 PREDICTION_LOG = Path("data/predictions.jsonl")
 MAX_DIFFICULTY = 3
 
+# How many times a student may retry the same failed question before the
+# recommender moves them to a different one at the same difficulty. Retrying
+# is what "reinforce" should mean after a failure; moving on immediately taught
+# nothing. The cap exists so a student who simply cannot solve it isn't stuck.
+RETRY_LIMIT = 3
+
 _model = None
 _index = None
 
@@ -122,8 +128,21 @@ def recommend_next(vector: FeatureVector, exclude=()) -> Recommendation:
     return _build(vector, decision, confidence, mode="model", exclude=exclude)
 
 
+def _should_retry(vector, decision):
+    """Reinforce after a failure means 'try this one again', up to RETRY_LIMIT."""
+    return (
+        decision == "reinforce"
+        # 0 attempts is cold start — there is nothing to retry yet.
+        and 1 <= vector.attempts_on_question < RETRY_LIMIT
+        and not vector.last_attempt_passed
+    )
+
+
 def _build(vector, decision, confidence, mode, exclude):
     """Map a decision to a concrete question, log it, return the contract type."""
+    if _should_retry(vector, decision):
+        return _finish(vector, vector.question_id, decision, confidence, mode)
+
     target = (
         min(vector.question_difficulty + 1, MAX_DIFFICULTY)
         if decision == "level_up"
@@ -136,6 +155,12 @@ def _build(vector, decision, confidence, mode, exclude):
     if next_id is None:  # every question exhausted; repeat rather than crash
         next_id = vector.question_id
         confidence = 0.0
+
+    return _finish(vector, next_id, decision, confidence, mode)
+
+
+def _finish(vector, next_id, decision, confidence, mode):
+    """Build, log and return the contract type."""
 
     recommendation = Recommendation(
         next_question_id=next_id, decision=decision, confidence=confidence

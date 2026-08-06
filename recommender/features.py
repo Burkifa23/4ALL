@@ -15,6 +15,10 @@ attempts_on_question  submissions on THIS question this session, INCLUDING the
                       one just judged. The app appends to history on submit and
                       only then recommends, so this is >=1 at every real
                       decision point and 0 only at cold start.
+last_attempt_passed   did the submission just judged pass? Encoded 1.0/0.0.
+                      This is the labeling rule's first argument, so leaving it
+                      out forced the model to infer the outcome from attempt
+                      counts — see the postmortem in docs/recommender_design.md.
 user_pass_rate        passes / attempts over the WHOLE session so far,
                       including the attempt just judged. Denominator is
                       attempts, not questions.
@@ -27,7 +31,8 @@ last_style_score      style of the most recent scored attempt.
 COLD-START DEFAULTS (no history at all)
 ---------------------------------------
 user_pass_rate 0.5, avg_efficiency_score 3.0, avg_style_score 3.0,
-last_efficiency_score 3, last_style_score 3, attempts_on_question 0.
+last_efficiency_score 3, last_style_score 3, attempts_on_question 0,
+last_attempt_passed False.
 0.5 and 3 are deliberate mid-scale values: a fresh student is neither assumed
 competent nor assumed struggling. 0.0 would have made every new student look
 like a failing one and biased the first recommendation toward "reinforce".
@@ -63,6 +68,7 @@ TOPICS = (
 NUMERIC_FEATURES = (
     "question_difficulty",
     "attempts_on_question",
+    "last_attempt_passed",
     "user_pass_rate",
     "avg_efficiency_score",
     "avg_style_score",
@@ -74,6 +80,7 @@ FEATURE_NAMES = NUMERIC_FEATURES + tuple(f"topic={t}" for t in TOPICS)
 
 COLD_START = {
     "attempts_on_question": 0,
+    "last_attempt_passed": False,
     "user_pass_rate": 0.5,
     "avg_efficiency_score": 3.0,
     "avg_style_score": 3.0,
@@ -101,13 +108,22 @@ def assemble_features(history, question) -> FeatureVector:
 
     history: list of attempt dicts, oldest first. Required keys:
         question_id  str
-        result       str, "passed" counts as a pass (matches SandboxResult.status)
+        result       str, one of SandboxResult.status
     Optional keys (from the LLMEvaluation of that attempt, when one was run):
         efficiency_score  int 1-5
         style_score       int 1-5
-    Attempts without scores are ignored by the score averages but still count
+
+    ONLY "passed" counts as a pass. The other four statuses — "failed",
+    "error", "blocked", "timeout" — are all non-passes that still count as
+    attempts, so they lower user_pass_rate and raise attempts_on_question.
+    That is deliberate: each one is the student's own submission, and counting
+    them biases the recommender toward the conservative "reinforce". Do not
+    "helpfully" widen the pass set.
+
+    Only a passing submission is ever graded, so non-passes carry no scores.
+    Attempts without scores are skipped by the score averages but still count
     toward user_pass_rate and attempts_on_question, so a session of pure
-    failures (which never get graded) still moves the pass rate.
+    failures still moves the pass rate.
 
     question: the question dict from data/questions/*.json (needs question_id,
         difficulty, topic).
@@ -139,6 +155,7 @@ def assemble_features(history, question) -> FeatureVector:
         question_difficulty=question["difficulty"],
         question_topic=question["topic"],
         attempts_on_question=attempts_on_question,
+        last_attempt_passed=bool(history) and history[-1]["result"] == "passed",
         user_pass_rate=user_pass_rate,
         avg_efficiency_score=avg_eff,
         avg_style_score=avg_sty,

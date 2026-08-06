@@ -138,10 +138,18 @@ def simulate_student(student_id, archetype, rng, index):
         p = params["pass_prob"][difficulty] + params["improvement"] * position
         p = float(np.clip(p + rng.normal(0, params["jitter"]), 0.02, 0.98))
 
-        # Patience varies per question. Without this every failure would take
-        # exactly MAX_SUBMISSIONS tries, handing the model a fake
-        # "attempts == 4 means failed" signal no real session would contain.
-        patience = int(rng.integers(2, MAX_SUBMISSIONS + 1))
+        # Patience varies per question, and the floor MUST be 1.
+        #
+        # Two artifacts have already been caused by getting this wrong, both of
+        # them invisible to grouped cross-validation and both caught only by
+        # driving the real app:
+        #   patience fixed at MAX_SUBMISSIONS -> every failure cost exactly 4
+        #     submissions, a fake "attempts == 4 means failed" tell.
+        #   patience floored at 2 -> no training row ever paired
+        #     attempts_on_question == 1 with a failure, so the model learned
+        #     "first attempt => passed" and levelled students up for failing.
+        # Real students fail on their first submission all the time.
+        patience = int(rng.integers(1, MAX_SUBMISSIONS + 1))
         submissions = 0
         passed = False
         while submissions < patience and not passed:
@@ -178,6 +186,7 @@ def simulate_student(student_id, archetype, rng, index):
                 "question_difficulty": difficulty,
                 "question_topic": topic,
                 "attempts_on_question": submissions,
+                "last_attempt_passed": passed,
                 "user_pass_rate": user_pass_rate,
                 "avg_efficiency_score": avg_eff,
                 "avg_style_score": avg_sty,

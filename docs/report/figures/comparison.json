@@ -1,16 +1,16 @@
 {
   "decision_tree": {
-    "accuracy": 0.9625187406296851,
-    "macro_f1": 0.9621481251120801,
-    "level_up_recall": 0.9965397923875432,
-    "reinforce_recall": 0.9365079365079365
+    "accuracy": 0.9968304278922345,
+    "macro_f1": 0.9967660926609266,
+    "level_up_recall": 1.0,
+    "reinforce_recall": 0.9944598337950139
   },
   "rules_baseline": {
-    "accuracy": 0.8215892053973014,
-    "macro_f1": 0.8167857348952623,
-    "level_up_recall": 0.7612456747404844,
-    "reinforce_recall": 0.8677248677248677
+    "accuracy": 0.7670364500792393,
+    "macro_f1": 0.7649108756313979,
+    "level_up_recall": 0.7851851851851852,
+    "reinforce_recall": 0.7534626038781164
   },
-  "n_test_rows": 667,
+  "n_test_rows": 631,
   "n_test_students": 50
 }
