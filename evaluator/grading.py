@@ -4,11 +4,26 @@ from evaluator.prompts import GRADER_PROMPT_V2_SYSTEM, GRADER_PROMPT_V1_USER_TEM
 from evaluator.parsing import parse_evaluation, strip_fences
 from evaluator.testing.golden_set.golden_set import GOLDEN_SET
 
+_EVALUATION_CACHE = {}
+
+
+def _cache_key(code: str, question_id: str, model: str) -> str:
+    import hashlib
+
+    raw = f"{code}|{question_id}|{model}"
+    return hashlib.sha256(raw.encode()).hexdigest()
+
 
 def evaluate_complexity(code: str, question: dict, byom_config: dict):
-    client = make_client(byom_config)
     provider = byom_config.get("provider")
     model = byom_config.get("model", "gemma2")
+    question_id = question.get("question_id", "unknown")
+
+    cache_key = _cache_key(code, question_id, model)
+    if cache_key in _EVALUATION_CACHE:
+        return _EVALUATION_CACHE[cache_key]
+
+    client = make_client(byom_config)
 
     example_1 = GOLDEN_SET[0]  # two_sum_brute — obvious O(N^2)
     example_2 = GOLDEN_SET[2]  # two_sum_optimal — O(N)
@@ -84,4 +99,6 @@ Now evaluate this code:
             timeout=150.0,
         )
 
-    return parse_evaluation(raw_text, provider)
+    result = parse_evaluation(raw_text, provider)
+    _EVALUATION_CACHE[cache_key] = result
+    return result
