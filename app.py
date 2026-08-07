@@ -1,12 +1,27 @@
+import os
+
 import streamlit as st
+from dotenv import load_dotenv
 
 
 from ui.editor import render_editor
 from ui.results import show_result
 from sandbox.runner import run_submission
 
-from evaluator.stub import get_hint, evaluate_complexity
+from evaluator.errors import EvaluatorError
 from ui.question_loader import load_questions
+
+# Reads OPENAI_API_KEY from .env so the sidebar key field comes pre-filled.
+load_dotenv()
+
+# EVALUATOR_MODE=stub swaps in the offline stand-in: identical signatures and
+# return types, no Ollama, no 90-second waits. The test suite runs this way, and
+# it is the demo fallback if the local model dies mid-presentation.
+if os.environ.get("EVALUATOR_MODE") == "stub":
+    from evaluator.stub import get_hint, evaluate_complexity
+else:
+    from evaluator.grading import evaluate_complexity
+    from evaluator.hints import get_hint
 
 
 from ui.history import initialize_history, add_attempt
@@ -48,29 +63,43 @@ code, submitted = render_editor(question)
 # Submit button
 
 if submitted:
-    sandbox_result = run_submission(code, question["question_id"])
+    with st.spinner("Running test cases..."):
+        sandbox_result = run_submission(code, question["question_id"])
 
     st.session_state["sandbox_result"] = sandbox_result
 
-    provider = st.session_state.get("model_provider", "ollama")
+    byom_config = st.session_state["byom_config"]
+
+    model_name = byom_config.get("model", "the model")
 
     evaluation = None
 
     # Grade a pass and nothing else. SandboxResult.status has five values, and
     # anything that isn't "passed" is code that did not work — grading it would
     # feed the recommender an efficiency score for code that never ran.
-    if sandbox_result.status == "passed":
-        evaluation = evaluate_complexity(code, question, provider)
+    #
+    # An LLM failure must never abort the submission: the attempt is still
+    # recorded (unscored) and still routed, and the recommender already falls
+    # back to cold-start values for a missing score.
+    try:
+        if sandbox_result.status == "passed":
+            with st.spinner(f"Asking {model_name} to review your solution..."):
+                evaluation = evaluate_complexity(code, question, byom_config)
 
-        st.session_state["evaluation"] = evaluation
+            st.session_state["evaluation"] = evaluation
 
-    elif sandbox_result.failed_case_summary:
-        # runner.py sets this on exactly the statuses worth hinting about
-        # (failed / error / timeout) and leaves it None for "blocked" — a
-        # security-blocked submission must not get coaching.
-        st.session_state["hint"] = get_hint(
-            code, question, sandbox_result.failed_case_summary, provider
-        )
+        elif sandbox_result.failed_case_summary:
+            # runner.py sets this on exactly the statuses worth hinting about
+            # (failed / error / timeout) and leaves it None for "blocked" — a
+            # security-blocked submission must not get coaching.
+            with st.spinner(f"Asking {model_name} for a hint..."):
+                st.session_state["hint"] = get_hint(
+                    code, question, sandbox_result.failed_case_summary, byom_config
+                )
+
+    except EvaluatorError as exc:
+        # errors.py already phrases these for students; never show a traceback.
+        st.error(exc.user_message)
 
     # Grade first, then record: the attempt's scores are part of the history
     # row the recommender reads. And record before assembling features —

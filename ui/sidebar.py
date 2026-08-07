@@ -1,13 +1,55 @@
+import json
 import os
+import urllib.request
 
 import streamlit as st
 
 # Label shown to the user -> the value contracts.types expects. client.py raises
 # ValueError on anything else, so the contract value is what must be stored.
+# "ollama" really means "any OpenAI-compatible server", which is the whole
+# point of BYOM — the label says so even though the contract value can't.
 PROVIDERS = {
-    "Local Ollama (Gemma)": "ollama",
+    "Local model (Ollama / LM Studio / any OpenAI-compatible server)": "ollama",
     "OpenAI Cloud": "openai",
 }
+
+DEFAULT_LOCAL_URL = "http://localhost:11434/v1"
+OTHER = "Other (type it below)"
+
+
+@st.cache_data(ttl=30, show_spinner=False)
+def list_local_models(base_url: str):
+    """Ask an Ollama server what it actually has installed.
+
+    Returns [] for anything that isn't a reachable Ollama — LM Studio, vLLM and
+    llama.cpp serve the OpenAI API but not /api/tags, and that is fine: the UI
+    falls back to a free-text field so any model name still works.
+    """
+    root = base_url.rstrip("/").removesuffix("/v1")
+    try:
+        with urllib.request.urlopen(f"{root}/api/tags", timeout=2) as response:
+            payload = json.load(response)
+        return sorted(m["name"] for m in payload.get("models", []))
+    except Exception:
+        return []
+
+
+def _local_model_picker(base_url):
+    """Pick from what's installed, but never trap the user in the list."""
+    installed = list_local_models(base_url)
+
+    if not installed:
+        st.sidebar.caption(
+            "No model list from this server — type the name your server uses."
+        )
+        return st.sidebar.text_input("Model name", value="gemma2")
+
+    choice = st.sidebar.selectbox("Model", installed + [OTHER])
+
+    if choice == OTHER:
+        return st.sidebar.text_input("Model name", value="")
+
+    return choice
 
 
 def render_sidebar():
@@ -15,9 +57,50 @@ def render_sidebar():
 
     label = st.sidebar.radio("Choose Model Provider", list(PROVIDERS))
 
-    st.session_state["model_provider"] = PROVIDERS[label]
+    provider = PROVIDERS[label]
 
-    st.sidebar.write(f"Selected: {label}")
+    base_url = None
+
+    # Only the cloud provider needs a key. Pre-filled from OPENAI_API_KEY so a
+    # student with a .env never types it; masked either way, and it lives in
+    # session state only — never written to disk or into a session transcript.
+    api_key = None
+
+    if provider == "ollama":
+        # Editable so the model can live anywhere: another port, LM Studio on
+        # 1234, a lab machine on the LAN, or a teammate's box.
+        base_url = st.sidebar.text_input(
+            "Server URL",
+            value=DEFAULT_LOCAL_URL,
+            help="Any OpenAI-compatible endpoint. Ollama defaults to "
+            "http://localhost:11434/v1; LM Studio uses http://localhost:1234/v1.",
+        )
+
+        model = _local_model_picker(base_url)
+
+    else:
+        model = st.sidebar.text_input("Model name", value="gpt-4o-mini")
+
+        api_key = st.sidebar.text_input(
+            "OpenAI API key",
+            type="password",
+            value=os.environ.get("OPENAI_API_KEY", ""),
+            help="Stored for this browser session only.",
+        )
+
+        if not api_key:
+            st.sidebar.warning("An API key is required for the cloud provider.")
+
+    if not model:
+        st.sidebar.warning("Enter a model name before submitting.")
+
+    # The whole evaluator reads this one dict — see evaluator/client.py.
+    st.session_state["byom_config"] = {
+        "provider": provider,
+        "model": model,
+        "api_key": api_key,
+        "base_url": base_url,
+    }
 
     st.sidebar.divider()
 

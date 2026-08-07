@@ -1,3 +1,4 @@
+from contracts.types import LLMHint
 from evaluator.client import make_client, complete
 from evaluator.prompts import HINT_PROMPT_V1_SYSTEM, HINT_PROMPT_V1_USER_TEMPLATE
 
@@ -28,7 +29,6 @@ def get_hint(code: str, question: dict, failed_case_summary: str, byom_config: d
         timeout=150.0,
     )
 
-    return {
-        "provider": byom_config.get("provider"),
-        "hint_text": hint_text,
-    }
+    # The contract type, not a dict — ui/results.py reads .hint_text, and
+    # LLMHint is what contracts/types.py froze on Jul 31.
+    return LLMHint(provider=byom_config.get("provider"), hint_text=hint_text)

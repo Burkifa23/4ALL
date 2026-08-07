@@ -12,7 +12,7 @@ for entry in GOLDEN_SET:
     scores = []
     for run in range(RUNS_PER_SOLUTION):
         result = evaluate_complexity(entry["code"], question, config)
-        scores.append(result["efficiency_score"])
+        scores.append(result.efficiency_score)
 
     variance = max(scores) - min(scores)
     within_1 = all(abs(s - entry["efficiency_score"]) <= 1 for s in scores)

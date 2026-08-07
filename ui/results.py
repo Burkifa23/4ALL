@@ -28,9 +28,20 @@ def show_result():
         if "evaluation" in st.session_state:
             evaluation = st.session_state["evaluation"]
 
-            st.write("Big O:", evaluation.big_o_time)
+            st.code(evaluation.big_o_time, language="text")
 
-            st.write("Efficiency:", evaluation.efficiency_score)
+            # Both scores are shown: the recommender routes on efficiency AND
+            # style, so grading a student on a dimension they never see would
+            # make the adaptive decisions unexplainable.
+            left, right = st.columns(2)
+
+            left.metric("Efficiency", f"{evaluation.efficiency_score}/5")
+
+            right.metric("Style", f"{evaluation.style_score}/5")
+
+            if evaluation.raw_feedback:
+                with st.expander("Model feedback"):
+                    st.write(evaluation.raw_feedback)
 
     elif result.status == "failed":
         st.error(f"Failed {result.tests_passed}/{result.tests_total}")

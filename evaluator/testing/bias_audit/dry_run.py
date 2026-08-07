@@ -21,10 +21,10 @@ for solution in DRY_RUN_SOLUTIONS:
                     "base_id": base_id,
                     "variant": variant_name,
                     "repetition": rep + 1,
-                    "efficiency_score": result["efficiency_score"],
-                    "style_score": result["style_score"],
-                    "big_o_time": result["big_o_time"],
-                    "raw_feedback": result["raw_feedback"],
+                    "efficiency_score": result.efficiency_score,
+                    "style_score": result.style_score,
+                    "big_o_time": result.big_o_time,
+                    "raw_feedback": result.raw_feedback,
                 }
             )
 

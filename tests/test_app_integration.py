@@ -19,18 +19,31 @@ Note that `starter_code` itself yields "failed", not "error": it ships with a
 """
 
 import json
+import os
 import sys
 import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+# Must be set before app.py is imported: it selects evaluator.stub over the real
+# LLM path, so the suite runs offline and fast. The stub's hardcoded 4/5 is what
+# the score assertions below deliberately pin.
+os.environ["EVALUATOR_MODE"] = "stub"
+
 from streamlit.testing.v1 import AppTest  # noqa: E402
 
+from contracts.types import LLMEvaluation, LLMHint  # noqa: E402
 from recommender import engine  # noqa: E402
+from ui import history as ui_history  # noqa: E402
+from ui.sidebar import OTHER as OTHER_LABEL  # noqa: E402
 
 # data/predictions.jsonl is the Week 13 evaluation dataset — keep test runs out.
 engine.PREDICTION_LOG = Path(tempfile.gettempdir()) / "recommender_apptest.jsonl"
+
+# Same for session transcripts: test sessions must not land in data/sessions/.
+SESSIONS_TMP = Path(tempfile.mkdtemp(prefix="sessions_"))
+ui_history.SESSIONS_DIR = SESSIONS_TMP
 
 QUESTIONS = {
     q["question_id"]: q
@@ -109,6 +122,16 @@ def button_label(app):
 
 def difficulty_of(question_id):
     return QUESTIONS[question_id]["difficulty"]
+
+
+def sidebar_input(app, label):
+    """Find a sidebar text input by label — position shifts as fields change."""
+    for field in app.sidebar.text_input:
+        if field.label == label:
+            return field
+    raise AssertionError(
+        f"no sidebar input {label!r}; have {[f.label for f in app.sidebar.text_input]}"
+    )
 
 
 def test_app_starts_clean():
@@ -331,10 +354,166 @@ def test_never_reserves_a_served_question():
     assert len(served) == len(set(served)), f"repeat served: {served}"
 
 
-def test_provider_is_the_contract_value():
-    """client.py raises on anything but 'ollama'/'openai' — not the UI label."""
+def test_byom_config_is_assembled():
+    """The evaluator reads one dict. client.py does byom_config.get('provider'),
+    so passing a bare string here is an AttributeError on the first submission."""
     app = run_app()
-    assert app.session_state["model_provider"] in ("ollama", "openai")
+    config = app.session_state["byom_config"]
+
+    assert isinstance(config, dict), config
+    # client.py raises ValueError on anything but these — not the UI label.
+    assert config["provider"] in ("ollama", "openai"), config
+    assert config["model"], "a model name is required by evaluator.client"
+    assert "api_key" in config
+    # base_url is what lets a user point at their own server / own model.
+    assert "base_url" in config
+
+
+def test_any_model_name_is_accepted():
+    """BYOM means any model the user has pulled — qwen, deepseek, whatever —
+    not a fixed dropdown. The local model field must be free text."""
+    app = run_app()
+
+    # With no local server reachable the picker falls back to a text input.
+    sidebar_input(app, "Model name").set_value("qwen2.5-coder:7b").run()
+
+    assert app.session_state["byom_config"]["model"] == "qwen2.5-coder:7b"
+
+
+def test_local_server_url_is_editable():
+    """A model can live on another port or another machine."""
+    from ui.sidebar import DEFAULT_LOCAL_URL, list_local_models
+
+    app = run_app()
+    assert app.session_state["byom_config"]["base_url"] == DEFAULT_LOCAL_URL
+
+    # Discovery must degrade quietly on a server that has no /api/tags.
+    assert list_local_models("http://localhost:9/v1") == []
+
+
+def fake_ollama(models):
+    """A stand-in Ollama serving /api/tags, so discovery is testable offline."""
+    import http.server
+    import threading
+
+    payload = json.dumps({"models": [{"name": m} for m in models]}).encode()
+
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            body = payload if self.path == "/api/tags" else b"{}"
+            self.send_response(200 if self.path == "/api/tags" else 404)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            pass
+
+    server = http.server.HTTPServer(("127.0.0.1", 0), Handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return server, f"http://127.0.0.1:{server.server_port}/v1"
+
+
+def test_installed_models_are_discovered():
+    """The sidebar should offer whatever the user has actually pulled —
+    that is what makes 'bring your own model' concrete rather than a dropdown
+    of three names somebody hardcoded."""
+    from ui.sidebar import list_local_models
+
+    server, url = fake_ollama(["qwen2.5-coder:7b", "deepseek-coder:6.7b", "gemma2"])
+    try:
+        assert list_local_models(url) == [
+            "deepseek-coder:6.7b",
+            "gemma2",
+            "qwen2.5-coder:7b",
+        ]
+
+        # ...and picking one through the UI puts it in byom_config.
+        app = run_app()
+        sidebar_input(app, "Server URL").set_value(url).run()
+
+        options = app.sidebar.selectbox[0].options
+        assert "qwen2.5-coder:7b" in options, options
+        assert OTHER_LABEL in options, "must always allow a name not in the list"
+
+        app.sidebar.selectbox[0].set_value("qwen2.5-coder:7b").run()
+        config = app.session_state["byom_config"]
+        assert config["model"] == "qwen2.5-coder:7b"
+        assert config["base_url"] == url
+    finally:
+        server.shutdown()
+
+
+def test_evaluator_stub_and_real_share_a_signature():
+    """app.py swaps these by env var, so their contracts must be identical."""
+    import inspect
+
+    from evaluator import grading, hints, stub
+
+    def params(fn):
+        return list(inspect.signature(fn).parameters)
+
+    assert params(stub.evaluate_complexity) == params(grading.evaluate_complexity)
+    assert params(stub.get_hint) == params(hints.get_hint)
+    # ...and both must produce the frozen contract types, not dicts.
+    config = {"provider": "ollama", "model": "gemma2"}
+    assert isinstance(stub.evaluate_complexity("", {}, config), LLMEvaluation)
+    assert isinstance(stub.get_hint("", {}, "", config), LLMHint)
+
+
+def test_session_transcript_is_written():
+    """data/sessions/<id>.json is the transcript source the Week 13
+    evaluation plan depends on — it had no producer at all before this."""
+    app = submit(run_app(), failing_code)
+
+    session_id = app.session_state["session_id"]
+    path = SESSIONS_TMP / f"{session_id}.json"
+    assert path.exists(), f"no transcript at {path}"
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    assert payload["session_id"] == session_id
+    assert len(payload["history"]) == 1
+    assert payload["provider"] in ("ollama", "openai")
+    assert payload["history"][0]["question_id"] == "q_0001"
+    # An API key must never reach disk.
+    assert "api_key" not in json.dumps(payload)
+
+    submit(app, failing_code)
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    assert len(payload["history"]) == 2, "transcript must grow with the session"
+
+
+def test_evaluator_failure_does_not_break_the_session():
+    """Ollama being down must not abort a submission or lose the attempt."""
+    from evaluator import stub
+    from evaluator.errors import EvaluatorError
+
+    # app.py re-runs `from evaluator.stub import get_hint` on every script run,
+    # so patching the module attribute is what reaches it.
+    original = stub.get_hint
+
+    def boom(*args, **kwargs):
+        raise EvaluatorError("Couldn't reach the model.")
+
+    stub.get_hint = boom
+    try:
+        app = run_app()
+        app.text_area[0].set_value(failing_code(current_id(app)))
+        app.button(key="submit_code_btn").click().run()
+        assert not app.exception, app.exception
+    finally:
+        stub.get_hint = original
+
+    # The friendly message is shown...
+    assert any("reach the model" in str(e.value) for e in app.error), [
+        str(e.value) for e in app.error
+    ]
+    # ...and the attempt is still recorded, unscored, and still routed.
+    attempt = app.session_state["history"][-1]
+    assert attempt["result"] == "failed"
+    assert attempt["efficiency_score"] is None
+    assert app.session_state["recommendation"].decision == "reinforce"
 
 
 def test_baseline_mode_switch():

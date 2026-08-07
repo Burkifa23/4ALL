@@ -1,4 +1,5 @@
 import json
+from contracts.types import LLMEvaluation
 from evaluator.client import make_client, complete
 from evaluator.prompts import GRADER_PROMPT_V2_SYSTEM, GRADER_PROMPT_V1_USER_TEMPLATE
 from evaluator.parsing import parse_evaluation, strip_fences
@@ -99,6 +100,8 @@ Now evaluate this code:
             timeout=150.0,
         )
 
-    result = parse_evaluation(raw_text, provider)
-    _EVALUATION_CACHE[cache_key] = result
-    return result
+    # parse_evaluation stays a dict-returning parser (it has other callers);
+    # constructing the frozen contract type is this layer's job.
+    evaluation = LLMEvaluation(**parse_evaluation(raw_text, provider))
+    _EVALUATION_CACHE[cache_key] = evaluation
+    return evaluation
