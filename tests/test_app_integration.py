@@ -134,6 +134,16 @@ def sidebar_input(app, label):
     )
 
 
+def sidebar_selectbox(app, label):
+    for field in app.sidebar.selectbox:
+        if field.label == label:
+            return field
+    raise AssertionError(
+        f"no sidebar selectbox {label!r}; "
+        f"have {[f.label for f in app.sidebar.selectbox]}"
+    )
+
+
 def test_app_starts_clean():
     app = run_app()
     assert current_id(app) == "q_0001"
@@ -361,17 +371,16 @@ def test_byom_config_is_assembled():
     config = app.session_state["byom_config"]
 
     assert isinstance(config, dict), config
-    # client.py raises ValueError on anything but these — not the UI label.
-    assert config["provider"] in ("ollama", "openai"), config
+    assert config["provider"], config
     assert config["model"], "a model name is required by evaluator.client"
     assert "api_key" in config
     # base_url is what lets a user point at their own server / own model.
-    assert "base_url" in config
+    assert config["base_url"], "every provider needs an endpoint, not just local"
 
 
 def test_any_model_name_is_accepted():
     """BYOM means any model the user has pulled — qwen, deepseek, whatever —
-    not a fixed dropdown. The local model field must be free text."""
+    not a fixed dropdown. The model field must be free text."""
     app = run_app()
 
     # With no local server reachable the picker falls back to a text input.
@@ -380,32 +389,83 @@ def test_any_model_name_is_accepted():
     assert app.session_state["byom_config"]["model"] == "qwen2.5-coder:7b"
 
 
-def test_local_server_url_is_editable():
-    """A model can live on another port or another machine."""
-    from ui.sidebar import DEFAULT_LOCAL_URL, list_local_models
+def test_every_provider_gets_a_url_and_a_key_field():
+    """The old design gave a URL only to the local branch and a key only to the
+    cloud branch, so a hosted non-OpenAI provider fitted neither."""
+    from ui.sidebar import DEFAULT_LOCAL_URL, PRESETS
 
     app = run_app()
     assert app.session_state["byom_config"]["base_url"] == DEFAULT_LOCAL_URL
 
-    # Discovery must degrade quietly on a server that has no /api/tags.
-    assert list_local_models("http://localhost:9/v1") == []
+    labels = [f.label for f in app.sidebar.text_input]
+    assert "Server URL" in labels and "API key" in labels, labels
+
+    for name, preset in PRESETS.items():
+        app.sidebar.selectbox[0].set_value(name).run()
+        config = app.session_state["byom_config"]
+
+        assert config["provider"] == preset["provider"]
+        assert config["base_url"] == preset["base_url"]
+        assert "Server URL" in [f.label for f in app.sidebar.text_input]
+        assert "API key" in [f.label for f in app.sidebar.text_input]
+
+    # Presets are starting points: the URL is editable for every one of them.
+    app.sidebar.selectbox[0].set_value("Groq").run()
+    sidebar_input(app, "Server URL").set_value("https://my-gateway.internal/v1").run()
+    assert (
+        app.session_state["byom_config"]["base_url"]
+        == "https://my-gateway.internal/v1"
+    )
 
 
-def fake_ollama(models):
-    """A stand-in Ollama serving /api/tags, so discovery is testable offline."""
+def fake_endpoint(models, chat_error=None, require_key=None):
+    """A stand-in OpenAI-compatible server, so BYOM is testable offline.
+
+    models: what GET /v1/models reports. Pass None to omit the endpoint, which
+        is how some servers (llama.cpp, older vLLM) behave.
+    chat_error: message to return as a 400 from /v1/chat/completions.
+    require_key: if set, requests without this bearer token get a 401.
+    """
     import http.server
     import threading
 
-    payload = json.dumps({"models": [{"name": m} for m in models]}).encode()
+    listing = (
+        json.dumps(
+            {"object": "list", "data": [{"id": m, "object": "model"} for m in models]}
+        ).encode()
+        if models is not None
+        else None
+    )
+    error_body = json.dumps(
+        {"error": {"message": chat_error, "type": "invalid_request_error"}}
+    ).encode()
 
     class Handler(http.server.BaseHTTPRequestHandler):
-        def do_GET(self):
-            body = payload if self.path == "/api/tags" else b"{}"
-            self.send_response(200 if self.path == "/api/tags" else 404)
+        def _send(self, status, body):
+            self.send_response(status)
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+
+        def _authorised(self):
+            if require_key is None:
+                return True
+            return self.headers.get("Authorization") == f"Bearer {require_key}"
+
+        def do_GET(self):
+            if not self._authorised():
+                self._send(401, b'{"error": {"message": "bad key"}}')
+            elif self.path == "/v1/models" and listing is not None:
+                self._send(200, listing)
+            else:
+                self._send(404, b"{}")
+
+        def do_POST(self):
+            if not self._authorised():
+                self._send(401, b'{"error": {"message": "bad key"}}')
+            else:
+                self._send(400, error_body)
 
         def log_message(self, *args):
             pass
@@ -415,15 +475,236 @@ def fake_ollama(models):
     return server, f"http://127.0.0.1:{server.server_port}/v1"
 
 
-def test_installed_models_are_discovered():
-    """The sidebar should offer whatever the user has actually pulled —
-    that is what makes 'bring your own model' concrete rather than a dropdown
-    of three names somebody hardcoded."""
-    from ui.sidebar import list_local_models
+def test_server_without_a_model_list_falls_back_to_free_text():
+    """Not every OpenAI-compatible server implements /v1/models. Discovery must
+    come up empty rather than erroring, so the free-text field is used."""
+    from evaluator.client import list_models
 
-    server, url = fake_ollama(["qwen2.5-coder:7b", "deepseek-coder:6.7b", "gemma2"])
+    server, url = fake_endpoint(models=None)
     try:
-        assert list_local_models(url) == [
+        assert list_models({"base_url": url}) == []
+
+        app = run_app()
+        sidebar_input(app, "Server URL").set_value(url).run()
+        sidebar_input(app, "Model name").set_value("gemma-4-e2b-it").run()
+
+        assert app.session_state["byom_config"]["model"] == "gemma-4-e2b-it"
+        assert app.session_state["byom_config"]["base_url"] == url
+    finally:
+        server.shutdown()
+
+
+def test_any_openai_compatible_provider_works():
+    """The regression that prompted this: a Groq key was sent to
+    api.openai.com and rejected 401, because the provider NAME chose the
+    endpoint. The URL must decide, and nothing else."""
+    from evaluator.client import make_client
+
+    # A hosted provider that is not OpenAI, with its own key.
+    server, url = fake_endpoint(models=["llama-3.3-70b-versatile"], require_key="gsk_x")
+
+    try:
+        config = {
+            "provider": "groq",
+            "base_url": url,
+            "api_key": "gsk_x",
+            "model": "llama-3.3-70b-versatile",
+        }
+        client = make_client(config)
+        assert str(client.base_url).rstrip("/") == url.rstrip("/"), client.base_url
+
+        from evaluator.client import list_models
+
+        assert list_models(config) == ["llama-3.3-70b-versatile"]
+
+        # ...and the wrong key is rejected by that server, not by OpenAI's.
+        assert list_models({**config, "api_key": "wrong"}) == []
+    finally:
+        server.shutdown()
+
+
+def test_provider_name_never_picks_the_endpoint():
+    """No provider name may be special-cased. An unknown one with a URL works;
+    a known one still honours an overriding URL."""
+    from evaluator.client import make_client
+
+    invented = make_client(
+        {"provider": "something-nobody-has-heard-of", "base_url": "http://x.test/v1"}
+    )
+    assert str(invented.base_url).rstrip("/") == "http://x.test/v1"
+
+    # "openai" must not force api.openai.com when a URL is given.
+    overridden = make_client({"provider": "openai", "base_url": "http://y.test/v1"})
+    assert "openai.com" not in str(overridden.base_url)
+
+
+def test_discovery_failure_says_why():
+    """A silent empty list leaves the user typing a model name blind — which is
+    how a typo becomes a 404 at submission time. Report the reason."""
+    from evaluator.client import fetch_models
+
+    # key rejected
+    server, url = fake_endpoint(models=["a"], require_key="right")
+    try:
+        models, reason = fetch_models({"base_url": url, "api_key": "wrong"})
+        assert models == []
+        assert "401" in reason, reason
+
+        models, reason = fetch_models({"base_url": url, "api_key": "right"})
+        assert models == ["a"] and reason is None
+    finally:
+        server.shutdown()
+
+    # endpoint has no listing at all
+    server, url = fake_endpoint(models=None)
+    try:
+        models, reason = fetch_models({"base_url": url})
+        assert models == []
+        assert "404" in reason, reason
+    finally:
+        server.shutdown()
+
+    # unreachable
+    models, reason = fetch_models({"base_url": "http://127.0.0.1:9/v1"})
+    assert models == [] and reason
+
+
+def test_wrong_model_name_is_shown_the_real_options():
+    """The endpoint knows which models exist; the user should not have to go
+    hunting through provider docs after a 404."""
+    from evaluator.client import fetch_models
+
+    server, url = fake_endpoint(
+        models=["llama-3.3-70b-versatile", "openai/gpt-oss-120b"],
+        chat_error="The model `grok` does not exist",
+    )
+    try:
+        config = {"provider": "groq", "base_url": url, "model": "grok"}
+        available, reason = fetch_models(config)
+
+        assert reason is None
+        assert config["model"] not in available
+        # this is what app.py puts in front of the user
+        assert "llama-3.3-70b-versatile" in available
+    finally:
+        server.shutdown()
+
+
+def test_missing_url_fails_loudly_instead_of_defaulting_to_openai():
+    """The SDK silently defaults to api.openai.com when base_url is None, which
+    reintroduces the same wrong assumption one layer down — a Groq key would be
+    sent to OpenAI and rejected 401."""
+    from evaluator.client import make_client
+    from evaluator.errors import EvaluatorError
+
+    try:
+        make_client({"provider": "custom", "base_url": "", "api_key": "gsk_x"})
+        raise AssertionError("expected an EvaluatorError")
+    except EvaluatorError as exc:
+        assert "server URL" in exc.user_message, exc.user_message
+
+
+def test_bare_host_url_gets_the_v1_suffix():
+    """LM Studio and Ollama both display their address without /v1, so that is
+    what people paste — and the SDK then posts to /chat/completions, which LM
+    Studio answers with HTTP 200 and an error body. Normalise it instead."""
+    from evaluator.client import normalise_base_url
+
+    assert normalise_base_url("http://localhost:1234") == "http://localhost:1234/v1"
+    assert normalise_base_url("http://localhost:1234/") == "http://localhost:1234/v1"
+    # already correct, and explicit paths are left alone
+    assert normalise_base_url("http://localhost:1234/v1") == "http://localhost:1234/v1"
+    assert normalise_base_url("http://host/custom/path") == "http://host/custom/path"
+    assert normalise_base_url("") == ""
+
+
+def test_a_200_with_no_completion_is_not_silently_swallowed():
+    """Some local servers report failure as 200 + an error body. `choices` is
+    then None, and indexing it used to raise a TypeError that map_error
+    flattened into 'something went wrong'."""
+    from evaluator.client import complete
+    from evaluator.errors import EvaluatorError
+
+    class FakeCompletions:
+        def create(self, **kwargs):
+            class Response:
+                choices = None
+                error = "Unexpected endpoint or method. (POST /chat/completions)"
+
+            return Response()
+
+    class FakeClient:
+        chat = type("chat", (), {"completions": FakeCompletions()})()
+
+    try:
+        complete(client=FakeClient(), model="m", system="s", user="u")
+        raise AssertionError("expected an EvaluatorError")
+    except EvaluatorError as exc:
+        assert "no completion" in exc.user_message
+        assert "/v1" in exc.user_message, "must point at the actual cause"
+        assert "Unexpected endpoint" in exc.detail, exc.detail
+
+
+def test_every_error_carries_technical_detail():
+    """The UI shows detail in an expander. Without it every misconfiguration
+    produces the same sentence and there is nothing to act on."""
+    import httpx
+    from openai import APIConnectionError, APITimeoutError
+
+    from evaluator.errors import map_error
+
+    request = httpx.Request("POST", "http://localhost:1234/v1/chat/completions")
+
+    for exc in (
+        APIConnectionError(request=request),
+        APITimeoutError(request=request),
+        RuntimeError("something unexpected"),
+    ):
+        mapped = map_error(exc)
+        assert mapped.detail, f"no detail for {type(exc).__name__}"
+        assert type(exc).__name__ in mapped.detail
+
+    # the catch-all must stop telling the user only to "try again"
+    generic = map_error(RuntimeError("boom"))
+    assert "details below" in generic.user_message
+
+
+def test_unusable_model_reports_the_servers_own_message():
+    """With free-text model names, 'this server can't give you that model' is
+    the most likely failure. The server's message is far more actionable than
+    a generic apology, so it must reach the student."""
+    from evaluator.client import complete, make_client
+    from evaluator.errors import EvaluatorError
+
+    server, url = fake_endpoint(models=None, chat_error="No models loaded.")
+    try:
+        config = {"provider": "ollama", "model": "nope", "base_url": url}
+        try:
+            complete(
+                client=make_client(config),
+                model="nope",
+                system="s",
+                user="u",
+                timeout=10,
+            )
+            raise AssertionError("expected the 400 to raise")
+        except EvaluatorError as exc:
+            assert "No models loaded." in exc.user_message, exc.user_message
+            assert "sidebar" in exc.user_message
+    finally:
+        server.shutdown()
+
+
+def test_available_models_are_discovered():
+    """The sidebar should offer whatever the endpoint actually serves — that is
+    what makes 'bring your own model' concrete rather than a dropdown of names
+    somebody hardcoded. Works via the OpenAI-standard /v1/models, so the same
+    code covers Ollama, LM Studio, Groq and OpenRouter alike."""
+    from evaluator.client import list_models
+
+    server, url = fake_endpoint(["qwen2.5-coder:7b", "deepseek-coder:6.7b", "gemma2"])
+    try:
+        assert list_models({"base_url": url}) == [
             "deepseek-coder:6.7b",
             "gemma2",
             "qwen2.5-coder:7b",
@@ -433,11 +714,11 @@ def test_installed_models_are_discovered():
         app = run_app()
         sidebar_input(app, "Server URL").set_value(url).run()
 
-        options = app.sidebar.selectbox[0].options
-        assert "qwen2.5-coder:7b" in options, options
-        assert OTHER_LABEL in options, "must always allow a name not in the list"
+        picker = sidebar_selectbox(app, "Model")
+        assert "qwen2.5-coder:7b" in picker.options, picker.options
+        assert OTHER_LABEL in picker.options, "must always allow a name not listed"
 
-        app.sidebar.selectbox[0].set_value("qwen2.5-coder:7b").run()
+        picker.set_value("qwen2.5-coder:7b").run()
         config = app.session_state["byom_config"]
         assert config["model"] == "qwen2.5-coder:7b"
         assert config["base_url"] == url

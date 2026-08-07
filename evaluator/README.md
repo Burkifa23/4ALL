@@ -104,6 +104,127 @@ another port or host, LM Studio (`http://localhost:1234/v1`), vLLM, llama.cpp.
 The local `api_key` also falls back to `"ollama"` rather than being hardcoded,
 since some local servers expect a real token.
 
+### 4. `errors.py` maps "bad or unloadable model" to the server's own message
+
+**Was:** `map_error` covered connection, auth, rate-limit and timeout. Everything
+else fell through to *"Something went wrong while contacting the model."*
+
+**Problem:** now that the sidebar accepts any model name against any server,
+"this server can't give you that model" is the **most likely** failure mode, and
+it landed in the generic bucket. Found while testing against LM Studio: asking
+for a model that won't load produced a 400 whose body said exactly what was
+wrong, and the UI replaced it with an apology.
+
+```
+BadRequestError 400
+{"error": {"message": "No models loaded. Please load a model in the developer
+ page or use the 'lms load' command.", "type": "invalid_request_error"}}
+```
+
+**Now:** a 400/404 whose message mentions the model passes the server's own text
+through — *"The model couldn't be used: No models loaded... Check the model name
+and Server URL in the sidebar."* Ollama's "model not found, try pulling it"
+surfaces the same way. Covered by
+`tests/test_app_integration.py::test_unusable_model_reports_the_servers_own_message`.
+
+### 5. Bare Server URLs get `/v1`, and 200-with-an-error-body is caught
+
+Both found from a real report of *"Something went wrong while contacting the
+model"* against LM Studio.
+
+**Cause.** LM Studio and Ollama both display their address as
+`http://localhost:1234` — so that is what people paste into the sidebar. The
+OpenAI SDK appends the route directly, producing `POST /chat/completions`
+instead of `POST /v1/chat/completions`. LM Studio's log showed it plainly:
+
+```
+[ERROR] Unexpected endpoint or method. (POST /chat/completions). Returning 200 anyway
+```
+
+**Two separate defects, both fixed:**
+
+1. `client.normalise_base_url` appends `/v1` when the URL is a bare host. An
+   explicit path is left alone, since not every server is mounted at `/v1`.
+2. **The SDK never raised.** LM Studio returns **HTTP 200** with an error body,
+   so the SDK produced `ChatCompletion(choices=None, error='Unexpected
+   endpoint...')` and `response.choices[0]` raised a `TypeError` — which
+   `map_error` flattened into the generic apology. `complete()` now checks
+   `response.choices` explicitly and surfaces the server's own text.
+
+### 6. `EvaluatorError` carries technical `detail`
+
+`user_message` stays student-facing; `detail` holds the exception type, HTTP
+status, request URL and the server's message. `app.py` renders it in a collapsed
+"Technical details" expander, so a student isn't shown a stack trace but whoever
+is wiring up a model has something to act on. Every `map_error` branch populates
+it, and the catch-all now says to open the details rather than just "try again".
+
+Setup and troubleshooting for all of this:
+[`docs/local_model_setup.md`](../docs/local_model_setup.md).
+
+### 7. The provider name no longer decides the endpoint
+
+**Was:** `make_client` branched on `provider`, hardcoding `"ollama"` → localhost
+and `"openai"` → `api.openai.com`, and raising `ValueError` on anything else.
+The sidebar matched: a URL field only on the local branch, a key field only on
+the cloud branch.
+
+**Problem:** any hosted OpenAI-compatible API that isn't OpenAI fitted neither
+branch. Reported with Groq — a `gsk_...` key was sent to `api.openai.com` and
+came back:
+
+```
+401 Incorrect API key provided: gsk_Ctnu****
+Request URL: https://api.openai.com/v1/chat/completions
+```
+
+**Now:** `make_client` reads `base_url`, `api_key` and `model` and branches on
+nothing. Any OpenAI-compatible endpoint works — Ollama, LM Studio, vLLM,
+llama.cpp, OpenAI, Groq, OpenRouter, Together, DeepSeek, a company gateway.
+Adding a provider is a row of data in `ui/sidebar.py::PRESETS`, never a code
+change, and **Custom** covers anything not listed.
+
+Three supporting changes:
+
+- **`LEGACY_BASE_URLS`** keeps configs that pass a provider name and no
+  `base_url` working — Person 2's `scratch_*.py` and `testing/` scripts all do
+  this. It is a lookup table of defaults, not behaviour.
+- **A missing URL now raises** rather than letting the SDK fall back to
+  `api.openai.com`, which was the same wrong assumption one layer down.
+- **`list_models(byom_config)`** replaces the Ollama-specific `/api/tags` probe
+  with the OpenAI-standard `GET /v1/models`, which Ollama, LM Studio, OpenAI,
+  Groq and OpenRouter all implement — one code path instead of per-provider
+  special cases. Returns `[]` on failure, so the UI falls back to free text and
+  nothing is ever gated behind the list.
+
+`contracts/types.py` widened `provider` from `Literal["ollama", "openai"]` to a
+free-text label, so a Groq run records `"groq"` instead of being mislabelled
+`"openai"`. Widening only — every previously valid value still is — and it
+matters because provider provenance feeds the Week 13 evaluation.
+
+### 8. Model discovery explains itself, and a bad model name lists the real ones
+
+**Was:** `list_models` returned `[]` on any failure. The sidebar then said
+*"This endpoint doesn't publish a model list"* and gave a free-text field.
+
+**Problem:** for a hosted provider that message is usually **wrong**. Groq does
+publish a list — it just 401s without a key, and most providers do the same. So
+the user was told the wrong thing and left typing a model id blind, which is
+exactly how `grok` (xAI's chatbot, not a Groq model id) got submitted and came
+back `404 model_not_found`.
+
+**Now:**
+
+- `fetch_models(config)` returns `(models, reason)` and the sidebar shows the
+  reason — *"the API key was rejected (401)"*, *"this endpoint has no /models
+  listing (404)"*, or the connection error. `list_models` remains as a thin
+  wrapper for existing callers.
+- A **Refresh model list** button bypasses the cache, for after pasting a key or
+  loading a model in LM Studio.
+- When a call fails and the chosen model isn't in the endpoint's list, `app.py`
+  **prints the available models** under the error. The endpoint knows the right
+  answer; the user shouldn't have to go hunting through provider docs.
+
 ---
 
 ## Still outstanding (Person 2's, untouched)

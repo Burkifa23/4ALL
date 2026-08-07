@@ -18,16 +18,25 @@ class SandboxResult:
     runtime_ms: int
 
 
+# Widened from Literal["ollama", "openai"] on Aug 7. The old pair could not name
+# a Groq or OpenRouter endpoint, so those runs had to be recorded as "openai" —
+# which is exactly the provenance the Week 13 evaluation must not get wrong.
+# Any OpenAI-compatible endpoint is supported, so this is a free-text label:
+# "ollama", "lmstudio", "openai", "groq", "openrouter", "custom", ...
+# Widening only; every value that was valid before still is.
+Provider = str
+
+
 @dataclass
 class LLMHint:
-    provider: Literal["ollama", "openai"]
+    provider: Provider
 
     hint_text: str
 
 
 @dataclass
 class LLMEvaluation:
-    provider: Literal["ollama", "openai"]
+    provider: Provider
 
     big_o_time: str
 

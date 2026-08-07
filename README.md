@@ -53,6 +53,10 @@ python tests/test_recommender.py
 ```
 
 
+> **Setting up a model?** Read **[docs/local_model_setup.md](docs/local_model_setup.md)** —
+> Ollama, LM Studio, OpenAI cloud, running with no model at all, and a
+> troubleshooting section for every error the app can show.
+
 ## Local Model Setup (Ollama)
 
 This project can run using a local AI model instead of a paid cloud API. Here's how to get that working on your machine.

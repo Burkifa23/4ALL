@@ -137,6 +137,39 @@ Two findings drove the design:
 brute-force code whose inefficiency is hidden *inside* a single loop. That is
 label noise the model inherits, and it is named in Limitations.
 
+### The calibration is model-specific — confirmed against Gemma 4 (Aug 7)
+
+The two findings above describe **gemma2 via Ollama**. Running the same
+evaluator against **Gemma 4 E2B (Q4_K_M) served by LM Studio** shows they do not
+transfer:
+
+| Code | Gemma 4 verdict |
+|---|---|
+| brute force (repeated `max`/`remove`) | `O(R^2 * C)`, **efficiency 2**, style 3 |
+| optimal (sort rows, sum column maxima) | `O(M * N log N)`, efficiency 5, style 5 |
+| reference solution incl. boilerplate | efficiency 3, **style 2** |
+
+**Gemma 4 emits efficiency 2, which gemma2 never did.** The simulator pins that
+cell to zero probability, so a Week 13 run on Gemma 4 would produce feature
+values the model never saw in training. The "never style 1" finding still holds
+on this evidence, but it rests on a handful of samples.
+
+Two consequences, both real:
+
+1. **Whatever model the Week 13 sessions use, the training calibration must
+   match it.** If the team runs on anything other than gemma2, re-derive the
+   score weights in `simulate.py` from that model's outputs and retrain — it is
+   two commands. Session transcripts record `model` and `base_url` precisely so
+   this is checkable after the fact rather than guessed.
+2. **This is the synthetic-real drift risk in Limitations, made concrete.** It
+   is no longer hypothetical, and the evaluation plan's §4 drift check should
+   report which model produced the real distributions.
+
+Latency is also model-specific and matters for the Aug 10 logistics: Gemma 4 E2B
+on this machine took **55–100 s per grading call** (and 460 s on the unusually
+long reference solution). Budget accordingly — five questions per test user is
+roughly ten minutes of pure model wait.
+
 ### Generated dataset
 
 `data/synthetic/logs_v1.csv` — 2,460 rows from 200 students.

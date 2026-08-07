@@ -77,6 +77,13 @@ different score profile — is the most likely explanation for any gap between
 the synthetic numbers and the human-agreement numbers. Record it either way;
 "no drift observed" is also a result.
 
+**Record which model produced the scores.** Session transcripts carry `model`
+and `base_url` for exactly this. The simulator's score distributions were
+calibrated on gemma2, and a spot check on Aug 7 showed Gemma 4 E2B emitting
+efficiency scores gemma2 never produced (see `docs/recommender_design.md` §3).
+If the sessions ran on anything but gemma2, that is a known source of drift and
+must be reported as such — not discovered afterwards.
+
 ## 5. If the model loses to the rules baseline
 
 Report it. Do not retune the model after seeing the human labels — that

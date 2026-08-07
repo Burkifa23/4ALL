@@ -8,6 +8,7 @@ from ui.editor import render_editor
 from ui.results import show_result
 from sandbox.runner import run_submission
 
+from evaluator.client import fetch_models
 from evaluator.errors import EvaluatorError
 from ui.question_loader import load_questions
 
@@ -100,6 +101,34 @@ if submitted:
     except EvaluatorError as exc:
         # errors.py already phrases these for students; never show a traceback.
         st.error(exc.user_message)
+
+        # A wrong model name is the commonest BYOM mistake, and the endpoint
+        # knows the right answer — so show it rather than making the user go
+        # hunting through a provider's docs.
+        available, _ = fetch_models(byom_config)
+
+        if available and byom_config.get("model") not in available:
+            st.warning(
+                f"**{byom_config.get('model')}** is not one of the "
+                f"{len(available)} models this endpoint offers. Pick one from "
+                "the sidebar's Model list:\n\n"
+                + "\n".join(f"- `{m}`" for m in available[:25])
+                + ("\n- ..." if len(available) > 25 else "")
+            )
+
+        # Whoever is wiring up a model needs the technical cause — but a
+        # student mid-assessment does not, so it stays collapsed.
+        if exc.detail:
+            with st.expander("Technical details"):
+                st.code(exc.detail, language="text")
+
+                st.caption(
+                    f"Provider {byom_config.get('provider')} - "
+                    f"model {byom_config.get('model')} - "
+                    f"server {byom_config.get('base_url') or 'provider default'}"
+                )
+
+                st.caption("Setup help: docs/local_model_setup.md")
 
     # Grade first, then record: the attempt's scores are part of the history
     # row the recommender reads. And record before assembling features —
