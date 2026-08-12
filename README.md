@@ -52,6 +52,31 @@ python tests/test_app_integration.py
 python tests/test_recommender.py
 ```
 
+```bash
+python tests/test_generated_question.py
+```
+
+## Custom Practice (fine-tuned question generator)
+
+The sidebar can write a **new** question for any topic you type, rather than
+serving one of the 50 in `data/questions/`.
+
+[`notebooks/finetune_codegen_tutor.ipynb`](notebooks/finetune_codegen_tutor.ipynb)
+fine-tunes `Qwen2.5-Coder-3B-Instruct` on `newfacade/LeetCodeDataset` with QLoRA
+in Google Colab and exports a ~2 GB GGUF that runs in Ollama. It reuses this
+repo's own ingest pipeline to build its training targets, so what the model is
+taught to emit and what `sandbox/runner.py` can execute are the same schema by
+construction — and its success metric is the app's own acceptance check, run on
+the model's real output.
+
+Every generated question is executed in the sandbox before it is shown: the
+model's reference solution must pass the model's test cases, or the question is
+regenerated. Generated questions never enter `data/questions/` and never move
+the student's position on the difficulty ladder.
+
+Setup, including `ollama create CodeGenTutor`, is in
+[docs/local_model_setup.md §5](docs/local_model_setup.md).
+
 
 > **Setting up a model?** Read **[docs/local_model_setup.md](docs/local_model_setup.md)** —
 > Ollama, LM Studio, OpenAI cloud, running with no model at all, and a

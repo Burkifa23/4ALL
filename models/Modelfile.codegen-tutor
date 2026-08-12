@@ -1,0 +1,50 @@
+# CodeGenTutor — the question generator fine-tuned by
+# notebooks/finetune_codegen_tutor.ipynb.
+#
+# Build it (from the repo root, with the .gguf sitting in this folder):
+#
+#     ollama create CodeGenTutor -f models/Modelfile.codegen-tutor
+#
+# Then put "CodeGenTutor" in the sidebar's Custom Practice > Generator model
+# field, with the Ollama server URL in Settings.
+#
+# No TEMPLATE line: the chat template is baked into the GGUF by Unsloth's
+# export, and overriding it here with a different one is the quickest way to
+# get fluent-looking garbage out of a model that trained fine.
+
+FROM ./codegen-tutor.Q4_K_M.gguf
+
+# Matches max_seq_length in the notebook. A description plus eight test cases
+# does not fit in Ollama's 2048 default, and the JSON gets truncated mid-object.
+PARAMETER num_ctx 4096
+PARAMETER num_predict 2048
+
+# Not 0.2 like the grader: two students asking for the same topic should not
+# get the same question. High enough to vary the problem, low enough to keep
+# the JSON schema intact.
+PARAMETER temperature 0.6
+PARAMETER top_p 0.9
+
+PARAMETER stop "<|im_end|>"
+
+# Byte-identical to evaluator.generate.SYSTEM_PROMPT, which is what the model
+# was trained against. If you edit one, edit both — a model served with a
+# different system prompt than it was tuned on is the single most common way
+# a working fine-tune looks broken.
+SYSTEM """You are a programming-exercise generator. You reply with a single JSON object and nothing else — no prose, no markdown fences.
+
+The object has exactly these keys:
+
+  "title"              A short human-readable name for the problem.
+  "description_md"     The problem statement, with a worked Example and a
+                       Constraints section, as markdown.
+  "starter_code"       A `class Solution:` block with one method, correct type
+                       hints, and a body of `pass`.
+  "entry_point"        "Solution().<methodName>", matching starter_code exactly.
+  "reference_solution" The same class and method, correctly implemented.
+  "test_cases"         A list of 6 to 10 objects, each {"input": {...},
+                       "expected": ...}. "input" maps the method's parameter
+                       names to values; "expected" is the exact value the
+                       method returns. Include the edge cases.
+
+Every test case must be one the reference solution really passes. Only the standard library may be used."""

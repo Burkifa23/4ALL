@@ -166,6 +166,58 @@ def render_sidebar():
     os.environ["RECOMMENDER_MODE"] = "baseline" if use_baseline else ""
 
 
+DIFFICULTIES = {"Easy": 1, "Medium": 2, "Hard": 3}
+
+# The tag from models/Modelfile.codegen-tutor. Editable, because the generator
+# is not always the fine-tuned model — any instruct model will attempt it, just
+# with a lower hit rate on the JSON schema.
+DEFAULT_GENERATOR = "CodeGenTutor"
+
+
+def render_custom_practice():
+    """Ask for a topic the question bank doesn't cover.
+
+    Returns {"topic", "difficulty", "model"} on submit, else None. The
+    generating itself happens in app.py, where the spinner and the
+    EvaluatorError handling for every other model call already live.
+    """
+    st.sidebar.divider()
+
+    st.sidebar.subheader("Custom Practice")
+
+    with st.sidebar.form("custom_practice"):
+        topic = st.text_input(
+            "Topic",
+            placeholder="Sliding Window",
+            help="Anything you want to drill. The model writes a fresh "
+            "question and its test cases.",
+        )
+
+        difficulty = st.selectbox("Difficulty", list(DIFFICULTIES), index=1)
+
+        model = st.text_input(
+            "Generator model",
+            value=DEFAULT_GENERATOR,
+            help="Uses the same server as the Settings above. The fine-tuned "
+            "model is the one that reliably returns the right JSON.",
+        )
+
+        submitted = st.form_submit_button("Generate question", use_container_width=True)
+
+    if not submitted:
+        return None
+
+    if not topic.strip():
+        st.sidebar.warning("Enter a topic first.")
+        return None
+
+    return {
+        "topic": topic.strip(),
+        "difficulty": DIFFICULTIES[difficulty],
+        "model": model.strip() or DEFAULT_GENERATOR,
+    }
+
+
 def show_recommendation():
     """Make the adaptive decision visible — otherwise routing looks like magic."""
 

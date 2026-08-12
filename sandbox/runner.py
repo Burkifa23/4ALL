@@ -22,11 +22,27 @@ WORKER_SCRIPT = Path(__file__).parent / "runner_worker.py"
 _question_cache = {}
 
 
-def _load_question(question_id) -> dict:
+def _prime_cache() -> None:
     if not _question_cache:
         for f in QUESTIONS_DIR.glob("q_*.json"):
             data = json.loads(f.read_text(encoding="utf-8"))
             _question_cache[data["question_id"]] = data
+
+
+def register_question(record: dict) -> None:
+    """Make a question runnable that was never written to data/questions/.
+
+    Generated questions (evaluator/generate.py) live only in memory and in
+    data/generated/. Priming first is not optional: an empty cache is the
+    "not loaded yet" signal, so registering into it before the disk pass would
+    make every real question disappear.
+    """
+    _prime_cache()
+    _question_cache[record["question_id"]] = record
+
+
+def _load_question(question_id) -> dict:
+    _prime_cache()
     if question_id not in _question_cache:
         raise ValueError(f"No question found with question_id={question_id!r}")
     return _question_cache[question_id]

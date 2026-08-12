@@ -162,6 +162,54 @@ back to a text field. Nothing is gated behind the list.
 
 ---
 
+## 5. CodeGenTutor — the question generator
+
+The sidebar's **Custom Practice** form writes a brand-new question for any topic
+you type, instead of serving one of the 50 in `data/questions/`. It needs a model
+that returns the app's question schema as JSON, which is what
+[`notebooks/finetune_codegen_tutor.ipynb`](../notebooks/finetune_codegen_tutor.ipynb)
+fine-tunes on Google Colab.
+
+Once the notebook has produced `codegen-tutor.Q4_K_M.gguf` (~2 GB):
+
+1. Put it in `models/` next to `Modelfile.codegen-tutor`. Unsloth exports it as
+   `unsloth.Q4_K_M.gguf`, so rename it to the name the Modelfile expects.
+
+2. Build it:
+
+```bash
+ollama create CodeGenTutor -f models/Modelfile.codegen-tutor
+```
+
+3. Set up **Settings** as usual (Local (Ollama), `http://localhost:11434/v1`),
+   then use **Custom Practice**: topic, difficulty, and the generator model name
+   — `CodeGenTutor` by default.
+
+The generator does **not** have to be the fine-tuned model. Any instruct model
+will attempt it and the app checks the result either way; the fine-tune just
+raises the hit rate a lot. `gpt-4o-mini` or a 70B on Groq will also work if you
+would rather not train anything.
+
+### What the app does with what the model returns
+
+Every generated question is run through the real sandbox **before the student
+sees it**: the model's own reference solution is executed against the model's own
+test cases, and the question is only served if they agree. A question that fails
+is regenerated once, then reported as an error. This is the check that stops a
+hallucinated `"expected"` value from handing someone an unsolvable problem.
+
+Generated questions are written to `data/generated/` for provenance and are
+never added to `data/questions/` — that folder is the recommender's question pool
+and the Week 13 evaluation set. They also never change your position on the
+difficulty ladder: routing stays anchored to the last real question, while the
+attempt itself still counts toward your pass rate.
+
+If a question is broken in a way the sandbox can't see — description and tests
+disagreeing, for instance — the **🚩 Report broken test** button under a failed
+submission logs it to `data/reports.jsonl` and offers to discard it.
+
+---
+
 ## Troubleshooting
 
 Every error in the app has a **Technical details** expander underneath it. Open
@@ -243,6 +291,22 @@ you don't need real grades.
 
 Budget for this when running test sessions: five questions per person is roughly
 ten minutes of pure model wait.
+
+### "Could not generate a working question about ..."
+
+Custom Practice asked twice and neither attempt survived the sandbox check. The
+Technical details expander says which of the two failure modes it was:
+
+- **`not JSON` / `missing or empty fields`** — the model isn't returning the
+  schema. Expected from a general chat model; use CodeGenTutor, or a stronger
+  model. If CodeGenTutor does this, check `num_ctx 4096` in the Modelfile: a
+  reply truncated at 2048 tokens is never valid JSON.
+- **`failed: 5/6 of its own test cases passed`** — the model wrote a problem and
+  then got one of its own answers wrong. Retry, or try a different topic; very
+  abstract topics ("dynamic programming on trees") fail this way more often than
+  concrete ones ("two pointers").
+
+Nothing is served when this happens — you stay on the question you were on.
 
 ### Scores look wrong or oddly harsh
 

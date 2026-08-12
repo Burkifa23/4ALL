@@ -45,6 +45,18 @@ engine.PREDICTION_LOG = Path(tempfile.gettempdir()) / "recommender_apptest.jsonl
 SESSIONS_TMP = Path(tempfile.mkdtemp(prefix="sessions_"))
 ui_history.SESSIONS_DIR = SESSIONS_TMP
 
+# And for the provenance copy of generated questions, and broken-test reports.
+from evaluator import generate as evaluator_generate  # noqa: E402
+from ui import results as ui_results  # noqa: E402
+
+evaluator_generate.GENERATED_DIR = Path(tempfile.mkdtemp(prefix="generated_"))
+ui_results.REPORTS_PATH = Path(tempfile.mkdtemp(prefix="reports_")) / "reports.jsonl"
+
+# The model-written question fixture lives with the checks that own it.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from test_generated_question import record as generated_record  # noqa: E402
+
 QUESTIONS = {
     q["question_id"]: q
     for q in (
@@ -265,6 +277,111 @@ def test_passing_always_moves_on():
     rec = app.session_state["recommendation"]
     assert rec.next_question_id != "q_0001"
     assert button_label(app) == "Next Question"
+
+
+# --- custom practice: a detour must not become a rung on the ladder --------
+
+
+def serve_generated(app):
+    """Put the app in the state Custom Practice leaves it in.
+
+    Deliberately not calling generate_question(): that needs a model, and what
+    is under test here is the routing, not the generating. app.py re-registers
+    from session_state on every rerun, so this exercises the real path.
+    """
+    record = generated_record()
+    app.session_state["generated"] = {record["question_id"]: record}
+    app.session_state["current_question_id"] = record["question_id"]
+    app.session_state["served"].append(record["question_id"])
+    app.run()
+    assert not app.exception, app.exception
+    return record
+
+
+def test_generated_question_is_served_and_runnable():
+    app = run_app()
+    record = serve_generated(app)
+
+    assert current_id(app) == record["question_id"]
+
+    # It was never written to data/questions/, so this only works because
+    # app.py registered it with the sandbox.
+    app.text_area[0].set_value(record["reference_solution"])
+    app.button(key="submit_code_btn").click().run()
+    assert not app.exception, app.exception
+
+    result = app.session_state["sandbox_result"]
+    assert result.status == "passed", result
+    assert result.tests_total == record["test_case_count"]
+
+
+def test_generated_question_does_not_move_the_ladder():
+    """The bypass: a model-written question's difficulty and topic must not
+    drive the next routing decision, but the attempt still counts."""
+    app = submit(run_app(), failing_code)  # one real attempt on q_0001
+
+    assert app.session_state["anchor_question_id"] == "q_0001"
+
+    record = serve_generated(app)
+
+    app.text_area[0].set_value(record["reference_solution"])
+    app.button(key="submit_code_btn").click().run()
+    assert not app.exception, app.exception
+
+    # The work counts: the attempt is in history under its own id.
+    attempt = app.session_state["history"][-1]
+    assert attempt["question_id"] == record["question_id"]
+    assert attempt["result"] == "passed", attempt
+
+    # The routing does not: the decision was made from the anchor.
+    assert app.session_state["anchor_question_id"] == "q_0001"
+
+    logged = json.loads(engine.PREDICTION_LOG.read_text().strip().splitlines()[-1])
+    vector = logged["vector"]
+
+    assert vector["question_id"] == "q_0001", vector
+    assert vector["question_difficulty"] == 1, "a generated 'Medium' is not a rung"
+    assert vector["question_topic"] == QUESTIONS["q_0001"]["topic"]
+
+    # The detour neither reset nor inflated the anchor's attempt count...
+    assert vector["attempts_on_question"] == 1, vector
+    # ...but its outcome did carry into the decision.
+    assert vector["last_attempt_passed"] is True, vector
+
+    # And the question served next is a real one.
+    assert logged["next_question_id"] in QUESTIONS
+
+    advance(app)
+    assert current_id(app) in QUESTIONS
+    assert app.session_state["anchor_question_id"] == current_id(app)
+
+
+def test_reporting_a_broken_test_logs_it_and_can_discard_the_question():
+    """The backstop for a question that is self-consistent but still wrong."""
+    app = run_app()
+    record = serve_generated(app)
+
+    method = record["entry_point"].split(".")[-1]
+    app.text_area[0].set_value(
+        f"class Solution:\n    def {method}(self, *args, **kwargs):\n        return None\n"
+    )
+    app.button(key="submit_code_btn").click().run()
+
+    app.button(key="report_broken_test_btn").click().run()
+    assert not app.exception, app.exception
+
+    logged = json.loads(ui_results.REPORTS_PATH.read_text().strip().splitlines()[-1])
+    assert logged["question_id"] == record["question_id"]
+    assert logged["generated"] is True
+    assert logged["code"], "a report without the submission is unactionable"
+
+    # Only generated questions can be discarded — a curated one has a verified
+    # solution behind it, so the answer there is to keep trying.
+    app.button(key="discard_btn").click().run()
+    assert not app.exception, app.exception
+
+    assert current_id(app) == app.session_state["anchor_question_id"]
+    assert current_id(app) in QUESTIONS
 
 
 # --- regression: broken code must not be graded as good code ---------------
