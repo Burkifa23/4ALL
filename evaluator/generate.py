@@ -82,12 +82,12 @@ The object has exactly these keys:
                        hints, and a body of `pass`.
   "entry_point"        "Solution().<methodName>", matching starter_code exactly.
   "reference_solution" The same class and method, correctly implemented.
-  "test_cases"         A list of 6 to 10 objects, each {"input": {...},
-                       "expected": ...}. "input" maps the method's parameter
-                       names to values; "expected" is the exact value the
-                       method returns. Include the edge cases.
+  "test_cases"         A list of 6 to 10 objects, each {"input": {...}}.
+                       "input" maps the method's parameter names to values.
+                       Include the edge cases, and do not write expected
+                       values: they are computed by running your solution.
 
-Every test case must be one the reference solution really passes. Only the \
+Every input must be one the reference solution runs on without error. Only the \
 standard library may be used."""
 
 
@@ -157,6 +157,75 @@ def _parse(raw_text: str, topic: str, difficulty: int) -> dict:
     return _finalize(taught, topic, difficulty)
 
 
+# A 6-10 case schema that loses more than a few cases to exceptions is a
+# solution that half works, not a question worth serving.
+MIN_TEST_CASES = 4
+
+
+def _fill_expected(record: dict) -> Optional[str]:
+    """Replace the model's guessed `expected` values with what its reference
+    solution really returns. Returns None when the question is usable, else why
+    it isn't.
+
+    The schema asks the model to write working Python and then state, from
+    memory, what that code returns for each input — which is asking a 3B to be
+    an interpreter. It measured 0/20 on held-out topics, and no amount of
+    further fine-tuning addresses it (docs/codegen_tutor_findings.md).
+
+    So this does not *check* the expected values, it *defines* them. Every case
+    the solution actually runs becomes self-consistent by construction, and
+    what remains is a question that may not match its own prose — a far better
+    failure than one no student can finish.
+
+    Imported here, not at module scope, for the same reason _verify() is:
+    evaluator/ is otherwise sandbox-free so evaluator/stub.py can stand in.
+    """
+    from sandbox.runner import solution_outputs
+
+    outputs = solution_outputs(record)
+
+    if not outputs:
+        return "the reference solution did not run at all"
+
+    # Built explicitly rather than {**case, ...}: a model told not to write
+    # expected values will invent its own key for them anyway ("output" is the
+    # one seen in practice), and a test case carrying two answer fields that
+    # disagree is a question record nobody can read with confidence.
+    # A computed None is dropped, not kept. It nearly always means the solution
+    # ran off the end through a branch it never wrote — the model borrows a
+    # problem whose statement guarantees a match, writes the idiomatic solution
+    # with no no-match return, then invents an input with no match. Recording
+    # that None as the spec produces a question the description says is
+    # impossible, annotated -> List[int], that no correct reading can pass.
+    cases = [
+        {"input": case["input"], "expected": output["value"]}
+        for case, output in zip(record["test_cases"], outputs)
+        if output["ok"] and output["value"] is not None
+    ]
+
+    if len(cases) < MIN_TEST_CASES:
+        return (
+            f"only {len(cases)} of {len(outputs)} test inputs produced a usable "
+            f"result, need {MIN_TEST_CASES}"
+        )
+
+    values = [case["expected"] for case in cases]
+
+    # Computing expected by execution makes the tests true by construction —
+    # including for a solution that returns None for everything, which would
+    # yield a question passable by `return None`. That is the one new way this
+    # approach can hand out a worthless question, so it is the one it checks.
+    if all(value == values[0] for value in values):
+        return f"every test case expects {values[0]!r}, so a stub would pass"
+
+    if not any(values):
+        return "every test case expects a falsy value, so a stub would pass"
+
+    record["test_cases"] = cases
+    record["test_case_count"] = len(cases)
+    return None
+
+
 def _verify(record: dict) -> Optional[str]:
     """Run the model's own solution against the model's own tests.
 
@@ -205,10 +274,13 @@ def generate_question(topic: str, difficulty: int, byom_config: dict,
             client=client,
             model=config["model"],
             system=SYSTEM_PROMPT,
+            # The expected values are computed now, so there is no point asking
+            # the model to get them right — what it still has to get right is a
+            # solution that runs on every input it invented.
             user=user if attempt == 0 else (
                 f"{user}\n\nYour last attempt was rejected ({problems[-1]}). "
-                "Return only the JSON object, and make sure every expected "
-                "value is what the reference solution really returns."
+                "Return only the JSON object, and make sure the reference "
+                "solution runs without error on every test input."
             ),
             # Higher than the grader's 0.2: two students asking for the same
             # topic should not get the same question back.
@@ -220,6 +292,14 @@ def generate_question(topic: str, difficulty: int, byom_config: dict,
             record = _parse(raw, topic, difficulty)
         except EvaluatorError as exc:
             problems.append(exc.detail or exc.user_message)
+            continue
+
+        # Before verifying, replace the model's guessed expected values with the
+        # real ones. _verify() below stops being a coin flip and becomes an
+        # assertion that this worked.
+        problem = _fill_expected(record)
+        if problem is not None:
+            problems.append(problem)
             continue
 
         problem = _verify(record)

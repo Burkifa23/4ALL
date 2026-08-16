@@ -17,6 +17,20 @@ import json
 import sys
 
 
+def _round_trips(value) -> bool:
+    """Whether `value` survives the trip home unchanged.
+
+    JSON is the only channel out of this process, and a harvested value is
+    written back into a question as `expected`, where it is compared with ==.
+    Serialisable is not enough: a tuple encodes fine and comes back a list, and
+    (1, 2) != [1, 2] — which would make a correct solution fail its own tests.
+    """
+    try:
+        return json.loads(json.dumps(value)) == value
+    except (TypeError, ValueError):
+        return False
+
+
 def run_job(job: dict) -> dict:
     namespace = {}
     captured = io.StringIO()
@@ -43,6 +57,7 @@ def run_job(job: dict) -> dict:
 
     test_cases = job.get("test_cases", [])
     failures = []
+    outputs = []
     passed = 0
 
     for i, case in enumerate(test_cases):
@@ -51,7 +66,21 @@ def run_job(job: dict) -> dict:
                 result = candidate(**case["input"])
         except Exception as e:
             failures.append({"case": i, "reason": f"raised {type(e).__name__}: {e}"})
+            outputs.append({"ok": False, "reason": f"raised {type(e).__name__}"})
             continue
+
+        outputs.append(
+            {"ok": True, "value": result}
+            if _round_trips(result)
+            else {"ok": False, "reason": f"{type(result).__name__} is not JSON-stable"}
+        )
+
+        # A job with no "expected" is a harvest (sandbox.runner.solution_outputs)
+        # rather than a submission: there is nothing to compare against yet, and
+        # the caller reads `outputs`.
+        if "expected" not in case:
+            continue
+
         if result == case["expected"]:
             passed += 1
         else:
@@ -65,6 +94,7 @@ def run_job(job: dict) -> dict:
         "tests_passed": passed,
         "tests_total": len(test_cases),
         "failures": failures,
+        "outputs": outputs,
         "captured_stdout": captured.getvalue(),
     }
 

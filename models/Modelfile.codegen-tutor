@@ -16,8 +16,13 @@ FROM ./codegen-tutor.Q4_K_M.gguf
 
 # Matches max_seq_length in the notebook. A description plus eight test cases
 # does not fit in Ollama's 2048 default, and the JSON gets truncated mid-object.
+#
+# num_predict is 3072 for the same reason, measured rather than guessed: a
+# scored sample ran past 4050 characters and was still going. A cut-off object
+# fails json.loads identically to a malformed one, so this ceiling shows up as
+# "the model can't write JSON" when the model is writing it fine.
 PARAMETER num_ctx 4096
-PARAMETER num_predict 2048
+PARAMETER num_predict 3072
 
 # Not 0.2 like the grader: two students asking for the same topic should not
 # get the same question. High enough to vary the problem, low enough to keep
@@ -42,9 +47,9 @@ The object has exactly these keys:
                        hints, and a body of `pass`.
   "entry_point"        "Solution().<methodName>", matching starter_code exactly.
   "reference_solution" The same class and method, correctly implemented.
-  "test_cases"         A list of 6 to 10 objects, each {"input": {...},
-                       "expected": ...}. "input" maps the method's parameter
-                       names to values; "expected" is the exact value the
-                       method returns. Include the edge cases.
+  "test_cases"         A list of 6 to 10 objects, each {"input": {...}}.
+                       "input" maps the method's parameter names to values.
+                       Include the edge cases, and do not write expected
+                       values: they are computed by running your solution.
 
-Every test case must be one the reference solution really passes. Only the standard library may be used."""
+Every input must be one the reference solution runs on without error. Only the standard library may be used."""

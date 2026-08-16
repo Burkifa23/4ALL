@@ -48,6 +48,80 @@ def _load_question(question_id) -> dict:
     return _question_cache[question_id]
 
 
+def _run_worker(job: dict):
+    """Spawn the worker on `job`. Returns (result, failure, runtime_ms), where
+    exactly one of result/failure is None and failure is (status, summary,
+    stdout) — everything the caller needs to describe what went wrong.
+
+    Shared by run_submission() and solution_outputs() so the timeout, the crash
+    handling and the "worker answered with garbage" case have one definition
+    each. Callers are responsible for the security check BEFORE calling this;
+    the worker does not re-check.
+    """
+    start = time.monotonic()
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(WORKER_SCRIPT)],
+            input=json.dumps(job),
+            capture_output=True,
+            text=True,
+            timeout=TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        runtime_ms = int((time.monotonic() - start) * 1000)
+        return None, ("timeout", f"Exceeded {TIMEOUT_SECONDS}s time limit", ""), runtime_ms
+
+    runtime_ms = int((time.monotonic() - start) * 1000)
+
+    if proc.returncode != 0:
+        summary = f"Worker process crashed: {proc.stderr.strip()[:500]}"
+        return None, ("error", summary, ""), runtime_ms
+
+    try:
+        result = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        failure = ("error", "Worker produced invalid output", proc.stdout[:500])
+        return None, failure, runtime_ms
+
+    if result.get("crashed"):
+        summary = result.get("error", "Unknown error")
+        return None, ("error", summary, result.get("captured_stdout", "")), runtime_ms
+
+    return result, None, runtime_ms
+
+
+def solution_outputs(record: dict) -> list:
+    """What record["reference_solution"] really returns for each test input.
+
+    One {"ok": True, "value": ...} or {"ok": False, "reason": ...} per test
+    case, in order; [] if the solution never ran at all.
+
+    This exists because the generator model cannot predict its own code's
+    output — measured at 0/20 on held-out topics, see
+    docs/codegen_tutor_findings.md — so evaluator/generate.py computes the
+    expected values rather than trusting the ones the model wrote. Same AST
+    security check and same isolated subprocess as a student submission: this
+    is model-written code and gets no more trust than any other.
+    """
+    code = record["reference_solution"]
+
+    try:
+        is_safe, _ = check_code_security(code)
+    except SyntaxError:
+        return []
+
+    if not is_safe:
+        return []
+
+    result, failure, _ = _run_worker({
+        "code": code,
+        "entry_point": record["entry_point"],
+        "test_cases": record["test_cases"],
+    })
+
+    return [] if failure is not None else result.get("outputs", [])
+
+
 def run_submission(code: str, question_id) -> SandboxResult:
     # --- 1. Security check, before anything is ever executed ---
     try:
@@ -83,60 +157,17 @@ def run_submission(code: str, question_id) -> SandboxResult:
     }
 
     # --- 3. Run in an isolated subprocess with a timeout ---
-    start = time.monotonic()
-    try:
-        proc = subprocess.run(
-            [sys.executable, str(WORKER_SCRIPT)],
-            input=json.dumps(job),
-            capture_output=True,
-            text=True,
-            timeout=TIMEOUT_SECONDS,
-        )
-    except subprocess.TimeoutExpired:
-        runtime_ms = int((time.monotonic() - start) * 1000)
-        return SandboxResult(
-            status="timeout",
-            tests_passed=0,
-            tests_total=len(job["test_cases"]),
-            failed_case_summary=f"Exceeded {TIMEOUT_SECONDS}s time limit",
-            security_alert=None,
-            stdout="",
-            runtime_ms=runtime_ms,
-        )
-    runtime_ms = int((time.monotonic() - start) * 1000)
+    result, failure, runtime_ms = _run_worker(job)
 
-    if proc.returncode != 0:
+    if failure is not None:
+        status, summary, stdout = failure
         return SandboxResult(
-            status="error",
+            status=status,
             tests_passed=0,
             tests_total=len(job["test_cases"]),
-            failed_case_summary=f"Worker process crashed: {proc.stderr.strip()[:500]}",
+            failed_case_summary=summary,
             security_alert=None,
-            stdout="",
-            runtime_ms=runtime_ms,
-        )
-
-    try:
-        result = json.loads(proc.stdout)
-    except json.JSONDecodeError:
-        return SandboxResult(
-            status="error",
-            tests_passed=0,
-            tests_total=len(job["test_cases"]),
-            failed_case_summary="Worker produced invalid output",
-            security_alert=None,
-            stdout=proc.stdout[:500],
-            runtime_ms=runtime_ms,
-        )
-
-    if result.get("crashed"):
-        return SandboxResult(
-            status="error",
-            tests_passed=0,
-            tests_total=len(job["test_cases"]),
-            failed_case_summary=result.get("error", "Unknown error"),
-            security_alert=None,
-            stdout=result.get("captured_stdout", ""),
+            stdout=stdout,
             runtime_ms=runtime_ms,
         )
 

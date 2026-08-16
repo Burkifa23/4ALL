@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from data.ingest.validates_questions import REQUIRED_FIELDS  # noqa: E402
 from evaluator.errors import EvaluatorError  # noqa: E402
-from evaluator.generate import SYSTEM_PROMPT, _parse, _verify  # noqa: E402
+from evaluator.generate import SYSTEM_PROMPT, _fill_expected, _parse, _verify  # noqa: E402
 from sandbox import runner  # noqa: E402
 from sandbox.runner import register_question, run_submission  # noqa: E402
 
@@ -128,6 +128,79 @@ def test_registering_does_not_hide_the_questions_on_disk():
     real_id = json.loads(on_disk[0].read_text(encoding="utf-8"))["question_id"]
 
     assert real_id in runner._question_cache
+
+
+def test_expected_values_are_computed_not_trusted():
+    """The answer to the 0/20 self-consistency result: the model's expected
+    values are overwritten with what its solution really returns, so a model
+    that cannot do arithmetic in its head stops mattering."""
+    wrong = record()
+    wrong["question_id"] = "gen_wrong"
+    wrong["test_cases"] = [{**c, "expected": 999} for c in wrong["test_cases"]]
+
+    assert _fill_expected(wrong) is None, "a sound solution must survive"
+
+    assert [c["expected"] for c in wrong["test_cases"]] == [12, 4, 5, -3, 10, 9]
+    assert _verify(wrong) is None, "computed values must pass the gate they define"
+
+
+def test_a_stub_passable_question_is_rejected():
+    """The one new way this approach can hand out a worthless question: compute
+    expected from a solution that returns the same thing every time and the
+    tests are true, consistent, and passable by one line."""
+    stub = record()
+    stub["question_id"] = "gen_stub"
+    # A constant, not None: None is dropped case-by-case as an unhandled
+    # branch, so it never reaches this gate. This is the case that does.
+    stub["reference_solution"] = (
+        "class Solution:\n"
+        "    def maxWindowSum(self, nums, k):\n"
+        "        return 42\n"
+    )
+
+    problem = _fill_expected(stub)
+
+    assert problem is not None, "a stub-passable question must not reach a student"
+    assert "stub" in problem, problem
+
+
+def test_cases_the_solution_falls_off_the_end_of_are_dropped():
+    """gen_0005 in the wild: the model borrowed a problem whose statement
+    guarantees a match, wrote the idiomatic solution with no no-match return,
+    then invented inputs with no match. Recording those implicit Nones as the
+    spec produced a question the description called impossible."""
+    partial = record()
+    partial["question_id"] = "gen_partial"
+    partial["reference_solution"] = (
+        "class Solution:\n"
+        "    def maxWindowSum(self, nums, k):\n"
+        "        if len(nums) < 3:\n"
+        "            return None\n"          # the branch it never meant to take
+        "        return sum(nums[:k])\n"
+    )
+
+    assert _fill_expected(partial) is None, "the usable cases should still serve"
+
+    kept = partial["test_cases"]
+    assert all(c["expected"] is not None for c in kept), kept
+    assert len(kept) < 6, "the None cases must have been dropped"
+
+
+def test_values_that_would_not_survive_the_trip_home_are_dropped():
+    """A tuple encodes as JSON fine and comes back a list, and (1, 2) != [1, 2]
+    — which would make this correct solution fail its own tests later."""
+    tuples = record()
+    tuples["question_id"] = "gen_tuple"
+    tuples["reference_solution"] = (
+        "class Solution:\n"
+        "    def maxWindowSum(self, nums, k):\n"
+        "        return (max(nums), k)\n"
+    )
+
+    problem = _fill_expected(tuples)
+
+    assert problem is not None, "unstable values must not become expected values"
+    assert "0 of 6" in problem, problem
 
 
 def test_bad_model_output_raises_a_student_facing_error():
