@@ -1,6 +1,6 @@
 from contracts.types import LLMHint
 from evaluator.client import make_client, complete
-from evaluator.prompts import HINT_PROMPT_V1_SYSTEM, HINT_PROMPT_V1_USER_TEMPLATE
+from evaluator.prompts import HINT_PROMPT_V2_SYSTEM, HINT_PROMPT_V1_USER_TEMPLATE
 
 MAX_DESCRIPTION_CHARS = 1000
 
@@ -23,7 +23,7 @@ def get_hint(code: str, question: dict, failed_case_summary: str, byom_config: d
     hint_text = complete(
         client=client,
         model=byom_config.get("model", "gemma2"),
-        system=HINT_PROMPT_V1_SYSTEM,
+        system=HINT_PROMPT_V2_SYSTEM,
         user=user_prompt,
         temperature=0.2,
         timeout=150.0,

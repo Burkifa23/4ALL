@@ -1,0 +1,123 @@
+{
+  "prompt": "v2",
+  "n": 10,
+  "totals": {
+    "no_code": 9,
+    "under_120w": 10,
+    "cites_case": 1,
+    "grounded": 5,
+    "not_echo": 10
+  },
+  "hints": [
+    {
+      "qid": "q_0007",
+      "concept": "the stones must be smashed repeatedly, not once",
+      "hint": "The code is supposed to return the weight of the last remaining stone, but it is returning the difference between the heaviest and the lightest stone. The code should return the absolute value of the difference between the heaviest and the lightest stone.",
+      "no_code": false,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": true,
+      "words": 43
+    },
+    {
+      "qid": "q_0008",
+      "concept": "proper divisors exclude the number itself",
+      "hint": "The student's code is correct, but it exceeds the time limit for large inputs. The student should consider optimizing the code by reducing the number of iterations or using a more efficient algorithm.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": true,
+      "not_echo": true,
+      "words": 33
+    },
+    {
+      "qid": "q_0011",
+      "concept": "the centre cell of an odd matrix is on both diagonals",
+      "hint": "The student is missing the condition that the primary and secondary diagonals can overlap when n is odd.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": true,
+      "words": 18
+    },
+    {
+      "qid": "q_0012",
+      "concept": "letter counts matter, not just which letters appear",
+      "hint": "The student has overlooked the fact that the order of characters in the strings matters. The code only checks if the sets of characters in both strings are equal, but it does not check if the characters appear in the same order.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": true,
+      "not_echo": true,
+      "words": 42
+    },
+    {
+      "qid": "q_0014",
+      "concept": "the first and last beds have only one neighbour",
+      "hint": "The student's code is correct for the given problem statement. The student has correctly implemented the logic to check if n new flowers can be planted in the flowerbed without violating the no-adjacent-flowers rule. The student's code iterates through the flowerbed array, checking each plot to see if it is empty and if the adjacent plots are also empty. If a plot meets these conditions, the student sets the plot to 1 (indicating a flower has been planted) and increments the count of planted flowers. The student then returns true if the count of planted flowers is greater than or equal to n.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": true,
+      "not_echo": true,
+      "words": 103
+    },
+    {
+      "qid": "q_0005",
+      "concept": "removing a pair can create a new adjacent pair",
+      "hint": "The student's code does not handle the case where the string \"AB\" or \"CD\" appears multiple times in a row, which would result in an incorrect length.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": true,
+      "words": 27
+    },
+    {
+      "qid": "q_0003",
+      "concept": "equal values must share a rank",
+      "hint": "The student's code is correct for the given problem statement. However, it seems that the student's code is not handling the case where there are duplicate elements in the input array. The student's code is returning the correct rank for each element in the input array, but it is not handling the case where there are duplicate elements. For example, in the input array [37, 12, 28, 9, 100, 56, 80, 5, 12], the element 12 appears twice, but the student's code is returning the rank 3 for both occurrences of 12, which is incorrect. The correct rank for 12 should be 2, since 12 is the second smallest element in the input array.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": true,
+      "grounded": true,
+      "not_echo": true,
+      "words": 114
+    },
+    {
+      "qid": "q_0010",
+      "concept": "n characters need n+1 distinct numbers",
+      "hint": "The student's code does not handle the case when the string s ends with 'I'. The code only considers the case when the string s ends with 'D'.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": true,
+      "words": 28
+    },
+    {
+      "qid": "q_0001",
+      "concept": "every round removes the largest from each row",
+      "hint": "The student is trying to find the maximum value in each row and then sum them up. However, the student is not considering the maximum value in each column after removing the maximum value from each row. The student should consider the maximum value in each column after removing the maximum value from each row and then sum them up.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": true,
+      "not_echo": true,
+      "words": 60
+    },
+    {
+      "qid": "q_0004",
+      "concept": "a '#' marks the two digits before it as one letter",
+      "hint": "The student is trying to map each digit to its corresponding letter, but they are not handling the case where a digit is followed by a '#'. The student should check if the next character is a '#' before converting the current digit to a letter.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": true,
+      "words": 46
+    }
+  ]
+}

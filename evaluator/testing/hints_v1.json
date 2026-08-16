@@ -1,0 +1,123 @@
+{
+  "prompt": "v1",
+  "n": 10,
+  "totals": {
+    "no_code": 10,
+    "under_120w": 10,
+    "cites_case": 0,
+    "grounded": 0,
+    "not_echo": 0
+  },
+  "hints": [
+    {
+      "qid": "q_0007",
+      "concept": "the stones must be smashed repeatedly, not once",
+      "hint": "Consider what happens when the list is empty.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": false,
+      "words": 8
+    },
+    {
+      "qid": "q_0008",
+      "concept": "proper divisors exclude the number itself",
+      "hint": "Consider what happens when the list is empty.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": false,
+      "words": 8
+    },
+    {
+      "qid": "q_0011",
+      "concept": "the centre cell of an odd matrix is on both diagonals",
+      "hint": "Consider what happens when the list is empty.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": false,
+      "words": 8
+    },
+    {
+      "qid": "q_0012",
+      "concept": "letter counts matter, not just which letters appear",
+      "hint": "Consider what happens when the list is empty.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": false,
+      "words": 8
+    },
+    {
+      "qid": "q_0014",
+      "concept": "the first and last beds have only one neighbour",
+      "hint": "Consider what happens when the list is empty.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": false,
+      "words": 8
+    },
+    {
+      "qid": "q_0005",
+      "concept": "removing a pair can create a new adjacent pair",
+      "hint": "Consider what happens when the list is empty.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": false,
+      "words": 8
+    },
+    {
+      "qid": "q_0003",
+      "concept": "equal values must share a rank",
+      "hint": "Consider what happens when the list is empty.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": false,
+      "words": 8
+    },
+    {
+      "qid": "q_0010",
+      "concept": "n characters need n+1 distinct numbers",
+      "hint": "Consider what happens when the list is empty.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": false,
+      "words": 8
+    },
+    {
+      "qid": "q_0001",
+      "concept": "every round removes the largest from each row",
+      "hint": "Consider what happens when the list is empty.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": false,
+      "words": 8
+    },
+    {
+      "qid": "q_0004",
+      "concept": "a '#' marks the two digits before it as one letter",
+      "hint": "Consider what happens when the list is empty.",
+      "no_code": true,
+      "under_120w": true,
+      "cites_case": false,
+      "grounded": false,
+      "not_echo": false,
+      "words": 8
+    }
+  ]
+}
