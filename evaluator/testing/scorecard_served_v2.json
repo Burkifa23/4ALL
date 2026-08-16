@@ -1,0 +1,8 @@
+{
+  "served": {
+    "valid JSON": 13,
+    "all 6 fields": 13,
+    "tests self-consistent": 10
+  },
+  "n": 20
+}

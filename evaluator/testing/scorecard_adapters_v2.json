@@ -1,0 +1,13 @@
+{
+  "before": {
+    "valid JSON": 0,
+    "all 6 fields": 0,
+    "tests self-consistent": 0
+  },
+  "n": 20,
+  "after": {
+    "valid JSON": 14,
+    "all 6 fields": 14,
+    "tests self-consistent": 0
+  }
+}
