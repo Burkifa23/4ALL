@@ -35,4 +35,18 @@ data/reports.jsonl
 # artifact; the .gguf comes from notebooks/finetune_codegen_tutor.ipynb.
 *.gguf
 
+# The rest of what that notebook brings back from Kaggle. The merged fp16
+# weights alone are 5.9 GB, and every byte of this is reproducible: the
+# adapters and checkpoints are mirrored on the Hub, the caches are caches.
+# Only codegen-tutor/scorecard.json is evidence, and it belongs in the report.
+codegen-tutor/
+codegen-tutor_gguf/
+unsloth_compiled_cache/
+huggingface_tokenizers_cache/
+__huggingface_repos__.json
+
 .claude
+# The Kaggle upload copy of the fine-tuning notebook. notebooks/ is canonical
+# (README and docs/local_model_setup.md both point there); this one has now
+# drifted from it twice, which is what keeping two copies in git would cement.
+main.ipynb

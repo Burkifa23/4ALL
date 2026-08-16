@@ -168,7 +168,11 @@ The sidebar's **Custom Practice** form writes a brand-new question for any topic
 you type, instead of serving one of the 50 in `data/questions/`. It needs a model
 that returns the app's question schema as JSON, which is what
 [`notebooks/finetune_codegen_tutor.ipynb`](../notebooks/finetune_codegen_tutor.ipynb)
-fine-tunes on Google Colab.
+fine-tunes. It runs on **Colab or Kaggle GPU** (not TPU — Unsloth is CUDA-only),
+and writes its checkpoints, LoRA adapters and scorecard to Drive or
+`/kaggle/working`, so a disconnected session is resumed rather than restarted.
+Kaggle's *Save Version → Save & Run All* runs it server-side, which is the
+sturdier option for a full run.
 
 Once the notebook has produced `codegen-tutor.Q4_K_M.gguf` (~2 GB):
 
