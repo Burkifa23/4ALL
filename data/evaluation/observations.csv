@@ -1,0 +1,5 @@
+participant_code,recommendation_judged_reasonable,reason_for_that_judgement,hint_verdict,generated_question_solvable,verbatim_confusions,breakages,session_id,started_at,questions_attempted,passes,failures,generated_served,minutes_on_first_question,hint_shown,model,provider
+,,,,,,,20260814-153822-47e363,2026-08-14T15:38:22,1,1,0,2,,0,codegen-tutor_gguf/qwen2.5-coder-3b-instruct.Q4_K_M.gguf,ollama
+,,,,,,,20260814-155429-875dfb,2026-08-14T15:54:29,1,0,6,1,,0,codegen-tutor_gguf/qwen2.5-coder-3b-instruct.Q4_K_M.gguf,ollama
+,,,,,,,20260814-170038-c61fd0,2026-08-14T17:00:38,2,1,1,1,,0,codegen-tutor_gguf/qwen2.5-coder-3b-instruct.Q4_K_M.gguf,ollama
+,,,,,,,20260817-152947-c9106f,2026-08-17T15:29:47,1,1,1,0,0.9,1,models/codegen-tutor.Q4_K_M.gguf,ollama

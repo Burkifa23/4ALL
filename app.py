@@ -144,6 +144,14 @@ if submitted:
 
     st.session_state.pop("reported", None)
 
+    # Last attempt's hint and grade belong to the last attempt. Without this a
+    # pass that follows a failure renders the stale hint, and — since the
+    # transcript now stores the hint text — records it against the wrong
+    # submission.
+    st.session_state.pop("hint", None)
+
+    st.session_state.pop("evaluation", None)
+
     byom_config = st.session_state["byom_config"]
 
     model_name = byom_config.get("model", "the model")
@@ -215,6 +223,9 @@ if submitted:
         tests_passed=sandbox_result.tests_passed,
         tests_total=sandbox_result.tests_total,
         evaluation=evaluation,
+        # Read back from session_state rather than a local: the hint is set in
+        # the branch above only for a failed attempt, and a pass leaves it None.
+        hint=st.session_state.get("hint"),
     )
 
     # Route from the anchor, never from a generated question.

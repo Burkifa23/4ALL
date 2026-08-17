@@ -21,7 +21,8 @@ def initialize_history():
         st.session_state.session_started = datetime.now().isoformat(timespec="seconds")
 
 
-def add_attempt(question_id, result, tests_passed, tests_total, evaluation=None):
+def add_attempt(question_id, result, tests_passed, tests_total, evaluation=None,
+                hint=None):
     """Record one submission.
 
     evaluation: the LLMEvaluation for this attempt, when one was produced.
@@ -29,15 +30,29 @@ def add_attempt(question_id, result, tests_passed, tests_total, evaluation=None)
     recommender expects exactly that and falls back to its cold-start values.
     These two fields are what feed the model's efficiency/style features, so
     dropping them here silently degrades every recommendation.
+
+    hint: the LLMHint shown for a failed attempt, when one was produced.
+
+    The model's own words — the hint, the Big-O judgement and the one-line
+    feedback — are kept alongside the scores because they are shown to the
+    student and were otherwise lost the moment the page re-rendered. Any study
+    of feedback quality needs the text, not just the numbers, and a complexity
+    judgement that is never written down cannot be checked afterwards.
+    `timestamp` makes time-on-task recoverable from the transcript instead of
+    something an observer has to catch with a stopwatch.
     """
 
     attempt = {
         "question_id": question_id,
+        "timestamp": datetime.now().isoformat(timespec="seconds"),
         "result": result,
         "tests_passed": tests_passed,
         "tests_total": tests_total,
         "efficiency_score": evaluation.efficiency_score if evaluation else None,
         "style_score": evaluation.style_score if evaluation else None,
+        "big_o_time": evaluation.big_o_time if evaluation else None,
+        "raw_feedback": evaluation.raw_feedback if evaluation else None,
+        "hint_text": hint.hint_text if hint else None,
     }
 
     st.session_state.history.append(attempt)

@@ -14,6 +14,7 @@ per docs/human_rating_guide.md.
 """
 
 import argparse
+import csv
 import difflib
 import json
 import re
@@ -91,6 +92,33 @@ def rate(hint, code, failed_case_summary):
     }
 
 
+def write_sheet(path, rows):
+    """A blind rating sheet: what the rater needs, and nothing that gives it away.
+
+    `concept` is the answer key and is deliberately absent — a rater who can see
+    the intended answer is not judging the hint, they are matching it. The two
+    blank columns are the whole study: whether the hint points at the real bug,
+    and, when it does not, what it pointed at instead. The second is what makes
+    a low score diagnosable rather than merely disappointing.
+    """
+    fields = ["fixture", "buggy_submission", "failing_case", "hint",
+              "points_at_actual_bug", "pointed_at_instead"]
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fields)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({
+                "fixture": row["qid"],
+                "buggy_submission": row["code"],
+                "failing_case": row["failing_case"],
+                "hint": row["hint"],
+                "points_at_actual_bug": "",   # rater: yes / partly / no
+                "pointed_at_instead": "",
+            })
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prompt", choices=sorted(PROMPTS), default="v1")
@@ -98,6 +126,8 @@ def main():
     parser.add_argument("--model", default="codegen-tutor")
     parser.add_argument("--timeout", type=float, default=900.0)
     parser.add_argument("--out", type=Path)
+    parser.add_argument("--sheet", type=Path, metavar="CSV",
+                        help="also write a blind rating sheet for human raters")
     args = parser.parse_args()
 
     client = make_client({"base_url": args.base_url})
@@ -139,7 +169,8 @@ def main():
         print(f"      should name: {case['concept']}")
         print(f"      said:        {hint.strip()[:300]}\n")
         rows.append({"qid": case["qid"], "concept": case["concept"],
-                     "hint": hint.strip(), **scores})
+                     "hint": hint.strip(), "code": case["code"],
+                     "failing_case": result.failed_case_summary, **scores})
 
     n = len(rows)
     print("=" * 60)
@@ -152,6 +183,10 @@ def main():
             {"prompt": args.prompt, "n": n,
              "totals": {r: totals[r] for r in rules}, "hints": rows}, indent=2))
         print(f"\nsaved to {args.out}")
+
+    if args.sheet:
+        write_sheet(args.sheet, rows)
+        print(f"rating sheet: {args.sheet}")
 
 
 if __name__ == "__main__":

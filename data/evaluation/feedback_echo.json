@@ -1,0 +1,90 @@
+{
+  "n": 12,
+  "echoes": 3,
+  "rows": [
+    {
+      "id": "two_sum_decent",
+      "true_big_o": "O(N log N)",
+      "model_big_o": "O(NlogN)",
+      "echoed": false,
+      "feedback": "Correct, but not optimal."
+    },
+    {
+      "id": "valid_parens_brute",
+      "true_big_o": "O(N^2)",
+      "model_big_o": "O(N^2)",
+      "echoed": true,
+      "feedback": "String concatenation in a loop is quadratic in Python since strings are immutable."
+    },
+    {
+      "id": "valid_parens_decent",
+      "true_big_o": "O(N)",
+      "model_big_o": "O(N)",
+      "echoed": false,
+      "feedback": "Optimal stack approach, clean and idiomatic."
+    },
+    {
+      "id": "valid_parens_optimal",
+      "true_big_o": "O(N)",
+      "model_big_o": "O(N)",
+      "echoed": false,
+      "feedback": "Optimal stack approach, clean and idiomatic."
+    },
+    {
+      "id": "reverse_string_decent",
+      "true_big_o": "O(N)",
+      "model_big_o": "O(N)",
+      "echoed": false,
+      "feedback": "Optimal in-place reversal, clean and idiomatic."
+    },
+    {
+      "id": "reverse_string_optimal",
+      "true_big_o": "O(N)",
+      "model_big_o": "O(N)",
+      "echoed": false,
+      "feedback": "Optimal slicing approach, clean and idiomatic."
+    },
+    {
+      "id": "find_max_brute",
+      "true_big_o": "O(N^2)",
+      "model_big_o": "O(N^2)",
+      "echoed": true,
+      "feedback": "Brute force nested loop, correct and readable, but not optimal."
+    },
+    {
+      "id": "find_max_decent",
+      "true_big_o": "O(N)",
+      "model_big_o": "O(N)",
+      "echoed": false,
+      "feedback": "Optimal linear scan, clean and idiomatic."
+    },
+    {
+      "id": "find_max_optimal",
+      "true_big_o": "O(N)",
+      "model_big_o": "O(N)",
+      "echoed": false,
+      "feedback": "Optimal max function call, clean and idiomatic."
+    },
+    {
+      "id": "check_duplicates_brute",
+      "true_big_o": "O(N^2)",
+      "model_big_o": "O(N^2)",
+      "echoed": true,
+      "feedback": "Brute force nested loop, correct and readable, but not optimal."
+    },
+    {
+      "id": "check_duplicates_decent",
+      "true_big_o": "O(N log N)",
+      "model_big_o": "O(N log N)",
+      "echoed": false,
+      "feedback": "Correct but not optimal."
+    },
+    {
+      "id": "check_duplicates_optimal",
+      "true_big_o": "O(N)",
+      "model_big_o": "O(N)",
+      "echoed": false,
+      "feedback": "Optimal set comparison, clean and idiomatic."
+    }
+  ]
+}
